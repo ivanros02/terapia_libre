@@ -1,0 +1,23 @@
+:root {
+    --verde: #567c6f;
+    --naranja: #f1974c;
+    --crema: #d8d3bc;
+}
+
+
+@font-face {
+    font-family: 'Things Serif';
+    src: url('./fuente/things-serif-font/things.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Things Serif', serif;
+}
+
+h2 {
+    font-size: 3rem !important;
+}

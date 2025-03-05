@@ -1,0 +1,21 @@
+.hero-section {
+    background-image: url("../assets/home.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    min-height: 95vh;
+}
+
+.hero-section h1 {
+    margin-bottom: 0 !important;
+    /* Elimina el espacio debajo del h1 */
+    padding-bottom: 0 !important;
+    /* Por si hay relleno extra */
+    margin-top: 15rem !important;
+}
+
+.hero-section p {
+    margin-top: -5px !important;
+    /* Acerca aún más el p al h1 */
+}

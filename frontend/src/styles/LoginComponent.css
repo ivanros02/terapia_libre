@@ -1,0 +1,23 @@
+.bg-transparent {
+    background-color: transparent !important; /* Asegura que sea transparente */
+}
+
+.row, .container, .col {
+    background: transparent !important; /* Previene herencias */
+    box-shadow: none !important; /* Quita cualquier sombra que haga parecer que tiene fondo */
+    border: none !important;
+}
+
+.rounded-personalizado{
+    border-radius: 5% !important;
+    height: 450px !important;
+}
+
+.login-container {
+    background: url("../assets/home.jpg") no-repeat center center;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

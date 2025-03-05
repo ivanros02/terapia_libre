@@ -1,0 +1,17 @@
+.form-container {
+    background-image: url("../assets/home.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 100px 20px 20px; /* Asegura un espacio arriba */
+}
+
+
+
+
+
+

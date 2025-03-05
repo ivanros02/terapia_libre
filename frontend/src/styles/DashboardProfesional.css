@@ -1,0 +1,92 @@
+.proxTurno {
+    background-color: var(--naranja) !important;
+
+}
+
+.sidebar {
+    background-color: var(--verde) !important;
+}
+
+
+
+
+.parent {
+    display: grid;
+    grid-template-columns: 100px 1fr 300px;
+    /* Sidebar de 100px, área principal flexible, calendario de 300px */
+    grid-template-rows: 60px 1fr 1fr;
+    /* Barra de búsqueda fija, el resto flexible */
+    grid-gap: 10px;
+    /* Espacio entre elementos */
+    height: 100vh;
+    /* Altura completa de la ventana */
+    padding: 10px;
+    /* Espaciado interno */
+    box-sizing: border-box;
+}
+
+.div1 {
+    grid-area: 1 / 2 / 2 / 4;
+    /* Fila 1, columnas 2 a 4 (barra de búsqueda) */
+    background-color: #648ca6;
+    /* Color de fondo */
+    color: #fff;
+    padding: 10px;
+}
+
+.div2 {
+    grid-area: 1 / 1 / 4 / 2;
+    /* Fila 1 a 4, columna 1 (sidebar) */
+    background-color: #394263;
+    /* Color de fondo solo para el sidebar */
+    color: #fff;
+    padding: 10px;
+    width: 100px;
+    /* Ancho fijo para el sidebar */
+    box-sizing: border-box;
+    /* Asegura que el padding no aumente el tamaño */
+}
+
+.div3 {
+    grid-area: 2 / 2 / 3 / 3;
+    /* Fila 2, columna 2 (card verde) */
+    background-color: #4caf50;
+    /* Color verde */
+    color: #fff;
+    padding: 10px;
+}
+
+.div4 {
+    grid-area: 3 / 2 / 4 / 3;
+    /* Fila 3, columna 2 (card debajo de la verde) */
+    background-color: #e3e4e6;
+    /* Color de fondo */
+    padding: 10px;
+}
+
+.div5 {
+    grid-area: 2 / 3 / 4 / 4;
+    /* Fila 2 a 4, columna 3 (calendario) */
+    background-color: #8d1111;
+    /* Color de fondo */
+    padding: 10px;
+    border: 1px solid #c92727;
+}
+
+@media only screen and (max-width: 768px) {
+    .parent {
+        grid-template-columns: 1fr;
+        /* Una columna en pantallas pequeñas */
+        grid-template-rows: auto auto auto auto auto;
+        /* Filas ajustadas al contenido */
+    }
+
+    .div1,
+    .div2,
+    .div3,
+    .div4,
+    .div5 {
+        grid-area: auto;
+        /* Restablecer áreas para pantallas pequeñas */
+    }
+}

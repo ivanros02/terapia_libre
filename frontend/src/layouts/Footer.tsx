@@ -1,0 +1,81 @@
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
+
+const Footer = () => {
+    return (
+        <footer className="py-4 border-top border-secondary" style={{backgroundColor: "var(--verde)"}}>
+            <div className="container">
+                <div className="row">
+                    {/* Sección Izquierda */}
+                    <div className="col-md-8 text-start">
+                        <div className="d-flex flex-column align-items-start">
+                            {/* Logo y título alineados en la misma fila */}
+                            <div className="d-flex align-items-center">
+                                <img
+                                    src="../src/assets/logo.png"
+                                    alt="Logo Terapia Libre"
+                                    className="me-2"
+                                    style={{ width: "60px", height: "60px" }}
+                                />
+                                <h5 className="text-light mb-0">Terapia Libre</h5>
+                            </div>
+
+                            {/* Descripción debajo */}
+                            <p className="text-light mt-2">
+                                Es una plataforma innovadora que te ofrece la libertad <br />
+                                de elegir al profesional de salud mental ideal para ti. <br />
+                                Con una amplia variedad de expertos, facilitamos la <br />
+                                búsqueda y selección de tu terapeuta, priorizando tu <br />
+                                bienestar emocional con tratamientos personalizados.
+                            </p>
+
+                            {/* Redes Sociales */}
+                            <div className="d-flex align-items-center">
+                                <a
+                                    href="https://www.instagram.com/terapia.libre"
+                                    className="text-light me-3"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <FaInstagram size={20} className="me-1" /> @terapia.libre
+                                </a>
+                            </div>
+                            <div className="d-flex align-items-center mt-2">
+                                <a
+                                    href="https://www.linkedin.com/company/terapialibre"
+                                    className="text-light"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <FaLinkedin size={20} className="me-1" /> Terapia Libre
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sección Derecha */}
+                    <div className="col-md-4 text-md-end mt-4 mt-md-0">
+                        {/* Imagen Arriba de los Links */}
+                        <img
+                            src="../src/assets/footer_image.png"
+                            alt="Imagen decorativa"
+                            className="mb-3 img-fluid"
+                            style={{ width: "150px", height: "auto" }}
+                        />
+                        {/* Enlaces en columna */}
+                        <div className="d-flex flex-column">
+                            <a href="/formProfessionals" className="text-light fw-semibold mb-2">
+                                Panel para profesionales
+                            </a>
+                            <a href="/admin" className="text-light fw-semibold">
+                                Acceder como administrador
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    );
+};
+
+export default Footer;
