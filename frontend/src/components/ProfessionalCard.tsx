@@ -16,7 +16,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ name, image, specia
 
             {/* Contenido con fondo opaco más gris */}
             <div className="position-absolute bottom-0 w-100 p-1 text-white" style={{
-                background: "rgba(171, 169, 166, 0.7)"
+                background: "rgba(var(--verde-rgb), 0.7)"
             }}>
                 <h5 className="fw-bold mb-1">{name}</h5>
 

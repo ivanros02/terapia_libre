@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { House, Calendar, MessageCircle, PieChart, Settings, LogOut } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/DashboardProfesional.css";
+
 const Sidebar: React.FC = () => {
   return (
-    <div className="sidebar d-flex flex-column align-items-center py-3 bg-success text-white vh-100" style={{ width: "80px", borderRadius: "25px 0 0 25px" }}>
+    <div className="sidebar">
       <ul className="nav flex-column w-100 text-center">
         <li className="nav-item" style={{ marginTop: "5rem" }}>
           <Link to="/dashboard" className="nav-link text-white py-3">
@@ -39,7 +40,7 @@ const Sidebar: React.FC = () => {
         </li>
       </ul>
       <div className="mt-3">
-        <img src="../src/assets/logo.png" alt="Logo" style={{ width: "40px" }} />
+        <img src="/logo.png" alt="Logo" style={{ width: "40px" }} />
       </div>
     </div>
   );

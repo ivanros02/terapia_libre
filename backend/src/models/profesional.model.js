@@ -3,11 +3,24 @@ const pool = require("../config/db");
 class Profesional {
 
   static async create({ nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional }) {
+    // Verificar si el correo electrónico ya está registrado
+    const [existingEmail] = await pool.execute(
+      `SELECT correo_electronico FROM profesionales WHERE correo_electronico = ?`,
+      [correo_electronico]
+    );
+
+    // Si el correo ya existe, lanzar un error
+    if (existingEmail.length > 0) {
+      throw new Error("El correo electrónico ya está registrado.");
+    }
+
+    // Si el correo no existe, proceder con la inserción
     const [result] = await pool.execute(
       `INSERT INTO profesionales (nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional]
     );
+
     return result.insertId;
   }
 
@@ -30,10 +43,18 @@ class Profesional {
 
   static async findByEmail(correo_electronico) {
     const [rows] = await pool.execute(
-      `SELECT * FROM profesionales WHERE correo_electronico = ?`,
+      `SELECT *,id_profesional AS id_usuario FROM profesionales WHERE correo_electronico = ?`,
       [correo_electronico]
     );
     return rows[0]; // Retorna el usuario si existe
+  }
+
+  static async findById(id_profesional) {
+    const [rows] = await pool.execute(
+      `SELECT * FROM profesionales WHERE id_profesional = ?`,
+      [id_profesional]
+    );
+    return rows[0]; // Retorna el profesional si existe
   }
 
 }

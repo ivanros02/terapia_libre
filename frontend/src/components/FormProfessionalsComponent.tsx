@@ -39,15 +39,47 @@ const FormProfessionalsComponent = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            await axios.post("http://localhost:5000/api/profesionales", formData);
 
-            alert("Profesional registrado con éxito");
-            {/** window.location.href = "/professionals"; */ }
-        } catch (error) {
+        // Validar antes de enviar
+        if (!validateForm()) {
+            alert("Por favor, complete todos los campos obligatorios.");
+            return;
+        }
+
+        try {
+            const response = await axios.post("http://localhost:5000/api/profesionales", formData);
+            alert(`Profesional registrado con éxito: ${JSON.stringify(response.data)}`);
+        } catch (error: any) {
             console.error("Error al registrar profesional:", error);
+            alert(`Error: ${error.response?.data?.message || error.message}`);
         }
     };
+
+    // Función de validación
+    const validateForm = () => {
+        const requiredFields = [
+            "nombre",
+            "telefono",
+            "correo_electronico",
+            "contrasena",
+            "titulo_universitario",
+            "matricula_nacional",
+            "matricula_provincial",
+            "descripcion",
+            "disponibilidad",
+            "valor",
+            "valor_internacional",
+        ];
+
+        for (const field of requiredFields) {
+            if (!formData[field as keyof typeof formData].toString().trim()) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
 
 
 
@@ -71,12 +103,14 @@ const FormProfessionalsComponent = () => {
                             <Form.Group controlId="formProfilePicture" className="mb-3">
                                 <h5>Foto de perfil</h5>
                                 <Form.Control
-                                    type="file"
-                                    accept="image/*"
+                                    type="text"
                                     name="foto_perfil_url"
-                                    onChange={handleChange} // ✅ Se agrega el onChange
+                                    placeholder="Ingrese la URL de su foto de perfil"
+                                    value={formData.foto_perfil_url}
+                                    onChange={handleChange}
                                 />
                             </Form.Group>
+
 
 
                             <hr />

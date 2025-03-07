@@ -1,18 +1,14 @@
 import React from "react";
 import "../styles/HeroSection.css";
 import CustomButton from "./CustomButton";
-import Head from "../layouts/Header"; // Importa el Head
+
 
 const HeroSection: React.FC = () => {
-  const menuLinks = [
-    { name: "¿Necesito terapia?", href: "/necesito-terapia" },
-    { name: "Buscar profesional", href: "/professionals" },
-    { name: "Iniciar Sesión", href: "/Login" },
-  ];
+  
 
   return (
     <>
-      <Head links={menuLinks} /> 
+      
       <section className="hero-section d-flex flex-column align-items-center text-center">
         <h1 className="display-2">¿NECESITAS AYUDA?</h1>
         <p className="fs-5">

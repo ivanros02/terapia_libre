@@ -12,7 +12,7 @@ const GoogleLoginButton = () => {
         className="border rounded-circle p-2"
         onClick={() => setShowLogin(true)}
       >
-        <img src="../src/assets/logo_google.png" alt="Google" width="30" />
+        <img src="/logo_google.png" alt="Google" width="30" />
       </Button>
 
       {showLogin && <LoginGoogle />}

@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Form, FormControl, InputGroup, Navbar, Nav, Image } from "react-bootstrap";
-import { FaSearch, FaBell, FaCommentDots, FaBars } from "react-icons/fa";
+import {FaBell, FaCommentDots, FaBars } from "react-icons/fa";
 
 interface SearchNavbarProps {
   profileImage: string;
@@ -16,38 +16,38 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ profileImage, profileName }
           <FaBars size={20} />
         </Navbar.Toggle>
 
-        <Navbar.Collapse id="navbar-content" className="justify-content-center">
-          {/* Barra de búsqueda */}
-          <Form className="d-flex" style={{ maxWidth: "500px", width: "100%" }}>
-            <InputGroup>
-              <FormControl type="search" placeholder="Buscar" className="rounded-pill mt-2" />
-              <InputGroup.Text className="bg-white border-0 rounded-pill">
-                <FaSearch />
-              </InputGroup.Text>
-            </InputGroup>
-          </Form>
+        {/* Barra de búsqueda al inicio (izquierda) */}
+        <Form className="d-flex me-3" style={{ maxWidth: "700px", width: "100%" }}>
+          <InputGroup>
+            <FormControl
+              type="search"
+              placeholder="Buscar"
+              className="rounded-pill border-end-0" // Elimina el borde derecho para que se una con la lupa
+            />
+          </InputGroup>
+        </Form>
 
-          {/* Íconos de mensajes y notificaciones */}
-          <Nav className="align-items-center ms-3">
-            <Nav.Link href="#" className="me-3 text-dark">
+        {/* Perfil del usuario con contenedor redondeado */}
+        <div className="d-flex align-items-center px-2 py-1"> 
+          {/* Íconos de mensajes y notificaciones más cerca del perfil */}
+          <Nav className="align-items-center ms-2"> {/* Reducir el margen izquierdo */}
+            <Nav.Link href="#" className="me-2 text-dark"> {/* Reducir el margen derecho */}
               <FaCommentDots size={20} />
             </Nav.Link>
-            <Nav.Link href="#" className="me-3 text-dark">
+            <Nav.Link href="#" className="me-2 text-dark"> {/* Reducir el margen derecho */}
               <FaBell size={20} />
             </Nav.Link>
           </Nav>
-        </Navbar.Collapse>
-
-        {/* Perfil del usuario con contenedor redondeado */}
-        <div className="d-flex align-items-center bg-white rounded-pill px-2 py-1 shadow-sm">
-          <Image
-            src={profileImage} 
-            roundedCircle
-            width={40}
-            height={40}
-            className="me-2"
-          />
-          <span className="fw-bold">{profileName}</span>
+          <div className="bg-white rounded-pill">
+            <Image
+              src={profileImage}
+              roundedCircle
+              width={40}
+              height={40}
+              className="me-2"
+            />
+            <span className="fw-bold">{profileName}</span>
+          </div>
         </div>
       </Container>
     </Navbar>

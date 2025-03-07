@@ -7,7 +7,7 @@ const AboutSection: React.FC = () => {
                 {/* Imagen */}
                 <div className="col-lg-5 d-flex justify-content-center">
                     <img
-                        src="../src/assets/quienes_somos.png"
+                        src="/quienes_somos.png"
                         alt="Imagen de Quienes Somos"
                         className="img-fluid"
                     />

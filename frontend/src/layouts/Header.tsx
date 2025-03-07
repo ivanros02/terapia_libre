@@ -7,9 +7,10 @@ type HeadProps = {
   description?: string;
   keywords?: string;
   links?: { name: string; href: string }[];
+  onScrollToNeedTherapy?: () => void; // Agregamos la prop opcional
 };
 
-const Head: React.FC<HeadProps> = ({ description, keywords, links = [] }) => {
+const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScrollToNeedTherapy }) => {
   return (
     <HelmetProvider>
       <Helmet>
@@ -21,7 +22,7 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [] }) => {
       <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom p-3 fixed-top shadow mb-5">
         <div className="container-fluid">
           <a className="navbar-brand d-flex align-items-center ms-4" href="/">
-            <img src="../src/assets/logo.png" alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
+            <img src="/logo.png" alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
             <span style={{ fontSize: '1.5rem', color: "var(--verde)" }}>Terapia Libre</span>
           </a>
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +31,24 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [] }) => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               {links.map((link, index) => (
-                <li key={index} className="nav-item me-3"><a className="nav-link text-secondary fs-5" href={link.href}>{link.name}</a></li>
+                <li key={index} className="nav-item me-3">
+                  {link.name === "¿Necesito terapia?" ? (
+                    <a
+                      className="nav-link text-secondary fs-5"
+                      href={link.href}
+                      onClick={(e) => {
+                        e.preventDefault(); // Evita la navegación
+                        onScrollToNeedTherapy?.(); // Llama a la función de scroll
+                      }}
+                    >
+                      {link.name}
+                    </a>
+                  ) : (
+                    <a className="nav-link text-secondary fs-5" href={link.href}>
+                      {link.name}
+                    </a>
+                  )}
+                </li>
               ))}
             </ul>
           </div>

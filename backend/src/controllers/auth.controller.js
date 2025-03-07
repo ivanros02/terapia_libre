@@ -26,7 +26,8 @@ exports.registrarUsuario = async (req, res) => {
     res.status(201).json({ message: "Usuario registrado con éxito", id_usuario });
   } catch (error) {
     console.error("Error en el registro:", error);
-    res.status(500).json({ message: "Error al registrar usuario" });
+    // Enviar el mensaje real del error al frontend
+    res.status(400).json({ message: error.message || "Error al registrar usuario" });
   }
 };
 
@@ -64,9 +65,10 @@ exports.login = async (req, res) => {
     res.json({
       message: "Inicio de sesión exitoso",
       token,
-      esProfesional, // 🔹 Enviar este dato al frontend
+      esProfesional,
+      id: usuario.id_usuario // 🔹 Enviar este dato al frontend
     });
-    
+
   } catch (error) {
     console.error("Error en el inicio de sesión:", error);
     res.status(500).json({ message: "Error al iniciar sesión" });
@@ -97,9 +99,37 @@ exports.loginConGoogle = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.json({ message: "Inicio de sesión con Google exitoso", token });
+    res.json({
+      message: "Inicio de sesión con Google exitoso",
+      token,
+      id: usuario.id_usuario, // 🔹 Devuelve el ID del usuario
+    });
   } catch (error) {
     console.error("Error en login con Google:", error);
     res.status(500).json({ message: "Error al iniciar sesión con Google" });
+  }
+};
+
+//Dashboard
+exports.getUserData = async (req, res) => {
+  try {
+    const { id } = req.params; // Obtener el ID desde los parámetros de la URL
+
+    // Buscar al usuario en la base de datos
+    const usuario = await Usuario.findById(id);
+
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Devolver los datos del usuario
+    res.json({
+      nombre: usuario.nombre,
+      correo_electronico: usuario.correo_electronico,
+      // Agregar más campos si es necesario
+    });
+  } catch (error) {
+    console.error("Error al obtener datos del usuario:", error);
+    res.status(500).json({ message: "Error al obtener datos del usuario" });
   }
 };

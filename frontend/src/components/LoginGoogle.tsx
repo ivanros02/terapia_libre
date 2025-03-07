@@ -5,25 +5,41 @@ import { useNavigate } from "react-router-dom";
 
 const LoginGoogle = () => {
   const navigate = useNavigate();
-  const handleSuccess = async (response: CredentialResponse) => {
-    if (!response.credential) return console.error("No se recibió credencial de Google");
 
-    const { email, name, sub }: any = jwtDecode(response.credential); // Decodifica el token de Google
+  const handleSuccess = async (response: CredentialResponse) => {
+    if (!response.credential) {
+      console.error("No se recibió credencial de Google");
+      return;
+    }
+
+    // Decodifica el token de Google
+    const { email, name, sub }: any = jwtDecode(response.credential);
 
     try {
+      // Hacer la solicitud al backend
       const res = await axios.post("http://localhost:5000/api/auth/google-login", {
         id_google: sub,
         correo_electronico: email,
         nombre: name,
       });
+
+      // Guardar el token y el ID en el localStorage
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("id", res.data.id); // 🔹 Guardar el ID del usuario
+
+      // Redirigir al dashboard del usuario
       navigate("/dashboard/usuario");
     } catch (error) {
       console.error("Error en login con Google:", error);
     }
   };
 
-  return <GoogleLogin onSuccess={handleSuccess} onError={() => console.log("Error en login con Google")} />;
+  return (
+    <GoogleLogin
+      onSuccess={handleSuccess}
+      onError={() => console.log("Error en login con Google")}
+    />
+  );
 };
 
 export default LoginGoogle;

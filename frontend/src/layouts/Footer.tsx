@@ -11,7 +11,7 @@ const Footer = () => {
                             {/* Logo y título alineados en la misma fila */}
                             <div className="d-flex align-items-center">
                                 <img
-                                    src="../src/assets/logo.png"
+                                    src="/logo.png"
                                     alt="Logo Terapia Libre"
                                     className="me-2"
                                     style={{ width: "60px", height: "60px" }}
@@ -56,7 +56,7 @@ const Footer = () => {
                     <div className="col-md-4 text-md-end mt-4 mt-md-0">
                         {/* Imagen Arriba de los Links */}
                         <img
-                            src="../src/assets/footer_image.png"
+                            src="footer_image.png"
                             alt="Imagen decorativa"
                             className="mb-3 img-fluid"
                             style={{ width: "150px", height: "auto" }}

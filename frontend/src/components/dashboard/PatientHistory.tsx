@@ -21,7 +21,7 @@ interface PatientHistoryProps {
 const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatient }) => {
     return (
         <Container fluid>
-            <Card className="shadow-lg p-2 rounded-4 border-0">
+            <Card className="shadow-lg p-3 rounded-4 border-0" style={{maxWidth: "90%" }}>
                 <Row>
                     {/* Lista de Pacientes */}
                     <Col md={5} className="border-end">

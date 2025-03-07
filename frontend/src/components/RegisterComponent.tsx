@@ -16,13 +16,21 @@ const RegisterComponent: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Verifica si algún campo está vacío
+    if (!formData.correo_electronico || !formData.contrasena || !formData.nombre) {
+      alert("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       const response = await axios.post("http://localhost:5000/api/auth/registro", formData);
       alert(response.data.message);
       navigate("/login");
 
-    } catch (error) {
-      alert("Error en el registro");
+    } catch (error: any) {
+      console.error("Error al registrar usuario:", error);
+      alert(`Error: ${error.response?.data?.message || error.message}`);
     }
   };
 

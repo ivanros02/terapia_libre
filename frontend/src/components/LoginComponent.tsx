@@ -21,8 +21,10 @@ const Login: React.FC = () => {
         try {
             const response = await axios.post("http://localhost:5000/api/auth/login", formData);
 
+            // Guardar el token, esProfesional y el ID en el localStorage
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("esProfesional", response.data.esProfesional);
+            localStorage.setItem("id", response.data.id); // 🔹 Asegúrate de que el backend devuelva el ID
 
             // Redirigir dinámicamente
             const dashboardRoute = response.data.esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
@@ -36,10 +38,10 @@ const Login: React.FC = () => {
         <Container fluid className="login-container mt-5">
             <Row className="shadow-lg overflow-hidden p-3 align-items-center bg-white rounded" style={{ maxWidth: "900px", width: "100%" }}>
                 {/* Sección Izquierda */}
-                <Col md={5} className="d-none d-md-flex align-items-center justify-content-center rounded-personalizado h-100" style={{ background: "var(--crema)" }}>
+                <Col md={5} className="d-none d-md-flex align-items-center justify-content-center rounded-personalizado h-100" style={{ background: "var(--verde)" }}>
                     <Card className="border-0 bg-transparent text-center">
                         <Card.Body className="d-flex flex-column align-items-center">
-                            <img src="../src/assets/footer_image.png" alt="Hola" className="img-fluid mb-3" style={{ maxWidth: "150px" }} />
+                            <img src="/footer_image.png" alt="Hola" className="img-fluid mb-3" style={{ maxWidth: "150px" }} />
                             <h3 className="fw-bold">Hola! 👋</h3>
                         </Card.Body>
                     </Card>

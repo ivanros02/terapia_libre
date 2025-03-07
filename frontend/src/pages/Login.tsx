@@ -5,7 +5,7 @@ import LoginComponente from "../components/LoginComponent"; // Asegúrate de ten
 const Login: React.FC = () => {
     const menuLinks = [
         { name: "¿Necesito terapia?", href: "/necesito-terapia" },
-        { name: "Buscar profesional", href: "/buscar-profesional" },
+        { name: "Buscar profesional", href: "/professionals" },
         { name: "Iniciar Sesión", href: "/Login" },
     ];
 

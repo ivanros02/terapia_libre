@@ -1,8 +1,9 @@
+import DashboardUsuarioComp from "../components/dashboard/DashboardUsuarioComp"
 
 const DashboardUsuario = () => {
   return (
     <div className="dashboard">
-      <h1>Hola</h1>
+      <DashboardUsuarioComp/>
     </div>
   );
 };

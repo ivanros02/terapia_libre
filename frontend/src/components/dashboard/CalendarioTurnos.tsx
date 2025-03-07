@@ -48,7 +48,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
             <div
                 className="calendar-container"
             >
-                <Card className="shadow-sm p-3 rounded-4" style={{ maxWidth: "350px", margin: "auto" }}>
+                <Card className="shadow-sm p-3 rounded-4 calendarioAncho" style={{ margin: "auto" }}>
                     {/* Encabezado con botones de navegación */}
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <Button variant="light" size="sm" onClick={() => cambiarMes(-1)}>

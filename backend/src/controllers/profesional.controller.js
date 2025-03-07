@@ -73,3 +73,26 @@ exports.createProfesional = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+//Dashboard
+exports.getProfesionalData = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const profesional = await Profesional.findById(id);
+       
+
+        if (!profesional) {
+            return res.status(404).json({ message: "Profesional no encontrado" });
+        }
+
+        res.json({
+            nombre: profesional.nombre,
+            correo_electronico: profesional.correo_electronico,
+            especialidades: profesional.especialidades,
+        });
+    } catch (error) {
+        console.error("Error al obtener datos del profesional:", error);
+        res.status(500).json({ message: "Error al obtener datos del profesional" });
+    }
+};
