@@ -1,35 +1,37 @@
 const pool = require("../config/db");
 
 class Turno {
-    static async crearTurno({ id_profesional, id_paciente, id_disponibilidad, motivo_consulta }) {
+    static async crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno) {
         const [result] = await pool.execute(
-            `INSERT INTO turnos (id_profesional, id_paciente, id_disponibilidad, motivo_consulta) 
-         VALUES (?, ?, ?, ?)`,
-            [id_profesional, id_paciente, id_disponibilidad, motivo_consulta]
+            `INSERT INTO turnos (id_profesional, id_usuario, fecha_turno, hora_turno, estado) VALUES (?, ?, ?, ?, 'Pendiente')`,
+            [id_profesional, id_usuario, fecha_turno, hora_turno]
         );
         return result.insertId;
     }
 
-    static async obtenerTurnosDisponibles(id_profesional, fecha) {
+    static async verificarDisponibilidad(id_profesional, fecha_turno, hora_turno) {
         const [rows] = await pool.execute(
-            `SELECT t.id_turno, t.motivo_consulta, t.estado 
-         FROM turnos t 
-         JOIN disponibilidad_profesional dp ON t.id_disponibilidad = dp.id_disponibilidad
-         WHERE t.id_profesional = ? AND dp.fecha = ? AND t.estado = 'confirmado'`,
-            [id_profesional, fecha]
+            `SELECT * FROM turnos WHERE id_profesional = ? AND fecha_turno = ? AND hora_turno = ? AND estado IN ('Pendiente', 'Confirmado')`,
+            [id_profesional, fecha_turno, hora_turno]
+        );
+        return rows.length === 0; // Retorna true si el turno está disponible
+    }
+
+    static async obtenerTurnosPorProfesional(id_profesional) {
+        const [rows] = await pool.execute(
+            `SELECT * FROM turnos WHERE id_profesional = ? ORDER BY fecha_turno, hora_turno`,
+            [id_profesional]
         );
         return rows;
     }
 
-    // Función para actualizar el estado del turno
-    static async actualizarEstadoTurno(id_turno, estado) {
+    static async cancelarTurno(id_turno, motivo) {
         const [result] = await pool.execute(
-            `UPDATE turnos SET estado = ? WHERE id_turno = ?`,
-            [estado, id_turno]
+            `UPDATE turnos SET estado = 'Cancelado', motivo_cancelacion = ? WHERE id_turno = ?`,
+            [motivo, id_turno]
         );
-        return result.affectedRows > 0; // Si la actualización fue exitosa
+        return result.affectedRows;
     }
 }
 
 module.exports = Turno;
-

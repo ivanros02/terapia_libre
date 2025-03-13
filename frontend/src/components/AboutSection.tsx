@@ -2,15 +2,17 @@ import React from "react";
 
 const AboutSection: React.FC = () => {
     return (
-        <section className="container py-5">
+        <section className="container py-2">
             <div className="row align-items-center">
                 {/* Imagen */}
                 <div className="col-lg-5 d-flex justify-content-center">
-                    <img
-                        src="/quienes_somos.png"
-                        alt="Imagen de Quienes Somos"
-                        className="img-fluid"
-                    />
+                    <div style={{ width: "350px", height: "399px" }}>
+                        <img
+                            src="/quienes_somos.png"
+                            alt="Imagen de Quienes Somos"
+                            className="img-fluid"
+                        />
+                    </div>
                 </div>
 
                 {/* Texto */}
@@ -19,8 +21,8 @@ const AboutSection: React.FC = () => {
                         Quiénes Somos
                     </h2>
                     <p className="fs-5 text-dark">
-                        En nuestra plataforma web, nos encargamos de{" "}
-                        <strong>conectar</strong> a los usuarios que requieren{" "}
+                        En nuestra plataforma web, nos encargamos de <strong>conectar</strong>{" "}
+                        a los usuarios que requieren{" "}
                         <strong>atención terapéutica</strong> con{" "}
                         <strong>profesionales altamente competentes</strong>.
                         Buscamos <strong>facilitar el acceso</strong> a servicios de

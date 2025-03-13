@@ -21,13 +21,28 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
       </Helmet>
       <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom p-3 fixed-top shadow mb-5">
         <div className="container-fluid">
+          {/* Logo y título */}
           <a className="navbar-brand d-flex align-items-center ms-4" href="/">
             <img src="/logo.png" alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
             <span style={{ fontSize: '1.5rem', color: "var(--verde)" }}>Terapia Libre</span>
           </a>
+
+          {/* Nuevo logo y texto */}
+          <div className="d-flex align-items-center"> {/* Aumenté el margen izquierdo con mx-5 */}
+            <img src="/atencion_psiquiatrica.png" alt="Atención Psiquiátrica" style={{ height: '70px', marginRight: '10px',paddingLeft: '10px' }} />
+            <span style={{ color: "var(--naranja)", fontWeight: 'bold' }}>
+              <span style={{ fontSize: '0.9rem' }}>ATENCIÓN PSIQUIÁTRICA INMEDIATA</span> {/* Texto normal */}
+              <br />
+              <span style={{ fontSize: '2rem' }}>0810 666 3372</span> {/* Número más grande */}
+            </span>
+          </div>
+
+          {/* Botón del menú responsive */}
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
+
+          {/* Enlaces de navegación */}
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               {links.map((link, index) => (

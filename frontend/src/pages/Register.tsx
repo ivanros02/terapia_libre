@@ -6,8 +6,8 @@ import RegisterComponent from "../components/RegisterComponent"; // Asegúrate d
 const Register: React.FC = () => {
     const menuLinks = [
         { name: "¿Necesito terapia?", href: "/necesito-terapia" },
-        { name: "Buscar profesional", href: "/buscar-profesional" },
-        { name: "Iniciar Sesión", href: "/Login" },
+        { name: "Buscar profesional", href: "/professionals" },
+        { name: "Iniciar Sesión", href: "/login" },
     ];
 
     return (

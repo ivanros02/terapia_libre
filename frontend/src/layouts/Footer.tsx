@@ -2,7 +2,7 @@ import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
     return (
-        <footer className="py-4 border-top border-secondary" style={{backgroundColor: "var(--verde)"}}>
+        <footer className="py-4 border-top border-secondary" style={{ backgroundColor: "var(--verde)" }}>
             <div className="container">
                 <div className="row">
                     {/* Sección Izquierda */}
@@ -14,17 +14,19 @@ const Footer = () => {
                                     src="/logo.png"
                                     alt="Logo Terapia Libre"
                                     className="me-2"
-                                    style={{ width: "60px", height: "60px" }}
+                                    style={{ width: "70px", height: "70px" }}
                                 />
-                                <h5 className="text-light mb-0">Terapia Libre</h5>
+                                <h5 className="text-light mb-0" style={{ marginLeft: "10px" }}>
+                                    Terapia Libre
+                                </h5>
                             </div>
 
                             {/* Descripción debajo */}
-                            <p className="text-light mt-2">
-                                Es una plataforma innovadora que te ofrece la libertad <br />
-                                de elegir al profesional de salud mental ideal para ti. <br />
-                                Con una amplia variedad de expertos, facilitamos la <br />
-                                búsqueda y selección de tu terapeuta, priorizando tu <br />
+                            <p className="text-light mt-2" style={{ maxWidth: "70%", lineHeight: "1.6", fontSize:"16px" }}>
+                                Es una plataforma innovadora que te ofrece la libertad
+                                de elegir al profesional de salud mental ideal para ti.
+                                Con una amplia variedad de expertos, facilitamos la
+                                búsqueda y selección de tu terapeuta, priorizando tu
                                 bienestar emocional con tratamientos personalizados.
                             </p>
 
@@ -56,7 +58,7 @@ const Footer = () => {
                     <div className="col-md-4 text-md-end mt-4 mt-md-0">
                         {/* Imagen Arriba de los Links */}
                         <img
-                            src="footer_image.png"
+                            src="/footer_image.png"
                             alt="Imagen decorativa"
                             className="mb-3 img-fluid"
                             style={{ width: "150px", height: "auto" }}

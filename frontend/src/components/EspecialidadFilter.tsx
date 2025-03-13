@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 interface Especialidad {
     id_especialidad: number;
@@ -16,7 +17,7 @@ const EspecialidadFilter: React.FC<EspecialidadFilterProps> = ({ selectedEspecia
     useEffect(() => {
         const fetchEspecialidades = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/especialidades");
+                const response = await fetch(`${url}/api/especialidades`);
                 if (!response.ok) {
                     throw new Error("Error al obtener especialidades");
                 }

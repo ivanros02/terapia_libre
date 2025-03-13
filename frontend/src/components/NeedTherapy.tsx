@@ -6,13 +6,27 @@ const NeedTherapy: React.FC = () => {
         <section
             className="container-fluid py-5"
             style={{
-                backgroundImage: "url('/home.jpg')",
+                position: "relative",
+                minHeight: "55vh",
+                backgroundImage: "url('/home.png')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
-                minHeight: "55vh",
             }}
         >
+            {/* Degradado superior */}
+            <div
+                style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "20%", // Ajusta según el tamaño del degradado que desees
+                    background: "linear-gradient(to bottom, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))",
+                    pointerEvents: "none",
+                }}
+            />
+
             <div className="container">
                 <div className="row align-items-center">
                     {/* Texto a la izquierda */}
@@ -46,7 +60,21 @@ const NeedTherapy: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Degradado inferior (transparente a blanco hacia abajo) */}
+            <div
+                style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "15%", // Ajusta la altura del degradado inferior
+                    background: "linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))",
+                    pointerEvents: "none",
+                }}
+            />
         </section>
+
     );
 };
 

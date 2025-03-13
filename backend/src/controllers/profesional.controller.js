@@ -5,14 +5,29 @@ const nodemailer = require("nodemailer"); // Importar nodemailer
 
 exports.getProfesionales = async (req, res) => {
     try {
-        const profesionales = await Profesional.getAll();
-        res.json(profesionales);
+        const page = parseInt(req.query.page) || 1; // Página actual (por defecto 1)
+        const limit = parseInt(req.query.limit) || 12; // Límite de registros por página (por defecto 10)
+        const offset = (page - 1) * limit; // Cálculo del offset
+
+        // Obtener profesionales de la página actual
+        const profesionales = await Profesional.getAll(limit, offset);
+
+        // Obtener el total de profesionales
+        const totalProfesionales = await Profesional.getTotalCount();
+
+        // Calcular el total de páginas
+        const totalPages = Math.ceil(totalProfesionales / limit);
+
+        // Devolver los profesionales y el total de páginas
+        res.json({
+            professionals: profesionales,
+            totalPages: totalPages,
+        });
     } catch (error) {
         console.error("Error al obtener profesionales:", error);
         res.status(500).json({ message: error.message });
     }
 };
-
 
 exports.createProfesional = async (req, res) => {
     try {
@@ -36,6 +51,38 @@ exports.createProfesional = async (req, res) => {
         if (especialidades && especialidades.length > 0) {
             await Profesional.assignEspecialidades(id_profesional, especialidades);
         }
+
+        /*
+        // 馃敼 Configurar el transporter de Nodemailer
+        const transporter = nodemailer.createTransport({
+            host: 'localhost',
+            port: 25,
+            auth: {
+                user: 'terapialibre@terapialibre.com.ar',
+                pass: 'abundancia2024'
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
+
+        // 馃敼 Definir el contenido del correo
+        const mailOptions = {
+            from: 'terapialibre@terapialibre.com.ar',
+            to: correo_electronico,
+            subject: "隆Bienvenido a Terapia Libre!",
+            html: `
+                <h2>Hola, ${nombre} 馃憢</h2>
+                <p>Gracias por registrarte como profesional en Terapia Libre.</p>
+                <p>Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesi贸n y gestionar tus consultas.</p>
+                <br>
+                <p>Si no realizaste este registro, por favor cont谩ctanos.</p>
+                <br>
+                <p>Atentamente,</p>
+                <p><strong>El equipo de Terapia Libre</strong></p>
+            `,
+        };
+        */
 
         // 🔹 Configurar el transporter de Nodemailer
         const transporter = nodemailer.createTransport({
@@ -80,19 +127,51 @@ exports.getProfesionalData = async (req, res) => {
         const { id } = req.params;
 
         const profesional = await Profesional.findById(id);
-       
 
         if (!profesional) {
             return res.status(404).json({ message: "Profesional no encontrado" });
         }
 
-        res.json({
-            nombre: profesional.nombre,
-            correo_electronico: profesional.correo_electronico,
-            especialidades: profesional.especialidades,
-        });
+        // Devolver todos los datos del profesional
+        res.json(profesional);
     } catch (error) {
         console.error("Error al obtener datos del profesional:", error);
         res.status(500).json({ message: "Error al obtener datos del profesional" });
     }
 };
+
+exports.updateProfesional = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, foto_perfil_url, valor, valor_internacional } = req.body;
+
+        // Verificar si el profesional existe
+        const profesionalExistente = await Profesional.findById(id);
+        if (!profesionalExistente) {
+            return res.status(404).json({ message: "Profesional no encontrado" });
+        }
+
+        // Actualizar los datos del profesional
+        await Profesional.update(id, {
+            nombre,
+            titulo_universitario,
+            matricula_nacional,
+            matricula_provincial,
+            descripcion,
+            telefono,
+            disponibilidad,
+            correo_electronico,
+            foto_perfil_url,
+            valor,
+            valor_internacional
+        });
+
+        res.json({ message: "Datos del profesional actualizados correctamente" });
+    } catch (error) {
+        console.error("Error al actualizar el profesional:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+
+

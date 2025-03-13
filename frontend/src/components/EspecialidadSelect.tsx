@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form } from "react-bootstrap";
 import axios from "axios";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 const EspecialidadSelect: React.FC<{ onChange: (selected: number[]) => void }> = ({ onChange }) => {
     const [especialidades, setEspecialidades] = useState<{ id_especialidad: number; nombre: string }[]>([]);
@@ -9,7 +10,7 @@ const EspecialidadSelect: React.FC<{ onChange: (selected: number[]) => void }> =
     useEffect(() => {
         const fetchEspecialidades = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/especialidades");
+                const response = await axios.get(`${url}/api/especialidades`);
                 setEspecialidades(response.data);
             } catch (error) {
                 console.error("Error al cargar especialidades:", error);

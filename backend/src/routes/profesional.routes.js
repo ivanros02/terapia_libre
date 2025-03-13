@@ -6,6 +6,8 @@ const { authenticate } = require("../middlewares/auth.middleware"); // 🔹 Aseg
 // Crear un nuevo profesional
 router.post("/", profesionalController.createProfesional);
 router.get("/", profesionalController.getProfesionales);
-router.get("/:id", authenticate, profesionalController.getProfesionalData); // 🔹 Nueva ruta para obtener datos de un profesional
+router.get("/:id", profesionalController.getProfesionalData);
+router.put("/:id", profesionalController.updateProfesional);
+
 
 module.exports = router;

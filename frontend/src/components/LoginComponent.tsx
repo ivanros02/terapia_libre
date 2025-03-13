@@ -4,6 +4,7 @@ import axios from "axios";
 import { Form, Container, Row, Col, Card } from "react-bootstrap";
 import "../styles/LoginComponent.css";
 import GoogleLoginButton from "./GoogleLoginButton";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -19,20 +20,28 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/login", formData);
+            const response = await axios.post(`${url}/api/auth/login`, formData);
 
             // Guardar el token, esProfesional y el ID en el localStorage
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("esProfesional", response.data.esProfesional);
-            localStorage.setItem("id", response.data.id); // 🔹 Asegúrate de que el backend devuelva el ID
+            localStorage.setItem("id", response.data.id);
 
-            // Redirigir dinámicamente
-            const dashboardRoute = response.data.esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
-            navigate(dashboardRoute);
+            // Recuperar la URL previa si existe, y redirigir
+            const prevPath = localStorage.getItem("prevPath") || null;
+            if (prevPath) {
+                localStorage.removeItem("prevPath"); // Limpiar la variable
+                navigate(prevPath); // Redirigir a la URL original
+            } else {
+                // Si no hay una URL guardada, redirigir normalmente
+                const dashboardRoute = response.data.esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
+                navigate(dashboardRoute);
+            }
         } catch (error: any) {
             alert(error.response?.data?.message || "Error en el inicio de sesión");
         }
     };
+
 
     return (
         <Container fluid className="login-container mt-5">

@@ -5,6 +5,7 @@ import Sidebar from "../components/dashboard/Sidebar";
 import DashboardCard from "../components/dashboard/DashboardCard";
 import PatientHistory from "../components/dashboard/PatientHistory";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos
 interface ProfesionalData {
@@ -56,7 +57,7 @@ const DashboardProfesional = () => {
         }
 
         // Hacer la solicitud a la API
-        const response = await axios.get(`http://localhost:5000/api/profesionales/${id}`, {
+        const response = await axios.get(`${url}/api/profesionales/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`, // Enviar el token en el header
           },

@@ -7,8 +7,8 @@ import FilterBar from "../components/FilterBar";
 const Professionals: React.FC = () => {
     const menuLinks = [
         { name: "¿Necesito terapia?", href: "/necesito-terapia" },
-        { name: "Buscar profesional", href: "/buscar-profesional" },
-        { name: "Iniciar Sesión", href: "/Login" },
+        { name: "Buscar profesional", href: "/professionals" },
+        { name: "Iniciar Sesión", href: "/login" },
     ];
 
     const [selectedEspecialidad, setSelectedEspecialidad] = useState<string>("");
@@ -21,18 +21,18 @@ const Professionals: React.FC = () => {
             <main
                 className="text-center"
                 style={{
-                    backgroundImage: "url('../src/assets/home.jpg')",
+                    backgroundImage: "url('/papel.png')",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                     width: "100%",
-                    minHeight: "95vh", // Asegura que ocupe toda la pantalla
+                    minHeight: "83vh", // Asegura que ocupe toda la pantalla
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     overflow: "hidden",
-                    paddingTop: "6rem" // Ajusta según la altura del navbar
+                    paddingTop: "16rem" // Ajusta según la altura del navbar
                 }}
             >
                 <h1 style={{ color: "var(--verde)" }}>PROFESIONALES</h1>

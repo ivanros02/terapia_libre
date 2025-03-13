@@ -3,6 +3,7 @@ import "../styles/FormProfessionalsComponent.css"; // Ajusta la ruta según corr
 import EspecialidadSelect from "./EspecialidadSelect";
 import axios from "axios";
 import React, { useState } from "react";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 const FormProfessionalsComponent = () => {
     const [formData, setFormData] = useState({
@@ -47,7 +48,7 @@ const FormProfessionalsComponent = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/profesionales", formData);
+            const response = await axios.post(`${url}/api/profesionales`, formData);
             alert(`Profesional registrado con éxito: ${JSON.stringify(response.data)}`);
         } catch (error: any) {
             console.error("Error al registrar profesional:", error);

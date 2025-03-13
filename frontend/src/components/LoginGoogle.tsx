@@ -2,6 +2,7 @@ import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"; // Asegúrate de instalarlo con `npm install jwt-decode`
 import { useNavigate } from "react-router-dom";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 const LoginGoogle = () => {
   const navigate = useNavigate();
@@ -12,12 +13,10 @@ const LoginGoogle = () => {
       return;
     }
 
-    // Decodifica el token de Google
     const { email, name, sub }: any = jwtDecode(response.credential);
 
     try {
-      // Hacer la solicitud al backend
-      const res = await axios.post("http://localhost:5000/api/auth/google-login", {
+      const res = await axios.post(`${url}/api/auth/google-login`, {
         id_google: sub,
         correo_electronico: email,
         nombre: name,
@@ -25,14 +24,21 @@ const LoginGoogle = () => {
 
       // Guardar el token y el ID en el localStorage
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("id", res.data.id); // 🔹 Guardar el ID del usuario
+      localStorage.setItem("id", res.data.id);
 
-      // Redirigir al dashboard del usuario
-      navigate("/dashboard/usuario");
+      // Redirigir a la URL previa si existe
+      const prevPath = localStorage.getItem("prevPath") || null;
+      if (prevPath) {
+        localStorage.removeItem("prevPath"); // Limpiar la variable
+        navigate(prevPath);
+      } else {
+        navigate("/dashboard/usuario");
+      }
     } catch (error) {
       console.error("Error en login con Google:", error);
     }
   };
+
 
   return (
     <GoogleLogin

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 const DashboardUsuarioComp = () => {
   const [usuario, setUsuario] = useState<{ nombre: string; correo_electronico: string } | null>(null);
@@ -17,7 +18,7 @@ const DashboardUsuarioComp = () => {
         }
 
         // Hacer la solicitud a la API para obtener los datos del usuario
-        const response = await axios.get(`http://localhost:5000/api/auth/usuario/${id}`, {
+        const response = await axios.get(`${url}/api/auth/usuario/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`, // Enviar el token en el header
           },
