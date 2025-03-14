@@ -5,15 +5,25 @@ import Sidebar from "../components/dashboard/Sidebar";
 import DashboardCard from "../components/dashboard/DashboardCard";
 import PatientHistory from "../components/dashboard/PatientHistory";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
+import "../styles/DashboardProfesional.css"
 const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos
 interface ProfesionalData {
   nombre: string;
-  correo_electronico: string;
-  especialidades: string[];
-  // Agrega más campos si es necesario
 }
+
+interface TurnoHoy {
+  nombre_paciente: string;
+  hora_turno: string;
+}
+
+interface Turno {
+  fecha: string;
+  paciente: string;
+}
+
+
 
 // Datos de ejemplo para PatientHistory
 const samplePatients = [
@@ -32,60 +42,76 @@ const sampleSelectedPatient = {
   details: "Pidió una consulta con urgencia, estaba atravesando una crisis laboral que resultó en sintomatología clínica de ataques de pánico."
 };
 
-// Datos de ejemplo para CalendarioTurnos
-const eventosEjemplo: string[] = ["2025-03-05", "2025-03-10", "2025-03-15"];
-const turnosEjemplo = [
-  { fecha: "2025-03-08", paciente: "Agustina Perez" },
-  { fecha: "2025-03-12", paciente: "Sofia Perez" },
-  { fecha: "2025-03-20", paciente: "Ana Diaz" },
-  { fecha: "2025-03-20", paciente: "Ana Diaz" }
-];
-
 const DashboardProfesional = () => {
   const [profesionalData, setProfesionalData] = useState<ProfesionalData | null>(null);
+  const [turnoHoy, setTurnoHoy] = useState<TurnoHoy | null>(null);
+  const [proximosTurnos, setProximosTurnos] = useState<Turno[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProfesionalData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const id = localStorage.getItem("id"); // Obtener el ID del localStorage
-        const token = localStorage.getItem("token"); // Obtener el token
+        const id = localStorage.getItem("id");
+        const token = localStorage.getItem("token");
 
         if (!id || !token) {
           throw new Error("No se encontró el ID o el token de autenticación.");
         }
 
-        // Hacer la solicitud a la API
-        const response = await axios.get(`${url}/api/profesionales/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Enviar el token en el header
-          },
+        // 🔹 Obtener datos del profesional
+        const profesionalResponse = await axios.get(`${url}/api/profesionales/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setProfesionalData(response.data); // Guardar los datos del profesional
+
+        setProfesionalData(profesionalResponse.data);
+
+        // 🔹 Obtener turno del día
+        const turnoResponse = await axios.get(`${url}/api/profesionales/${id}/turno-hoy`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (turnoResponse.data) {
+          setTurnoHoy({
+            nombre_paciente: turnoResponse.data.nombre_paciente,
+            hora_turno: turnoResponse.data.hora_turno,
+          });
+        } else {
+          setTurnoHoy(null); // No hay turno hoy
+        }
+
+        // 🔹 Obtener próximos turnos
+        const proximosTurnosResponse = await axios.get(`${url}/api/profesionales/${id}/proximos-turnos`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const turnosFormateados: Turno[] = proximosTurnosResponse.data.map((turno: any) => ({
+          fecha: turno.fecha_turno,
+          paciente: turno.nombre_paciente,
+        }));
+
+        setProximosTurnos(turnosFormateados);
+
       } catch (error: any) {
-        setError(error.message || "Error al obtener los datos del profesional.");
+        console.error("Error en el dashboard:", error);
+        setError(error.response?.data?.message || "Error al cargar los datos");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfesionalData();
+    fetchDashboardData();
   }, []);
 
-  if (loading) {
-    return <div>Cargando...</div>; // Mostrar un mensaje de carga
-  }
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
 
-  if (error) {
-    return <div>Error: {error}</div>; // Mostrar un mensaje de error
-  }
-
+  const eventos = proximosTurnos.map(t => t.fecha); // Extraer solo la fecha
   return (
     <div className="parent">
       <div className="div1">
         <SearchNavbar
-          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={profesionalData?.nombre || "Profesional"} // Usar el nombre del profesional
         />
       </div>
@@ -94,9 +120,9 @@ const DashboardProfesional = () => {
       </div>
       <div className="div3">
         <DashboardCard
-          name={profesionalData?.nombre || "Profesional"} // Usar el nombre del profesional
-          patientName="Agustina Perez"
-          appointmentTime="04:00 PM"
+          name={profesionalData?.nombre || "Profesional"}
+          patientName={turnoHoy?.nombre_paciente || "Sin paciente hoy"}
+          appointmentTime={turnoHoy ? `${turnoHoy.hora_turno}` : "Sin turnos"}
           sessionLink="https://tusitio.com/sesion"
           newPatients={3}
           progress={51}
@@ -106,7 +132,7 @@ const DashboardProfesional = () => {
         <PatientHistory patients={samplePatients} selectedPatient={sampleSelectedPatient} />
       </div>
       <div className="div5">
-        <CalendarioTurnos eventos={eventosEjemplo} proximosTurnos={turnosEjemplo} />
+        <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />
       </div>
     </div>
   );

@@ -36,6 +36,24 @@ const Chat = {
     );
     return rows[0] || null;
   },
+
+  // Obtener TODOS los chats donde el usuario es paciente
+  findAllByUserId: async (userId) => {
+    const [rows] = await db.query(
+      "SELECT * FROM chats WHERE id_usuario = ?",
+      [userId]
+    );
+    return rows;
+  },
+
+  // Obtener TODOS los chats donde el usuario es profesional
+  findAllByProfesionalId: async (profesionalId) => {
+    const [rows] = await db.query(
+      "SELECT * FROM chats WHERE id_profesional = ?",
+      [profesionalId]
+    );
+    return rows;
+  },
 };
 
 module.exports = Chat;

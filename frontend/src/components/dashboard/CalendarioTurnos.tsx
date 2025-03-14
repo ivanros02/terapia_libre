@@ -43,12 +43,15 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
 
     const diasSemana: string[] = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
+    const eventosNormalizados = eventos.map(fecha => moment(fecha).format("YYYY-MM-DD"));
+
     return (
         <Container fluid>
             <div
                 className="calendar-container"
             >
                 <Card className="shadow-sm p-3 rounded-4 calendarioAncho" style={{ margin: "auto" }}>
+
                     {/* Encabezado con botones de navegación */}
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <Button variant="light" size="sm" onClick={() => cambiarMes(-1)}>
@@ -73,7 +76,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
                     <div className="d-flex flex-wrap">
                         {generarCalendario().map((dia, index) => {
                             const esDelMes = dia.month() === fechaActual.month();
-                            const tieneEvento = eventos.includes(dia.format("YYYY-MM-DD"));
+                            const tieneEvento = eventosNormalizados.includes(dia.format("YYYY-MM-DD"));
 
                             return (
                                 <div
@@ -114,7 +117,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
                                         className="rounded-circle bg-secondary text-white text-center proxTurno"
                                         style={{ width: "30px", height: "30px", lineHeight: "30px", fontSize: "12px" }}
                                     >
-                                        {turno.paciente.charAt(0).toUpperCase()}
+                                        {turno.paciente ? turno.paciente.charAt(0).toUpperCase() : "?"}
                                     </div>
                                     <div className="ms-2 ">
                                         <span className="fw-bold" >{turno.paciente}</span>

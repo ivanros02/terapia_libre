@@ -1,23 +1,20 @@
-// src/routes/chat.routes.js
 const express = require("express");
 const chatController = require("../controllers/chat.controller");
-const { authenticate } = require("../middlewares/auth.middleware"); // Importar correctamente
+const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
-// Obtener o crear un chat
-router.post("/chat", authenticate, chatController.getOrCreateChat); // Usar authenticate
+router.post("/chat", authenticate, chatController.getOrCreateChat);
+router.post("/message", authenticate, chatController.sendMessage);
+router.get("/:id_chat/messages", authenticate, chatController.getMessages);
+router.get("/chatId", authenticate, chatController.getChatId);
 
-// Enviar un mensaje
-router.post("/message", authenticate, chatController.sendMessage); // Usar authenticate
+// ✅ Nueva ruta para obtener la lista de chats disponibles
+router.get("/list", authenticate, chatController.getChatList);
 
-// Obtener mensajes de un chat
-router.get("/:id_chat/messages", authenticate, chatController.getMessages); // Usar authenticate
-
-// Nueva ruta para obtener el chatId
-router.get("/chatId", authenticate, chatController.getChatId); // Agrega esta línea
+// ✅ Nueva ruta para obtener los contactos con turnos activos
+router.get("/available-users", authenticate, chatController.getAvailableChatUsers);
 
 router.put("/:id_chat/marcar-leidos", authenticate, chatController.marcarMensajesComoLeidos);
-
 
 module.exports = router;

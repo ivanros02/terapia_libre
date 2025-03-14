@@ -1,8 +1,19 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useSocket } from '../../context/SocketContext';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Modal, Button, Form } from 'react-bootstrap'; // Importar componentes de Bootstrap
+import React, { useEffect, useState, useRef } from "react";
+import { useSocket } from "../../context/SocketContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Modal, Button, Form, ListGroup } from "react-bootstrap"; // Importar componentes de Bootstrap
+
+interface Chat {
+  id_chat: number;
+  id_profesional: number;
+  id_usuario: number;
+  nombre?: string; // 🔹 Agregamos 'nombre' para los usuarios disponibles en el modal
+  nombre_usuario?: string; // 🔹 Agregamos estos para los nombres en la lista de chats
+  nombre_profesional?: string;
+}
+
+
 
 interface Message {
   id_mensaje: string | number;
@@ -19,296 +30,350 @@ interface SocketMessage {
 }
 
 const Messages: React.FC = () => {
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [chatId, setChatId] = useState<number | null>(null);
-  const [showNewChatModal, setShowNewChatModal] = useState(false); // Estado para el modal de nuevo chat
-  const [newChatUserId, setNewChatUserId] = useState(''); // Estado para el ID del usuario del nuevo chat
+  const [newMessage, setNewMessage] = useState("");
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState<Chat[]>([]); // Usuarios disponibles para nuevo chat
   const socket = useSocket();
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Obtener el ID del usuario/profesional y el token del localStorage
-  const userId = localStorage.getItem('id');
-  const token = localStorage.getItem('token');
-  const esProfesional = localStorage.getItem('esProfesional') === 'true';
+  const userId = localStorage.getItem("id");
+  const token = localStorage.getItem("token");
+  const esProfesional = localStorage.getItem("esProfesional") === "true";
 
-
-
-  // Verificar autenticación
+  // 🔹 Redirigir si no está autenticado
   useEffect(() => {
     if (!token || !userId) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [navigate, token, userId]);
 
-  // Obtener el chatId al cargar el componente
+  // 🔹 Obtener lista de chats
   useEffect(() => {
-    const fetchChatId = async () => {
+    const fetchChats = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/chat/chatId`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            userId,
-            esProfesional,
-          },
-        });
-        setChatId(response.data.chatId);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/chat/list`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            params: { userId, esProfesional },
+          }
+        );
+        setChats(response.data);
       } catch (error) {
-        console.error("Error al obtener el chatId:", error);
-        setChatId(null); // 🔹 Evita que el frontend crashee
+        console.error("Error al obtener los chats:", error);
       }
     };
 
-    fetchChatId();
+    fetchChats();
   }, [token, userId, esProfesional]);
 
-  // Mostrar mensaje si no hay chat
-  {
-    chatId === null ? (
-      <div className="alert alert-warning text-center">
-        No tienes chats disponibles. Inicia una conversación con un profesional.
-      </div>
-    ) : (
-      <div> {/* Renderizar mensajes aquí */} </div>
-    )
-  }
-
+  // 🔹 Obtener mensajes cuando se selecciona un chat
   useEffect(() => {
-    if (socket && chatId !== null) {
-      socket.emit("join_chat", chatId);
-      console.log(`📡 Uniendo al chat: ${chatId}`);
+    if (!selectedChat) return;
+
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/chat/${selectedChat.id_chat}/messages`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setMessages(response.data);
+      } catch (error) {
+        console.error("Error al obtener los mensajes:", error);
+      }
+    };
+
+    fetchMessages();
+
+    if (socket) {
+      socket.emit("join_chat", selectedChat.id_chat);
+      console.log(`📡 Uniendo al chat: ${selectedChat.id_chat}`);
 
       const handleReceiveMessage = (newMessage: SocketMessage) => {
-        if (newMessage.senderId === parseInt(userId || '0')) {
-          // Ignora tu propio mensaje, ya fue añadido localmente.
-          return;
-        }
+        if (!selectedChat || newMessage.id_chat !== selectedChat.id_chat) return;
 
         setMessages((prevMessages) => {
-          const exists = prevMessages.some(msg => msg.id_mensaje === newMessage.id_mensaje);
+          // 🔹 Evitar agregar mensajes enviados por el propio usuario
+          if (newMessage.senderId === parseInt(userId || "0")) return prevMessages;
+
+          // 🔹 Filtrar para asegurarnos de que no se dupliquen mensajes
+          const exists = prevMessages.find(msg => msg.id_mensaje === newMessage.id_mensaje);
           if (exists) return prevMessages;
 
-          return [
-            ...prevMessages,
-            {
-              id_mensaje: newMessage.id_mensaje,
-              id_chat: newMessage.id_chat,
-              id_remitente: newMessage.senderId,
-              mensaje: newMessage.message,
-            },
-          ];
+          return [...prevMessages, {
+            id_mensaje: newMessage.id_mensaje,
+            id_chat: newMessage.id_chat,
+            id_remitente: newMessage.senderId,
+            mensaje: newMessage.message,
+          }];
         });
       };
 
+      socket.on("receive_message", handleReceiveMessage);
 
-      // Limpiar el listener anterior antes de agregar uno nuevo
-      socket.off("receive_message", handleReceiveMessage); // Limpiar listener previo
-      socket.on("receive_message", handleReceiveMessage); // Agregar nuevo listener
-
-      // Cargar mensajes anteriores solo una vez al entrar al chat
-      const fetchMessages = async () => {
-        try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/chat/${chatId}/messages`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setMessages(response.data);
-        } catch (error) {
-          console.error('Error al obtener los mensajes:', error);
-        }
-      };
-
-      fetchMessages();
-
-      // Limpiar el listener cuando el componente se desmonte
       return () => {
         socket.off("receive_message", handleReceiveMessage);
       };
     }
-  }, [socket, chatId, token]);
+  }, [socket, selectedChat, token]);
 
-
-
-
-  // Enviar un mensaje
+  // 🔹 Enviar un mensaje
   const sendMessage = async () => {
-    if (!socket || !newMessage.trim() || chatId === null || !userId) return;
+    if (!socket || !newMessage.trim() || !selectedChat || !userId) return;
 
     const tempId = `temp-${Date.now()}`;
     const tempMessage: Message = {
       id_mensaje: tempId,
-      id_chat: chatId,
-      id_remitente: parseInt(userId || '0'),
+      id_chat: selectedChat.id_chat,
+      id_remitente: parseInt(userId || "0"),
       mensaje: newMessage,
     };
 
-    // Agregar mensaje temporal a la lista
     setMessages((prev) => [...prev, tempMessage]);
 
     try {
-      // Enviar mensaje al backend
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/chat/message`,
         {
-          id_chat: chatId,
+          id_chat: selectedChat.id_chat,
           id_remitente: parseInt(userId),
           mensaje: newMessage,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Crear mensaje con el ID real
-      const savedMessage: Message = {
-        id_mensaje: response.data.messageId,
-        id_chat: chatId,
-        id_remitente: parseInt(userId),
-        mensaje: newMessage
-      };
-
-      // Reemplazar el mensaje temporal con el mensaje guardado
       setMessages((prev) =>
-        prev.map((msg) => (msg.id_mensaje === tempId ? savedMessage : msg))
+        prev.map((msg) => (msg.id_mensaje === tempId ? { ...msg, id_mensaje: response.data.messageId } : msg))
       );
 
-      // 🔹 Evitar recibir el mensaje duplicado por el socket
-      socket.emit('send_message', {
-        chatId,
-        senderId: parseInt(userId || '0'),
+      socket.emit("send_message", {
+        chatId: selectedChat.id_chat,
+        senderId: parseInt(userId || "0"),
         message: newMessage,
-        id_mensaje: response.data.messageId, // Agregar el ID real del mensaje
+        id_mensaje: response.data.messageId,
       });
 
     } catch (error) {
-      console.error('Error al enviar el mensaje:', error);
-      // Eliminar mensaje temporal en caso de error
+      console.error("Error al enviar el mensaje:", error);
       setMessages((prev) => prev.filter((msg) => msg.id_mensaje !== tempId));
     }
 
-    setNewMessage('');
+    setNewMessage("");
   };
 
-
-
-
-  // Desplazarse al final de los mensajes cuando se agrega uno nuevo
+  // 🔹 Obtener lista de usuarios disponibles para chat
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
+    if (!showNewChatModal) return;
 
-  // Crear un nuevo chat
-  const createNewChat = async () => {
+    const fetchAvailableUsers = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/chat/available-users`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { userId, esProfesional },
+          }
+        );
+        setAvailableUsers(response.data);
+      } catch (error) {
+        console.error("Error al obtener los usuarios disponibles:", error);
+      }
+    };
+
+    fetchAvailableUsers();
+  }, [showNewChatModal, token, userId, esProfesional]);
+
+  const fetchChats = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/chat/list`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { userId, esProfesional },
+        }
+      );
+
+      console.log("📡 Datos de los chats recibidos:", response.data);
+
+      if (Array.isArray(response.data)) {
+        setChats(response.data);
+      } else {
+        console.error("⚠️ La API no devolvió un array:", response.data);
+        setChats([]);
+      }
+    } catch (error) {
+      console.error("❌ Error al obtener los chats:", error);
+    }
+  };
+
+  // 🔹 Crear nuevo chat
+  const createNewChat = async (id_usuario_o_profesional: number) => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/chat/chat`,
         {
-          id_profesional: esProfesional ? userId : newChatUserId,
-          id_usuario: esProfesional ? newChatUserId : userId,
+          id_profesional: esProfesional ? userId : id_usuario_o_profesional,
+          id_usuario: esProfesional ? id_usuario_o_profesional : userId,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setChatId(response.data.chatId);
+
+      const nuevoChat = response.data;
+
+      // 🔹 Ocultar el modal antes de actualizar el estado
       setShowNewChatModal(false);
+
+      // 🔹 Esperar a que `fetchChats()` obtenga los datos correctos antes de actualizar `setSelectedChat`
+      fetchChats().then(() => {
+        setTimeout(() => {
+          setChats((prevChats) => {
+            const updatedChats = prevChats.find(chat => chat.id_chat === nuevoChat.id_chat);
+            if (updatedChats) {
+              setSelectedChat(updatedChats); // 🔹 Selecciona el chat con datos correctos
+            }
+            return prevChats; // Mantiene los chats sin agregar duplicados
+          });
+        }, 300); // 🔹 Agregamos un pequeño retraso para evitar problemas de sincronización
+      });
+
     } catch (error) {
-      console.error('Error al crear el chat:', error);
+      console.error("Error al crear el chat:", error);
     }
   };
 
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+
+
+
   return (
-    <div className="d-flex flex-column vh-100 bg-light">
-      {/* Navbar con botón para crear nuevo chat */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="container-fluid">
-          <span className="navbar-brand">Chat</span>
-          <Button variant="primary" onClick={() => setShowNewChatModal(true)}>
-            Nuevo Chat
-          </Button>
-        </div>
-      </nav>
-
-      {/* Lista de mensajes */}
-      <div className="flex-grow-1 overflow-auto p-3">
-        {messages.map((msg, index) => (
-          <div key={msg.id_mensaje ?? `temp-${index}`} className={`d-flex my-2 ${msg.id_remitente === parseInt(userId || '0') ? 'justify-content-end' : 'justify-content-start'}`}>
-            <div
-              className={`p-3 rounded ${msg.id_remitente === parseInt(userId || '0')
-                ? 'bg-primary text-white'
-                : 'bg-light text-dark'
-                }`}
-              style={{ maxWidth: '75%' }}
+    <div className="d-flex vh-100 bg-light">
+      {/* Lista de chats */}
+      <div className="col-3 border-end p-3">
+        <h5>Chats</h5>
+        <ListGroup>
+          {chats.map((chat) => (
+            <ListGroup.Item
+              key={`chat-${chat.id_chat}`} // 🔹 Se asegura un key único agregando un prefijo
+              action
+              onClick={() => setSelectedChat(chat)}
             >
-              <p className="mb-0">{msg.mensaje}</p>
-              <small className="d-block text-end opacity-75">
-              </small>
+              {esProfesional
+                ? chat.nombre_usuario || "Usuario desconocido"
+                : chat.nombre_profesional || "Profesional desconocido"}
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+
+        <Button variant="primary" className="mt-3" onClick={() => setShowNewChatModal(true)}>
+          Nuevo Chat
+        </Button>
+
+        {/* Modal para crear un nuevo chat */}
+        <Modal show={showNewChatModal} onHide={() => setShowNewChatModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Seleccionar usuario para chatear</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {/* Verificar si hay datos en availableUsers */}
+            {availableUsers.length > 0 ? (
+              <ListGroup>
+                {availableUsers.map((user) => (
+                  <ListGroup.Item
+                    key={`user-${user.id_usuario || user.id_profesional}`} // 🔹 Se asegura un key único
+                    action
+                    onClick={() => createNewChat(esProfesional ? user.id_usuario : user.id_profesional)}
+                  >
+                    {user.nombre || "Usuario Desconocido"}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            ) : (
+              <p className="text-center text-muted">No hay usuarios disponibles para chatear.</p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowNewChatModal(false)}>
+              Cerrar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+
+      </div>
+
+      {/* Chat seleccionado */}
+      <div className="col-9 d-flex flex-column">
+        {selectedChat ? (
+          <>
+            <div className="chat-container d-flex flex-column bg-white border rounded shadow-sm mt-5" style={{ height: "70vh", maxWidth: "60%" }}>
+
+              {/* 🔹 Header del chat (siempre visible) */}
+              <div className="chat-header bg-primary text-white p-3 rounded-top">
+                <h5 className="mb-0">
+                  Chat con {esProfesional
+                    ? selectedChat?.nombre_usuario || "Usuario desconocido"
+                    : selectedChat?.nombre_profesional || "Profesional desconocido"}
+                </h5>
+              </div>
+
+
+              {/* 🔹 Caja de mensajes con scroll interno */}
+              <div className="messages-box flex-grow-1 overflow-auto p-3" style={{ maxHeight: "calc(100% - 110px)" }}>
+                {messages.map((msg) => {
+                  const isSentByUser = msg.id_remitente === parseInt(userId || "0");
+                  return (
+                    <div key={msg.id_mensaje} className={`d-flex my-2 ${isSentByUser ? "justify-content-end" : "justify-content-start"}`}>
+                      <div
+                        className={`p-2 rounded shadow-sm ${isSentByUser ? "bg-primary text-white" : "bg-light text-dark"}`}
+                        style={{
+                          maxWidth: "75%",
+                          borderRadius: "15px",
+                          padding: "10px 15px",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        <p className="mb-0">{msg.mensaje}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input para escribir mensajes */}
+              <div className="p-3 border-top d-flex align-items-center bg-light">
+                <input
+                  type="text"
+                  className="form-control me-2"
+                  placeholder="Escribe un mensaje..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                />
+                <Button variant="primary" onClick={sendMessage}>Enviar</Button>
+              </div>
             </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+          </>
+        ) : (
+          <p className="text-center text-muted mt-5">Selecciona un chat para empezar a chatear.</p>
+        )}
       </div>
 
-      {/* Input para enviar mensajes */}
-      <div className="p-3 bg-white border-top">
-        <div className="input-group">
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-            className="form-control"
-            placeholder="Escribe un mensaje..."
-          />
-          <button
-            onClick={sendMessage}
-            className="btn btn-primary"
-          >
-            Enviar
-          </button>
-        </div>
-      </div>
-
-      {/* Modal para crear un nuevo chat */}
-      <Modal show={showNewChatModal} onHide={() => setShowNewChatModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Crear Nuevo Chat</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>ID del Usuario</Form.Label>
-              <Form.Control
-                type="text"
-                value={newChatUserId}
-                onChange={(e) => setNewChatUserId(e.target.value)}
-                placeholder="Ingresa el ID del usuario"
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowNewChatModal(false)}>
-            Cerrar
-          </Button>
-          <Button variant="primary" onClick={createNewChat}>
-            Crear Chat
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };

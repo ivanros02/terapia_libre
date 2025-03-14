@@ -2,6 +2,37 @@ const bcrypt = require("bcryptjs");
 const Profesional = require("../models/profesional.model");
 const nodemailer = require("nodemailer"); // Importar nodemailer
 
+exports.getTurnoDelDia = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const turnoHoy = await Profesional.getTurnoDelDia(id);
+
+        if (!turnoHoy) {
+            return res.status(404).json({ message: "No hay turnos programados para hoy." });
+        }
+
+        res.status(200).json(turnoHoy);
+    } catch (error) {
+        console.error("Error al obtener el turno del día:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+exports.getProximosTurnos = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const turnos = await Profesional.getProximosTurnos(id);
+
+        if (turnos.length === 0) {
+            return res.status(404).json({ message: "No hay próximos turnos agendados." });
+        }
+
+        res.status(200).json(turnos);
+    } catch (error) {
+        console.error("Error al obtener los próximos turnos:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
 
 exports.getProfesionales = async (req, res) => {
     try {

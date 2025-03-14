@@ -24,6 +24,38 @@ class Profesional {
     return result.insertId;
   }
 
+  static async getTurnoDelDia(id_profesional) {
+    const [turno] = await pool.execute(
+      `SELECT t.id_turno, t.fecha_turno, t.hora_turno, u.nombre AS nombre_paciente
+       FROM turnos t
+       JOIN usuarios u ON t.id_usuario = u.id_usuario
+       WHERE t.id_profesional = ? 
+         AND t.fecha_turno = CURDATE() 
+         AND t.estado IN ('Pendiente', 'Confirmado')
+       ORDER BY t.hora_turno ASC
+       LIMIT 1`,
+      [id_profesional]
+    );
+
+    return turno.length > 0 ? turno[0] : null;
+  }
+
+  static async getProximosTurnos(id_profesional) {
+    const [turnos] = await pool.execute(
+      `SELECT t.fecha_turno, u.nombre AS paciente
+       FROM turnos t
+       JOIN usuarios u ON t.id_usuario = u.id_usuario
+       WHERE t.id_profesional = ? 
+         AND t.fecha_turno >= CURDATE() 
+         AND t.estado IN ('Pendiente', 'Confirmado')
+       ORDER BY t.fecha_turno ASC
+       LIMIT 10`,
+      [id_profesional]
+    );
+
+    return turnos;
+  }
+
   static async assignEspecialidades(id_profesional, especialidades) {
     if (especialidades.length === 0) return;
 

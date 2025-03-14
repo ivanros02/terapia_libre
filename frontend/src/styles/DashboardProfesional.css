@@ -98,16 +98,29 @@
 .div3 {
     grid-area: 2 / 2 / 3 / 3;
     padding: 6.5px;
-    margin-left: -30px;
-    /* Pegar la card más cerca del sidebar */
+    margin-left: -45px;
+    max-width: 90%; /* Limitar el ancho en pantallas grandes */
+}
+
+/* Ajuste en pantallas más pequeñas como notebooks */
+@media (max-width: 1366px) {
+    .div3 {
+        margin-left: -10px; /* Menos desplazamiento a la izquierda */
+    }
 }
 
 .div4 {
     grid-area: 3 / 2 / 4 / 3;
-    /* Fila 3, columna 2 (card debajo de la verde) */
     padding: 6.5px;
     margin-left: -30px;
-    /* Pegar la card más cerca del sidebar */
+    
+}
+
+/* Ajuste en notebooks */
+@media (max-width: 1366px) {
+    .div4 {
+        margin-left: -10px; /* Reducir desplazamiento */
+    }
 }
 
 .div5 {
@@ -116,7 +129,8 @@
     /* Color de fondo */
     padding: 3px;
     margin-top: 59.9px;
-    margin-left: -90px;
+    margin-left: -350px;
+    width: 500px !important;
 }
 
 

@@ -8,10 +8,20 @@ const getOrCreateChat = async (req, res) => {
   const { id_profesional, id_usuario } = req.body;
 
   try {
-    // Buscar un chat existente
+    // 🔹 Verificar si existe un turno entre usuario y profesional
+    const [turno] = await db.query(
+      "SELECT * FROM turnos WHERE id_profesional = ? AND id_usuario = ? AND estado IN ('Pendiente', 'Confirmado', 'Completado')",
+      [id_profesional, id_usuario]
+    );
+
+    if (!turno.length) {
+      return res.status(403).json({ message: "No puedes iniciar un chat sin un turno activo." });
+    }
+
+    // 🔹 Buscar un chat existente
     let chat = await Chat.findByParticipants(id_profesional, id_usuario);
 
-    // Si no existe, crear uno nuevo
+    // 🔹 Si no existe, crear uno nuevo
     if (!chat) {
       const chatId = await Chat.create(id_profesional, id_usuario);
       chat = { id_chat: chatId };
@@ -19,6 +29,7 @@ const getOrCreateChat = async (req, res) => {
 
     res.status(200).json({ chatId: chat.id_chat });
   } catch (error) {
+    console.error("Error en getOrCreateChat:", error);
     res.status(500).json({ message: "Error al obtener o crear el chat" });
   }
 };
@@ -148,15 +159,12 @@ const getChatId = async (req, res) => {
   }
 
   try {
-    // Convertir esProfesional a booleano (viene como string en query params)
     const isProfesional = esProfesional === "true";
-
     let chat;
+
     if (isProfesional) {
-      // Si es un profesional, buscar un chat donde sea el profesional
       chat = await Chat.findByProfesionalId(parseInt(userId));
     } else {
-      // Si es un usuario, buscar un chat donde sea el usuario
       chat = await Chat.findByUserId(parseInt(userId));
     }
 
@@ -164,12 +172,103 @@ const getChatId = async (req, res) => {
       return res.status(404).json({ message: "No tienes chats disponibles." });
     }
 
+    // 🔹 Verificar si el usuario/profesional tiene un turno con la otra persona del chat
+    const [turno] = await db.query(
+      "SELECT * FROM turnos WHERE (id_profesional = ? AND id_usuario = ?) AND estado IN ('Pendiente', 'Confirmado', 'Completado')",
+      isProfesional
+        ? [parseInt(userId), chat.id_usuario]
+        : [chat.id_profesional, parseInt(userId)]
+    );
+
+    if (!turno.length) {
+      return res.status(403).json({ message: "No tienes un turno activo con este usuario." });
+    }
+
     res.status(200).json({ chatId: chat.id_chat });
   } catch (error) {
-    console.error("Error al obtener el chatId:", error);
+    console.error("Error en getChatId:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
+
+// Obtener lista de chats disponibles para el usuario/profesional
+const getChatList = async (req, res) => {
+  const { userId, esProfesional } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ message: "Falta el userId" });
+  }
+
+  try {
+    const isProfesional = esProfesional === "true";
+
+    // Obtener los chats donde el usuario/profesional participa
+    const chats = isProfesional
+      ? await Chat.findAllByProfesionalId(parseInt(userId))
+      : await Chat.findAllByUserId(parseInt(userId));
+
+    // Enriquecer con nombres de usuarios/profesionales
+    for (let chat of chats) {
+      const [profesional] = await db.query(
+        "SELECT nombre FROM profesionales WHERE id_profesional = ?",
+        [chat.id_profesional]
+      );
+
+      const [usuario] = await db.query(
+        "SELECT nombre FROM usuarios WHERE id_usuario = ?",
+        [chat.id_usuario]
+      );
+
+      chat.nombre_profesional = profesional.length ? profesional[0].nombre : "Profesional desconocido";
+      chat.nombre_usuario = usuario.length ? usuario[0].nombre : "Usuario desconocido";
+    }
+
+    res.status(200).json(chats);
+  } catch (error) {
+    console.error("Error al obtener la lista de chats:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Obtener lista de usuarios o profesionales con turnos activos
+const getAvailableChatUsers = async (req, res) => {
+  const { userId, esProfesional } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ message: "Falta el userId" });
+  }
+
+  try {
+    const isProfesional = esProfesional === "true";
+    let contacts;
+
+    if (isProfesional) {
+      // Obtener pacientes con turnos activos para el profesional
+      [contacts] = await db.query(
+        `SELECT DISTINCT u.id_usuario, u.nombre 
+         FROM turnos t 
+         JOIN usuarios u ON t.id_usuario = u.id_usuario
+         WHERE t.id_profesional = ? AND t.estado IN ('Pendiente', 'Confirmado', 'Completado')`,
+        [userId]
+      );
+    } else {
+      // Obtener profesionales con turnos activos para el usuario
+      [contacts] = await db.query(
+        `SELECT DISTINCT p.id_profesional, p.nombre 
+         FROM turnos t 
+         JOIN profesionales p ON t.id_profesional = p.id_profesional
+         WHERE t.id_usuario = ? AND t.estado IN ('Pendiente', 'Confirmado', 'Completado')`,
+        [userId]
+      );
+    }
+
+    res.status(200).json(contacts);
+  } catch (error) {
+    console.error("Error al obtener contactos para chat:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
 
 
 
@@ -180,4 +279,6 @@ module.exports = {
   getMessages,
   getChatId,
   marcarMensajesComoLeidos,
+  getChatList,
+  getAvailableChatUsers,
 };

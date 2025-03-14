@@ -32,7 +32,7 @@ const DashboardUsuario = () => {
     <div className="parent">
       <div className="div1">
         <SearchNavbar
-          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={userName || "Usuario"} // 🔹 Mostrar el nombre del usuario o un valor por defecto
         />
       </div>

@@ -20,7 +20,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
 
             {/* Tarjeta principal */}
             <div style={{ position: "relative", maxWidth: "100%" }}>
-                <Card className="p-3 shadow-lg rounded-4 border-0" style={{ background: "linear-gradient(to bottom right, #92e6a7, #6ec1c6)", maxWidth: "90%" }}>
+                <Card className="p-3 shadow-lg rounded-4 border-0" style={{ background: "linear-gradient(to bottom right, #92e6a7, #6ec1c6)", maxWidth: "80%" }}>
                     {/* Tarjeta interna: Próximo paciente */}
                     <Card className="p-3 mb-3 rounded-4 border-0" style={{ background: "rgba(255, 255, 255, 0.2)", backdropFilter: "blur(10px)", maxWidth: "50%" }}>
                         <h5 className="fw-bold text-white">Próximo paciente</h5>
