@@ -174,28 +174,33 @@ exports.getProfesionalData = async (req, res) => {
 exports.updateProfesional = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, foto_perfil_url, valor, valor_internacional } = req.body;
+        const { especialidades, ...data } = req.body; // Extraemos las especialidades
 
-        // Verificar si el profesional existe
+        // Convertir `estado` a `1` o `0`
+        if (data.estado !== undefined) {
+            data.estado = data.estado ? 1 : 0;
+        }
+
+        console.log(`Recibida actualización para ID ${id}:`, data);
+
         const profesionalExistente = await Profesional.findById(id);
         if (!profesionalExistente) {
             return res.status(404).json({ message: "Profesional no encontrado" });
         }
 
-        // Actualizar los datos del profesional
-        await Profesional.update(id, {
-            nombre,
-            titulo_universitario,
-            matricula_nacional,
-            matricula_provincial,
-            descripcion,
-            telefono,
-            disponibilidad,
-            correo_electronico,
-            foto_perfil_url,
-            valor,
-            valor_internacional
-        });
+        if (Object.keys(data).length === 0) {
+            return res.status(400).json({ message: "No se enviaron datos para actualizar" });
+        }
+
+        // Actualizar los datos básicos del profesional
+        await Profesional.update(id, data);
+
+        console.log(`Estado actualizado en la BD para ID ${id}`);
+
+        // Manejar especialidades si están presentes
+        if (especialidades && Array.isArray(especialidades)) {
+            await Profesional.updateEspecialidades(id, especialidades);
+        }
 
         res.json({ message: "Datos del profesional actualizados correctamente" });
     } catch (error) {
@@ -203,6 +208,3 @@ exports.updateProfesional = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
-
-
-

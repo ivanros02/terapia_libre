@@ -1,18 +1,35 @@
 :root {
-    --verde: #567c6f;
-    --naranja: #f1974c;
+    --verde: #4C655C;
+    --naranja: #F1974C;
     --crema: #d8d3bc;
     --verde-rgb: 86, 124, 111; /* Definir la variable en formato RGB */
 }
 
-
+/*
 @font-face {
+    font-family: 'Montserrat', sans-serif;
     font-family: 'Things Serif';
     src: url('./fuente/things-serif-font/things.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
+*/
+/* src/fonts.css */
+@font-face {
+    font-family: 'Montserrat';
+    src: url('./fonts/Montserrat-Regular.woff2') format('woff2'),
+         url('./fonts/Montserrat-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 
+@font-face {
+    font-family: 'Montserrat';
+    src: url('./fonts/Montserrat-Bold.woff2') format('woff2'),
+         url('./fonts/Montserrat-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
 h1,
 h2,
 h3 {

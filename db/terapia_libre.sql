@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-03-2025 a las 13:28:48
+-- Tiempo de generación: 14-03-2025 a las 16:48:25
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -39,7 +39,8 @@ CREATE TABLE `chats` (
 --
 
 INSERT INTO `chats` (`id_chat`, `id_profesional`, `id_usuario`, `creado_en`) VALUES
-(1, 1001, 5, '2025-03-11 21:14:36');
+(1, 1001, 5, '2025-03-11 21:14:36'),
+(9, 1001, 6, '2025-03-14 13:50:45');
 
 -- --------------------------------------------------------
 
@@ -55,6 +56,13 @@ CREATE TABLE `disponibilidad` (
   `hora_fin` time NOT NULL,
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `disponibilidad`
+--
+
+INSERT INTO `disponibilidad` (`id_disponibilidad`, `id_profesional`, `dia_semana`, `hora_inicio`, `hora_fin`, `creado_en`) VALUES
+(10, 1001, 'Lunes', '08:00:00', '17:00:00', '2025-03-13 14:37:18');
 
 -- --------------------------------------------------------
 
@@ -95,48 +103,8 @@ CREATE TABLE `mensajes` (
 --
 
 INSERT INTO `mensajes` (`id_mensaje`, `id_chat`, `id_remitente`, `mensaje`, `fecha_envio`, `leido`) VALUES
-(89, 1, 1001, 'a', '2025-03-12 16:06:33', 0),
-(90, 1, 1001, 'a2', '2025-03-12 16:11:02', 0),
-(91, 1, 5, 'Hola, ¿cómo estás?', '2025-03-12 16:22:26', 0),
-(92, 1, 1001, 'bien y vos', '2025-03-12 16:22:30', 0),
-(93, 1, 5, 'hola!', '2025-03-12 18:44:09', 0),
-(94, 1, 5, 'hola', '2025-03-12 19:57:31', 0),
-(95, 1, 5, 'holiwi', '2025-03-12 19:57:39', 0),
-(96, 1, 5, 'holaaa', '2025-03-12 19:58:02', 0),
-(97, 1, 1001, 'holi', '2025-03-12 19:58:06', 0),
-(98, 1, 5, 'Saludos', '2025-03-12 20:13:04', 0),
-(99, 1, 1001, 'hola', '2025-03-12 20:13:56', 0),
-(100, 1, 1001, 'evento', '2025-03-12 20:15:23', 0),
-(101, 1, 1001, 'evento', '2025-03-12 20:15:53', 0),
-(102, 1, 1001, 'notificacion', '2025-03-12 20:16:37', 0),
-(103, 1, 5, 'hola', '2025-03-12 20:17:03', 0),
-(104, 1, 5, 'envio notificacion', '2025-03-12 20:20:39', 0),
-(105, 1, 1001, 'notificacion', '2025-03-12 20:23:41', 0),
-(106, 1, 1001, 'noti', '2025-03-12 20:24:28', 0),
-(107, 1, 1001, 'holi', '2025-03-12 20:35:37', 0),
-(108, 1, 1001, 'hola', '2025-03-12 20:43:04', 0),
-(109, 1, 1001, 'hola', '2025-03-12 20:43:11', 0),
-(110, 1, 5, 'hola', '2025-03-12 20:49:52', 0),
-(111, 1, 5, 'hola carnal', '2025-03-12 20:54:36', 0),
-(112, 1, 5, 'hola doc', '2025-03-12 21:01:23', 0),
-(113, 1, 5, 'hola', '2025-03-12 21:03:42', 0),
-(114, 1, 5, 'a', '2025-03-12 21:04:02', 0),
-(115, 1, 5, 'en vivo', '2025-03-12 21:05:54', 0),
-(116, 1, 1001, 'hola', '2025-03-12 21:05:58', 0),
-(117, 1, 1001, 'test', '2025-03-12 21:06:19', 0),
-(118, 1, 5, 'hola', '2025-03-12 21:06:23', 0),
-(119, 1, 1001, 'test', '2025-03-12 21:06:45', 0),
-(120, 1, 5, 'copia', '2025-03-12 21:06:50', 0),
-(121, 1, 5, 'aa', '2025-03-12 21:10:30', 0),
-(122, 1, 5, 'atest', '2025-03-12 21:10:37', 0),
-(123, 1, 5, 'hola', '2025-03-12 21:10:59', 0),
-(124, 1, 1001, 'test', '2025-03-12 21:11:03', 0),
-(125, 1, 1001, 'aaa', '2025-03-12 21:14:36', 0),
-(126, 1, 5, 'test', '2025-03-12 21:14:43', 0),
-(127, 1, 5, 'hola', '2025-03-12 21:14:58', 0),
-(128, 1, 1001, 'aaa', '2025-03-12 21:17:31', 0),
-(129, 1, 5, 'test', '2025-03-12 21:17:35', 0),
-(130, 1, 5, 'buenas', '2025-03-12 21:17:51', 0);
+(146, 1, 1001, 'Hola soy el profesional', '2025-03-14 13:59:51', 0),
+(147, 1, 5, 'Hola soy el paciente', '2025-03-14 13:59:58', 0);
 
 -- --------------------------------------------------------
 
@@ -1204,7 +1172,7 @@ INSERT INTO `profesionales` (`id_profesional`, `nombre`, `titulo_universitario`,
 (998, 'Moisés Lobo', 'Profesional de nivel medio de partería', '7718866', '7838209', 'Ducimus amet suscipit non. Accusamus in nam eius tenetur id.\nLaborum eligendi provident. Perspiciatis quia temporibus praesentium quasi.', '+34 964 73 97 66', '24 horas', 'lumbrerasprudencio@example.org', '83ccfcbac7608c8bfff5913cb947d0da', 'https://placekitten.com/184/393', 8839.60, 461.97, '2024-10-24 01:12:57'),
 (999, 'Che Rovira', 'Operador de incineradores, instalaciones de tratamiento de agua', '6184250', '9641388', 'Porro ut maiores est optio eum dignissimos.\nCulpa sint magnam repellendus dolores. Quasi molestias a magni consectetur atque dolor aliquid.', '+34923 27 37 02', '72 horas', 'dcarnero@example.org', '1c30b33f0ab02a95ee95ff06a31d81ca', 'https://dummyimage.com/750x9', 5299.03, 828.16, '2024-07-01 12:58:12'),
 (1000, 'Consuela Gimeno', 'Parquetero y colocador de suelos', '6290434', '3659504', 'Ipsum voluptates maiores fugit.\nVeritatis quaerat et ratione architecto. Cum voluptate dignissimos quibusdam nemo qui illo.', '+34 883513670', '72 horas', 'wferrero@example.org', 'a5c27ed8f3f6e53b669c52c2d41ec2a7', 'https://dummyimage.com/1013x309', 1722.44, 914.88, '2024-09-26 14:21:13'),
-(1001, 'IVAN TEST', 'Lic. test', '345', '123', 'aaa', '1139114579', '24 horas', 'ivanrosendo1102@gmail.com', '$2b$10$5r2CGOfPettbiRfcblV1pe1/FQ9K6osMrg.ZpAQbs/xHEzJLzreK2', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2tYdAJt1rd9BQN2tnZxTANSDYTaxgix75Kg&s', 12.00, 11.00, '2025-03-11 20:16:23');
+(1001, 'Ivan Rosendo', 'Lic. test', '564', '123', 'aaa', '1139114579', '24 horas', 'ivanrosendo1102@gmail.com', '$2b$10$5r2CGOfPettbiRfcblV1pe1/FQ9K6osMrg.ZpAQbs/xHEzJLzreK2', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2tYdAJt1rd9BQN2tnZxTANSDYTaxgix75Kg&s', 1.00, 1.00, '2025-03-11 20:16:23');
 
 -- --------------------------------------------------------
 
@@ -2746,6 +2714,15 @@ CREATE TABLE `turnos` (
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `turnos`
+--
+
+INSERT INTO `turnos` (`id_turno`, `id_profesional`, `id_usuario`, `fecha_turno`, `hora_turno`, `estado`, `motivo_cancelacion`, `creado_en`) VALUES
+(1, 1001, 5, '2025-03-17', '09:00:00', 'Pendiente', NULL, '2025-03-13 20:36:41'),
+(2, 1001, 5, '2025-03-14', '09:00:00', 'Pendiente', NULL, '2025-03-13 21:01:44'),
+(3, 1001, 6, '2025-03-14', '10:00:00', 'Pendiente', NULL, '2025-03-14 13:10:02');
+
 -- --------------------------------------------------------
 
 --
@@ -2858,13 +2835,13 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `chats`
 --
 ALTER TABLE `chats`
-  MODIFY `id_chat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_chat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `disponibilidad`
 --
 ALTER TABLE `disponibilidad`
-  MODIFY `id_disponibilidad` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_disponibilidad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `especialidades`
@@ -2876,7 +2853,7 @@ ALTER TABLE `especialidades`
 -- AUTO_INCREMENT de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
 -- AUTO_INCREMENT de la tabla `notificaciones`
@@ -2900,7 +2877,7 @@ ALTER TABLE `profesionales`
 -- AUTO_INCREMENT de la tabla `turnos`
 --
 ALTER TABLE `turnos`
-  MODIFY `id_turno` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`

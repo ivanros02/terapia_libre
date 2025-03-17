@@ -1,0 +1,176 @@
+/* 📌 Quitar bordes del calendario */
+.custom-calendar {
+    border: none !important;
+    box-shadow: none !important;
+    width: 130% !important; /* 🔹 Aumenta el ancho del calendario */
+    background: transparent !important;
+    font-family: "Montserrat", sans-serif !important;
+}
+
+/* 📌 Ajustes para mejorar el estilo de los días */
+.custom-calendar .react-calendar__tile {
+    border-radius: 10px !important;
+    padding: 12px !important;
+    font-size: 20px;
+}
+
+/* 📌 Estilizar el día seleccionado */
+.custom-calendar .react-calendar__tile--active {
+    background-color: var(--verde) !important;
+    color: white !important;
+}
+
+/* 📌 Aplicar Montserrat al título del calendario (Ejemplo: "Marzo de 2025") */
+.custom-calendar .react-calendar__navigation {
+    font-family: "Montserrat", sans-serif !important;
+    font-weight: 600;
+    font-size: 18px; /* 🔹 Aumentar tamaño */
+}
+
+/* 📌 Estilizar el día seleccionado */
+.custom-calendar .react-calendar__tile--active {
+    background-color: var(--verde) !important;
+    color: white !important;
+}
+
+/* 📌 Estilo de los días disponibles */
+.custom-calendar .available-day {
+    font-weight: bold;
+    color: var(--verde);
+}
+
+/* Fondo semitransparente cuando el calendario está abierto */
+.floating-calendar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Para asegurarse de que esté sobre todo */
+    padding: 20px; /* Evita que en móviles quede pegado a los bordes */
+}
+
+/* Contenedor flotante del calendario */
+.floating-calendar-container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    width: 1050px; /* Ajustado para pantallas grandes */
+    text-align: center;
+    position: relative;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 90vh; /* 🔹 Evita que sea más alto que la pantalla */
+    overflow-y: auto; /* 🔹 Permite scroll en móviles */
+}
+
+
+/* Contenedor principal del calendario y horarios */
+.calendar-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1050px; /* Ajustado para pantallas grandes */
+    padding: 30px;
+    margin: 0 auto;
+    gap: 50px;
+}
+
+
+/* Contenedor de horarios más ancho */
+.available-times {
+    flex-grow: 2;
+    max-width: 700px; /* Ajustado para pantallas grandes */
+    min-width: 300px;
+    height: 350px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background: transparent;
+    padding: 25px;
+    overflow-y: auto;
+    border-color: transparent;
+}
+
+/* Botones de horarios más grandes y espaciados */
+.available-times button {
+    width: 55% !important; 
+    padding: 16px 44px;
+    font-size: 25px !important;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    color: var(--verde); 
+    border: 2px solid grey;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease; /* 🔹 Agrega una transición suave */
+}
+
+/* 📌 Cambio de color cuando el cursor está sobre la hora */
+.available-times button:hover {
+    background-color: var(--verde) !important; /* 🔹 Cambia el fondo a verde */
+    color: white !important; /* 🔹 Cambia el texto a blanco */
+    border-color: var(--verde) !important;
+}
+
+/* 🔹 RESPONSIVE para móviles y tablets */
+@media (max-width: 1024px) {
+    .floating-calendar-container {
+        width: 95%;
+        max-width: 700px; /* Más pequeño en pantallas medianas */
+        padding: 20px;
+    }
+
+    .calendar-container {
+        flex-direction: column; /* Cambiar a diseño en columna */
+        align-items: center;
+        max-width: 100%;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .available-times {
+        max-width: 100%;
+        min-width: 100%;
+        height: auto;
+    }
+
+    .calendar-wrapper {
+        max-width: 100%;
+    }
+}
+
+/* 🔹 RESPONSIVE para móviles pequeños */
+@media (max-width: 600px) {
+    .floating-calendar-container {
+        width: 95%;
+        max-width: 500px; /* Más pequeño en móviles */
+        padding: 15px;
+    }
+
+    .calendar-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .available-times {
+        max-width: 100%;
+        min-width: 100%;
+        height: auto;
+        padding: 15px;
+    }
+
+    .calendar-wrapper {
+        max-width: 100%;
+    }
+}

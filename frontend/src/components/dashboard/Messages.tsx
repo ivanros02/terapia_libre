@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSocket } from "../../context/SocketContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Modal, Button, Form, ListGroup } from "react-bootstrap"; // Importar componentes de Bootstrap
+import { Modal, Button, ListGroup } from "react-bootstrap"; // Importar componentes de Bootstrap
 
 interface Chat {
   id_chat: number;

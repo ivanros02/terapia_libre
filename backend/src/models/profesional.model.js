@@ -65,7 +65,7 @@ class Profesional {
 
   static async getAll(limit, offset) {
     const [rows] = await pool.execute(`
-        SELECT p.id_profesional, p.nombre, p.foto_perfil_url, p.disponibilidad, p.valor, 
+        SELECT p.id_profesional, p.nombre, p.foto_perfil_url, p.disponibilidad, p.valor, p.estado, 
                GROUP_CONCAT(e.nombre SEPARATOR ', ') AS especialidades
         FROM profesionales p
         LEFT JOIN profesional_especialidad pe ON p.id_profesional = pe.id_profesional
@@ -73,8 +73,11 @@ class Profesional {
         GROUP BY p.id_profesional
         LIMIT ? OFFSET ?
     `, [limit, offset]);
+
+    console.log("Profesionales obtenidos:", rows); // 🔹 Log para verificar
     return rows;
   }
+
 
   // Nuevo método para obtener el total de profesionales
   static async getTotalCount() {
@@ -117,15 +120,78 @@ class Profesional {
   }
 
   static async update(id_profesional, data) {
-    const { nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, foto_perfil_url, valor, valor_internacional } = data;
+    const fields = [];
+    const values = [];
 
-    await pool.execute(
-      `UPDATE profesionales 
-         SET nombre = ?, titulo_universitario = ?, matricula_nacional = ?, matricula_provincial = ?, descripcion = ?, telefono = ?, disponibilidad = ?, correo_electronico = ?, foto_perfil_url = ?, valor = ?, valor_internacional = ?
-         WHERE id_profesional = ?`,
-      [nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, foto_perfil_url, valor, valor_internacional, id_profesional]
-    );
+    Object.keys(data).forEach((key) => {
+      if (key === "estado") {
+        fields.push(`${key} = ?`);
+        values.push(data[key] ? 1 : 0); // 🔹 Convertir `true/false` a `1/0`
+      } else {
+        fields.push(`${key} = ?`);
+        values.push(data[key]);
+      }
+    });
+
+    values.push(id_profesional);
+
+    if (fields.length === 0) {
+      throw new Error("No se proporcionaron datos para actualizar");
+    }
+
+    const query = `UPDATE profesionales SET ${fields.join(", ")} WHERE id_profesional = ?`;
+
+    console.log("Ejecutando SQL:", query, values); // 🔹 Log para depuración
+
+    await pool.execute(query, values);
   }
+
+  static async updateEspecialidades(id_profesional, especialidades) {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // 🔹 Obtener las especialidades actuales del profesional
+      const [currentEspecialidades] = await connection.execute(
+        `SELECT id_especialidad FROM profesional_especialidad WHERE id_profesional = ?`,
+        [id_profesional]
+      );
+
+      const currentEspecialidadesSet = new Set(currentEspecialidades.map(e => e.id_especialidad));
+      const newEspecialidadesSet = new Set(especialidades);
+
+      // 🔹 Determinar cambios
+      const especialidadesAEliminar = [...currentEspecialidadesSet].filter(e => !newEspecialidadesSet.has(e));
+      const especialidadesAInsertar = [...newEspecialidadesSet].filter(e => !currentEspecialidadesSet.has(e));
+
+      // 🔹 Eliminar solo las especialidades que fueron deseleccionadas
+      if (especialidadesAEliminar.length > 0) {
+        await connection.execute(
+          `DELETE FROM profesional_especialidad WHERE id_profesional = ? AND id_especialidad IN (${especialidadesAEliminar.map(() => '?').join(', ')})`,
+          [id_profesional, ...especialidadesAEliminar]
+        );
+      }
+
+      // 🔹 Insertar solo las nuevas especialidades seleccionadas
+      if (especialidadesAInsertar.length > 0) {
+        const insertQueries = especialidadesAInsertar.map(id_especialidad =>
+          connection.execute(
+            `INSERT INTO profesional_especialidad (id_profesional, id_especialidad) VALUES (?, ?)`,
+            [id_profesional, id_especialidad]
+          )
+        );
+        await Promise.all(insertQueries);
+      }
+
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
 
 }
 

@@ -7,7 +7,6 @@ const FormProfessionals: React.FC = () => {
     const menuLinks = [
         { name: "¿Necesito terapia?", href: "/necesito-terapia" },
         { name: "Buscar profesional", href: "/professionals" },
-        { name: "Iniciar Sesión", href: "/Login" },
     ];
 
     return (

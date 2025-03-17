@@ -47,7 +47,7 @@ const DashboardProfesional = () => {
   const [turnoHoy, setTurnoHoy] = useState<TurnoHoy | null>(null);
   const [proximosTurnos, setProximosTurnos] = useState<Turno[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -104,7 +104,7 @@ const DashboardProfesional = () => {
   }, []);
 
   if (loading) return <div>Cargando...</div>;
-  if (error) return <div>Error: {error}</div>;
+  
 
   const eventos = proximosTurnos.map(t => t.fecha); // Extraer solo la fecha
   return (

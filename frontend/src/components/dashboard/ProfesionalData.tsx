@@ -14,6 +14,7 @@ interface Profesional {
     valor: number;
     valor_internacional: number;
     creado_en: string;
+    especialidades: number[];
 }
 
 interface ProfesionalDataProps {

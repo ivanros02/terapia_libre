@@ -10,7 +10,7 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate(); // 👈 Hook para redirigir
   const socket = useSocket();
   const [hasNewMessages, setHasNewMessages] = useState(false);
-  const [chatId, setChatId] = useState<number | null>(null);
+  const [chatId] = useState<number | null>(null);
   const userId = localStorage.getItem("id");
   // Obtener si es profesional o usuario
   const esProfesional = localStorage.getItem("esProfesional") === "true";

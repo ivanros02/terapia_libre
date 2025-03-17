@@ -3,6 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; // ⬅️ Para la redirección
 import CalendarAvailability from "./CalendarAvailability";
 
+
 interface Professional {
     id_profesional: number;
     nombre: string;
@@ -18,28 +19,23 @@ interface ProfessionalDetailsComponentProps {
 }
 
 const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> = ({ professional }) => {
-    const [showModal, setShowModal] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [showCalendar, setShowCalendar] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Verificar si hay un token en localStorage para saber si el usuario está autenticado
+    const handleOpenCalendar = () => {
         const token = localStorage.getItem("token");
-        setIsAuthenticated(!!token); // Si hay token, está autenticado
-    }, []);
-
-    const handleOpenModal = () => {
-        const token = localStorage.getItem("token");
-
+    
         if (!token) {
             // Guardamos la URL actual antes de redirigir al login
             localStorage.setItem("prevPath", location.pathname);
             navigate("/login");
             return;
         }
-
-        setShowModal(true);
+    
+        // Si hay token, abrir el calendario
+        setShowCalendar(true);
     };
+    
 
     return (
         <div className="container mt-5">
@@ -66,31 +62,25 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
                         <p className="fw-semibold">{professional.especialidades.join(" • ")}</p>
                         <p className="text-light">{professional.descripcion}</p>
 
-                        {/* Botón para abrir el modal, con validación de autenticación */}
-                        <button className="btn btn-light fw-bold mt-3" onClick={handleOpenModal}>
+                        {/* Botón para abrir el calendario flotante */}
+                        <button className="btn btn-light fw-bold mt-3" onClick={handleOpenCalendar}>
                             Agendar turno
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Modal con el Calendario */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Selecciona un turno</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <CalendarAvailability id_profesional={professional.id_profesional} showModal={showModal} />
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Cerrar
-                    </Button>
-                    <Button variant="primary" disabled>
-                        Confirmar Turno
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            {/* Calendario flotante */}
+            {showCalendar && (
+                <div className="floating-calendar-overlay" onClick={() => setShowCalendar(false)}>
+                    <div className="floating-calendar-container" onClick={(e) => e.stopPropagation()}>
+                        <CalendarAvailability id_profesional={professional.id_profesional} showModal={showCalendar} />
+                        <button className="btn btn-danger mt-3" onClick={() => setShowCalendar(false)}>
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

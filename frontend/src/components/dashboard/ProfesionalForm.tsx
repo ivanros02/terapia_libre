@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Button, Form } from "react-bootstrap";
+import EspecialidadSelectEditable from "./EspecialidadSelectEditable";
 
 interface Profesional {
     id_profesional: number;
@@ -16,6 +17,7 @@ interface Profesional {
     valor: number;
     valor_internacional: number;
     creado_en: string;
+    especialidades: number[];
 }
 
 const url = import.meta.env.VITE_API_BASE_URL;
@@ -32,7 +34,7 @@ interface ProfesionalFormProps {
 function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesionalData }: ProfesionalFormProps) {
 
     // 🔹 Inicialización segura del estado
-    const [formData, setFormData] = useState<Profesional>({
+    const [formData, setFormData] = useState<Profesional & { especialidades: number[] }>({
         id_profesional: 0,
         nombre: "",
         titulo_universitario: "",
@@ -45,21 +47,71 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
         foto_perfil_url: "",
         valor: 0.0,
         valor_internacional: 0.0,
-        creado_en: ""
+        creado_en: "",
+        especialidades: [] // Ahora almacenamos IDs de especialidades
     });
 
-    // 🔹 Actualiza `formData` cuando cambia `profesional`
+    const [especialidadesDisponibles, setEspecialidadesDisponibles] = useState<{ id_especialidad: number; nombre: string }[]>([]);
+
     useEffect(() => {
-        if (profesional) {
+        const fetchEspecialidades = async () => {
+            try {
+                const response = await axios.get<{ id_especialidad: number; nombre: string }[]>(`${url}/api/especialidades`);
+                setEspecialidadesDisponibles(response.data);
+                console.log("Especialidades disponibles:", response.data);
+            } catch (error) {
+                console.error("Error al cargar especialidades", error);
+            }
+        };
+
+        fetchEspecialidades();
+    }, []);
+
+
+    // 🔹 Actualiza `formData` cuando cambia `profesional`
+    const [selectedEspecialidades, setSelectedEspecialidades] = useState<number[]>([]);
+
+    // 🔹 Cargar especialidades cuando cambia el profesional seleccionado
+    useEffect(() => {
+        if (profesional && show && especialidadesDisponibles.length > 0) {
+            console.log("Cargando especialidades del profesional:", profesional.especialidades);
+            console.log("Especialidades disponibles:", especialidadesDisponibles);
+
+            // Verificar que `profesional.especialidades` sea un array válido
+            if (!Array.isArray(profesional.especialidades) || profesional.especialidades.length === 0) {
+                console.warn("⚠️ `profesional.especialidades` está vacío o no es un array:", profesional.especialidades);
+                return;
+            }
+
+            // 🔹 Convertir nombres en IDs si `profesional.especialidades` contiene nombres
+            const especialidadesIDs = profesional.especialidades
+                .map((id: number) => {
+                    const match = especialidadesDisponibles.find(esp => esp.id_especialidad === id);
+                    return match ? match.id_especialidad : null;
+                })
+                .filter(id => id !== null) as number[]; // 🔹 Filtrar valores null y asegurarse que sean números
+
+            console.log("Especialidades convertidas a IDs:", especialidadesIDs);
+
             setFormData({
                 ...profesional,
-                descripcion: profesional.descripcion ?? "",
-                telefono: profesional.telefono ?? "",
-                matricula_provincial: profesional.matricula_provincial ?? "",
-                foto_perfil_url: profesional.foto_perfil_url ?? ""
+                especialidades: especialidadesIDs
             });
+
+            setSelectedEspecialidades(especialidadesIDs);
         }
-    }, [profesional]);
+    }, [profesional, especialidadesDisponibles, show]);
+
+
+
+
+
+
+
+
+
+
+
 
     // 🔹 Manejo seguro de los cambios en los inputs
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -73,14 +125,25 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.put(`${url}/api/profesionales/${profesional.id_profesional}`, formData);
+            await axios.put(`${url}/api/profesionales/${profesional.id_profesional}`, {
+                ...formData,
+                especialidades: selectedEspecialidades.map(Number) // 🔹 Asegurar que sean números
+            });
             onSave();
-            fetchProfesionalData(); // 🔹 Ahora sí se refresca la vista
+            fetchProfesionalData();
             handleClose();
         } catch (error) {
             console.error("Error al actualizar datos del profesional", error);
         }
     };
+
+
+
+
+
+
+
+
 
 
 
@@ -119,6 +182,16 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                             <option value="72 horas">72 horas</option>
                             <option value="96 horas">96 horas</option>
                         </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Especialidades</Form.Label>
+                        <EspecialidadSelectEditable
+                            selectedEspecialidades={selectedEspecialidades} // 🔹 Se pasa el estado con las especialidades del profesional
+                            onChange={(selected) => {
+                                setSelectedEspecialidades(selected); // 🔹 Mantiene el estado sincronizado
+                                setFormData(prev => ({ ...prev, especialidades: selected }));
+                            }}
+                        />
                     </Form.Group>
                     <Button type="submit" variant="success">Guardar</Button>
                 </Form>

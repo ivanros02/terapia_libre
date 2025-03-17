@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 type HeadProps = {
   description?: string;
@@ -11,6 +14,51 @@ type HeadProps = {
 };
 
 const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScrollToNeedTherapy }) => {
+  const navigate = useNavigate(); // Hook para redireccionar
+  const [usuario, setUsuario] = useState<{ nombre: string; esProfesional: boolean } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUsuarioData = async () => {
+      try {
+        const id = localStorage.getItem("id");
+        const token = localStorage.getItem("token");
+        const esProfesional = localStorage.getItem("esProfesional") === "true"; // Convierte a booleano
+
+        if (!id || !token) {
+          throw new Error("No se encontró el ID o el token de autenticación.");
+        }
+
+        // Definir la URL según el tipo de usuario
+        const apiEndpoint = esProfesional ? `${url}/api/profesionales/${id}` : `${url}/api/auth/usuario/${id}`;
+
+        // Hacer la solicitud a la API
+        const response = await axios.get(apiEndpoint, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setUsuario({ ...response.data, esProfesional }); // Guardar datos del usuario
+      } catch (error: any) {
+        setError(error.message || "Error al obtener los datos del usuario.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsuarioData();
+  }, []);
+
+  // Función para redirigir al dashboard correcto
+  const handleDashboardRedirect = () => {
+    if (usuario) {
+      const dashboardPath = usuario.esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
+      navigate(dashboardPath);
+    }
+  };
+
   return (
     <HelmetProvider>
       <Helmet>
@@ -21,23 +69,23 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
       </Helmet>
       <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom p-3 fixed-top shadow mb-5">
         <div className="container-fluid">
-          {/* Logo y título */}
+          {/* Logo */}
           <a className="navbar-brand d-flex align-items-center ms-4" href="/">
-            <img src="/logo.png" alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
-            <span style={{ fontSize: '1.5rem', color: "var(--verde)" }}>Terapia Libre</span>
+            <img src="/logo.png" alt="Logo" style={{ height: "40px", marginRight: "10px" }} />
+            <span style={{ fontSize: "1.5rem", color: "var(--verde)" }}>Terapia Libre</span>
           </a>
 
-          {/* Nuevo logo y texto */}
-          <div className="d-flex align-items-center"> {/* Aumenté el margen izquierdo con mx-5 */}
-            <img src="/atencion_psiquiatrica.png" alt="Atención Psiquiátrica" style={{ height: '70px', marginRight: '10px',paddingLeft: '10px' }} />
-            <span style={{ color: "var(--naranja)", fontWeight: 'bold' }}>
-              <span style={{ fontSize: '0.9rem' }}>ATENCIÓN PSIQUIÁTRICA INMEDIATA</span> {/* Texto normal */}
+          {/* Sección Atención Inmediata */}
+          <div className="d-flex align-items-center">
+            <img src="/atencion_psiquiatrica.png" alt="Atención Psiquiátrica" style={{ height: "70px", marginRight: "10px", paddingLeft: "10px" }} />
+            <span style={{ color: "var(--naranja)", fontWeight: "bold" }}>
+              <span style={{ fontSize: "0.9rem" }}>ATENCIÓN INMEDIATA</span>
               <br />
-              <span style={{ fontSize: '2rem' }}>0810 666 3372</span> {/* Número más grande */}
+              <span style={{ fontSize: "2rem" }}>0810 666 3372</span>
             </span>
           </div>
 
-          {/* Botón del menú responsive */}
+          {/* Botón de menú responsive */}
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
@@ -52,8 +100,8 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
                       className="nav-link text-secondary fs-5"
                       href={link.href}
                       onClick={(e) => {
-                        e.preventDefault(); // Evita la navegación
-                        onScrollToNeedTherapy?.(); // Llama a la función de scroll
+                        e.preventDefault();
+                        onScrollToNeedTherapy?.();
                       }}
                     >
                       {link.name}
@@ -65,6 +113,28 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
                   )}
                 </li>
               ))}
+              {/* Muestra "Hola, Nombre" y lo hace clickeable */}
+              {loading ? (
+                <li className="nav-item me-3">
+                  <span className="nav-link text-secondary fs-5">Cargando...</span>
+                </li>
+              ) : usuario ? (
+                <li className="nav-item me-3">
+                  <span
+                    className="nav-link fs-5 fw-bold"
+                    style={{ color: "var(--verde)", cursor: "pointer" }}
+                    onClick={handleDashboardRedirect} // Redirige al dashboard
+                  >
+                    Hola, {usuario.nombre}
+                  </span>
+                </li>
+              ) : (
+                <li className="nav-item me-3">
+                  <a className="nav-link text-secondary fs-5" href="/login">
+                    Iniciar Sesión
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>

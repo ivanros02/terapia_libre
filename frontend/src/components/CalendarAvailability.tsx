@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import axios from "axios";
+import "../styles/CalendarAvailability.css";
+import ConfirmBookingModal from "./ConfirmBookingModalProps";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 interface Disponibilidad {
     [key: string]: { hora_inicio: string; hora_fin: string }[];
@@ -12,13 +15,25 @@ interface CalendarAvailabilityProps {
     showModal: boolean;
 }
 
+interface Professional {
+    id_profesional: number;
+    nombre: string;
+    foto_perfil_url: string;
+    especialidades: string[];
+    disponibilidad: string;
+    valor: number;
+    descripcion: string;
+    valor_internacional: number;
+    correo_electronico: string;
+}
+
 const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesional, showModal }) => {
     const [availableDays, setAvailableDays] = useState<string[]>([]);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [availableTimes, setAvailableTimes] = useState<Disponibilidad>({});
-
-    const url = import.meta.env.VITE_API_BASE_URL;
+    const [selectedDateTime, setSelectedDateTime] = useState<string | null>(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [professional, setProfessional] = useState<Professional | null>(null);
 
     useEffect(() => {
         const fetchAvailability = async () => {
@@ -34,57 +49,99 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
         if (showModal) fetchAvailability();
     }, [showModal, id_profesional]);
 
-    // Convertir el día seleccionado a texto con la primera letra en mayúscula
+
+
+    useEffect(() => {
+        const fetchProfessional = async () => {
+            try {
+                const response = await axios.get(`${url}/api/profesionales/${id_profesional}`);
+                setProfessional(response.data);
+            } catch (error) {
+                console.error("Error al obtener los detalles del profesional:", error);
+            }
+        };
+
+        fetchProfessional();
+    }, [id_profesional]);
+
     const obtenerDiaSemana = (fecha: Date): string => {
         return new Intl.DateTimeFormat("es-ES", { weekday: "long" })
             .format(fecha)
-            .replace(/^\w/, (c) => c.toUpperCase()); // Corrige la capitalización
+            .replace(/^\w/, (c) => c.toUpperCase());
     };
 
-    const handleDateChange = async (value: Date | Date[] | null) => {
+    const handleDateChange = (value: Date | Date[] | null) => {
         if (!value || Array.isArray(value)) return;
-        const diaSeleccionado = obtenerDiaSemana(value);
         setSelectedDate(value);
+    };
 
-        try {
-            const response = await axios.get(`${url}/disponibilidad/horas?id_profesional=${id_profesional}`);
-            const disponibilidad = response.data;
+    const [precioFinal, setPrecioFinal] = useState<number>(0); // 🔹 Precio en ARS (MercadoPago)
+    const [precioFinalInternacional, setPrecioFinalInternacional] = useState<number>(0); // 🔹 Precio en USD (PayPal)
 
-            if (!disponibilidad[diaSeleccionado]) {
-                setAvailableTimes({});
-                return;
-            }
+    const handleSelectTime = (hora_inicio: string, hora_fin: string) => {
+        if (selectedDate && professional) {
+            // ✅ Convertir la fecha seleccionada a `YYYY-MM-DD`
+            const formattedDate = selectedDate.toISOString().split("T")[0];
 
-            setAvailableTimes({ [diaSeleccionado]: disponibilidad[diaSeleccionado] });
-        } catch (error) {
-            console.error("Error al obtener disponibilidad:", error);
+            console.log("📌 Fecha antes de enviar:", formattedDate); // Depuración
+
+            setSelectedDateTime(`${formattedDate} - ${hora_inicio} a ${hora_fin}`);
+            setPrecioFinal(Number(professional.valor) || 0); // 🔹 Precio en ARS para Mercado Pago
+            setPrecioFinalInternacional(Number(professional.valor_internacional) || 0); // 🔹 Precio en USD para PayPal
+            setShowConfirmModal(true);
+        } else {
+            console.error("El profesional aún no está cargado, intenta nuevamente.");
         }
     };
 
+
+
+
     return (
         <>
-            <Calendar
-                onChange={(value) => handleDateChange(value as Date | Date[] | null)}
-                value={selectedDate}
-                tileDisabled={({ date }) => {
-                    const dia = obtenerDiaSemana(date);
-                    return !availableDays.includes(dia);
-                }}
+            <div className="calendar-container d-flex flex-column flex-md-row justify-content-center align-items-center w-100" style={{ maxWidth: "100%", padding: "20px", margin: "0 auto" }}>
+                <div className="calendar-wrapper">
+                    <Calendar
+                        onChange={(value) => handleDateChange(value as Date | Date[] | null)}
+                        value={selectedDate}
+                        tileDisabled={({ date }) => !availableDays.includes(obtenerDiaSemana(date))}
+                        tileClassName={({ date }) => availableDays.includes(obtenerDiaSemana(date)) ? "available-day" : ""}
+                        className="custom-calendar"
+                    />
+                </div>
+
+                <div className="available-times">
+                    <h5 className="text-center mb-3">
+                        {selectedDate ? selectedDate.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" }) : "Selecciona un día"}
+                    </h5>
+                    {selectedDate && availableTimes[obtenerDiaSemana(selectedDate)]?.length > 0 ? (
+                        availableTimes[obtenerDiaSemana(selectedDate)].map((time, index) => (
+                            <button
+                                key={index}
+                                className="btn btn-outline-success my-1 w-100"
+                                style={{ padding: "14px 20px", fontSize: "16px", borderRadius: "12px" }}
+                                onClick={() => handleSelectTime(time.hora_inicio, time.hora_fin)}
+                            >
+                                {`${time.hora_inicio} - ${time.hora_fin}`}
+                            </button>
+                        ))
+                    ) : (
+                        <p className="text-muted text-center">No hay horarios disponibles</p>
+                    )}
+                </div>
+            </div>
+
+            {/* Modal de Confirmación */}
+            <ConfirmBookingModal
+                show={showConfirmModal}
+                onHide={() => setShowConfirmModal(false)}
+                selectedDateTime={selectedDateTime}
+                id_profesional={id_profesional}
+                id_usuario={parseInt(localStorage.getItem("id") || "0")}
+                precio={precioFinal}  // 🔹 Mercado Pago (ARS)
+                precioInternacional={precioFinalInternacional}  // 🔹 PayPal (USD)
             />
 
-            {selectedDate && (
-                <div className="mt-3">
-                    <label className="fw-bold">Horarios disponibles:</label>
-                    <select className="form-control" value={selectedTime || ""} onChange={(e) => setSelectedTime(e.target.value)}>
-                        <option value="">Selecciona un horario</option>
-                        {availableTimes[obtenerDiaSemana(selectedDate) as keyof Disponibilidad]?.map((time, index) => (
-                            <option key={index} value={`${time.hora_inicio}-${time.hora_fin}`}>
-                                {`${time.hora_inicio} - ${time.hora_fin}`}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            )}
         </>
     );
 };
