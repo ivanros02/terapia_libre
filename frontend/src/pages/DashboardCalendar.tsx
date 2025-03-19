@@ -6,33 +6,38 @@ import GoogleCalendar from "../components/GoogleCalendar";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos
+interface Turno {
+  id_turno: number;
+  fecha_turno: string;
+  hora_turno: string;
+  estado: string;
+}
+
 interface UserData {
   nombre: string;
   correo_electronico: string;
 }
 
-const Dashboard = () => {
+const DashboardCalendar = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Detectar si es profesional o usuario
+  const [turnos, setTurnos] = useState<Turno[]>([]);
+  const [, setLoading] = useState(true);
+  const [, setError] = useState<string | null>(null);
+
   const esProfesional = localStorage.getItem("esProfesional") === "true";
+  const id = localStorage.getItem("id");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const id = localStorage.getItem("id");
-        const token = localStorage.getItem("token");
-
         if (!id || !token) {
           throw new Error("No se encontró el ID o el token de autenticación.");
         }
 
-        // Determinar la API correcta según el tipo de usuario
-        const apiUrl = esProfesional 
-          ? `${url}/api/profesionales/${id}`  // Si es profesional, obtiene su info
-          : `${url}/api/auth/usuario/${id}`; // Si es usuario, obtiene su info
+        const apiUrl = esProfesional
+          ? `${url}/api/profesionales/${id}`
+          : `${url}/api/auth/usuario/${id}`;
 
         const response = await axios.get(apiUrl, {
           headers: {
@@ -43,21 +48,38 @@ const Dashboard = () => {
         setUserData(response.data);
       } catch (error: any) {
         setError(error.message || "Error al obtener los datos.");
+      }
+    };
+
+    const fetchTurnos = async () => {
+      try {
+        if (!id || !token) return;
+
+        const turnosUrl = esProfesional
+          ? `${url}/api/turnos/profesional/${id}`  // 🔹 Endpoint para profesionales
+          : `${url}/api/turnos/usuario/${id}`;   // 🔹 Endpoint para usuarios
+
+        const response = await axios.get(turnosUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("📩 Turnos recibidos del backend:", response.data);
+        setTurnos(response.data);
+      } catch (error: any) {
+        setError(error.message || "Error al obtener los turnos.");
       } finally {
         setLoading(false);
       }
     };
 
+
     fetchUserData();
-  }, [esProfesional]);
+    fetchTurnos();
+  }, [id, token]);
 
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <div className="parent">
@@ -70,9 +92,9 @@ const Dashboard = () => {
       <div className="div2">
         <Sidebar />
       </div>
-      <GoogleCalendar />
+      <GoogleCalendar turnos={turnos} usuarioRol={esProfesional ? "profesional" : "usuario"} />
     </div>
   );
 };
 
-export default Dashboard;
+export default DashboardCalendar;

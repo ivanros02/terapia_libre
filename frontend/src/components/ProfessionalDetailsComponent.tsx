@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ⬅️ Para la redirección
 import CalendarAvailability from "./CalendarAvailability";
 

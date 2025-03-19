@@ -13,7 +13,8 @@ const disponibilidadRoutes = require("./src/routes/disponibilidad.routes");
 const turnosRoutes = require("./src/routes/turnos.routes");
 const googleAuthRoutes = require('./src/routes/googleAuth.routes');
 const chatRoutes = require('./src/routes/chat.routes'); // Nueva ruta para el chat
-
+const mercadoPagoRoutes = require("./src/routes/mercadoPago.routes");
+const googleMeetRoutes = require("./src/routes/googleMeet.routes");
 const app = express();
 const server = http.createServer(app);
 
@@ -38,6 +39,8 @@ app.use("/api/especialidades", especialidadRoutes);
 app.use("/disponibilidad", disponibilidadRoutes);
 app.use("/api/turnos", turnosRoutes);
 app.use('/google', googleAuthRoutes);
+app.use("/google-meet", googleMeetRoutes);
+app.use("/api/mercadopago", mercadoPagoRoutes);
 // Pasar `io` al cargar las rutas del chat
 app.use("/api/chat", (req, res, next) => {
     req.io = io;

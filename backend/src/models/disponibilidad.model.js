@@ -21,66 +21,125 @@ class Disponibilidad {
         return rows;
     }
 
-    static calcularFechaDesdeDiaSemana(diaSemana) {
+    static calcularFechasDesdeDiaSemana(diaSemana, semanas = 24) { // Ahora calcula para 6 meses
         const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         const hoy = new Date();
-        const diaActual = hoy.getDay();
-        const diferencia = diasSemana.indexOf(diaSemana) - diaActual;
-        const fecha = new Date();
-        fecha.setDate(hoy.getDate() + (diferencia >= 0 ? diferencia : 7 + diferencia)); // Próxima ocurrencia del día
-        return fecha.toISOString().split("T")[0]; // Retorna en formato YYYY-MM-DD
+        const fechas = [];
+    
+        // 🔹 Normalizar el nombre del día
+        const diaSemanaNormalizado = diaSemana?.trim()?.toLowerCase();
+        console.log("🔍 Verificando día de la semana recibido:", diaSemanaNormalizado);
+    
+        const diasSemanaNormalizados = diasSemana.map(d => d.toLowerCase());
+    
+        if (!diasSemanaNormalizados.includes(diaSemanaNormalizado)) {
+            console.error(`❌ Error: El día recibido "${diaSemana}" no es válido`);
+            return [];
+        }
+    
+        for (let i = 0; i < semanas * 7; i++) { // Extiende a 6 meses
+            const fecha = new Date();
+            fecha.setDate(hoy.getDate() + i);
+    
+            const nombreDia = diasSemana[fecha.getDay()].toLowerCase();
+    
+            if (nombreDia === diaSemanaNormalizado) {
+                fechas.push(fecha.toISOString().split("T")[0]); // Formato YYYY-MM-DD
+            }
+        }
+    
+        console.log("✅ Fechas generadas correctamente:", fechas);
+        return fechas;
     }
+    
+
+
 
     static async obtenerDisponibilidadesHoras(id_profesional) {
         // Obtener todas las disponibilidades del profesional
         const [rows] = await pool.execute(
             `SELECT d.dia_semana, d.hora_inicio, d.hora_fin 
-            FROM disponibilidad d
-            WHERE d.id_profesional = ? 
-            ORDER BY FIELD(d.dia_semana, 'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'), d.hora_inicio`,
+             FROM disponibilidad d
+             WHERE d.id_profesional = ? 
+             ORDER BY FIELD(d.dia_semana, 'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'), d.hora_inicio`,
             [id_profesional]
         );
 
         // Obtener los turnos ocupados para este profesional
         const [turnosOcupados] = await pool.execute(
-            `SELECT DATE_FORMAT(fecha_turno, '%Y-%m-%d') AS fecha_turno, hora_turno 
-            FROM turnos 
-            WHERE id_profesional = ? 
-            AND estado IN ('Pendiente', 'Confirmado')`,
+            `SELECT DATE_FORMAT(fecha_turno, '%Y-%m-%d') AS fecha_turno, 
+                    TIME_FORMAT(hora_turno, '%H:%i:%s') AS hora_turno
+             FROM turnos 
+             WHERE id_profesional = ? 
+             AND estado IN ('Pendiente', 'Confirmado')`,
             [id_profesional]
         );
 
-        // Convertir los turnos ocupados en un Set para búsqueda rápida
+        // Convertimos los turnos ocupados en un Set para búsqueda rápida
         const turnosSet = new Set(turnosOcupados.map(t => `${t.fecha_turno}-${t.hora_turno}`));
 
-        // Filtrar la disponibilidad excluyendo solo los horarios ocupados
-        const horariosDisponibles = rows.flatMap(d => {
-            const fecha = Disponibilidad.calcularFechaDesdeDiaSemana(d.dia_semana);
-            let horarios = [];
-            let horaActual = d.hora_inicio;
+        console.log("📆 Turnos ocupados registrados:", turnosSet);
 
-            while (horaActual < d.hora_fin) {
-                let [horas, minutos] = horaActual.split(":").map(Number);
-                let horaFin = `${String(horas + 1).padStart(2, "0")}:00:00`;
+        // Objeto para almacenar los horarios disponibles sin repetir
+        const horariosDisponibles = {};
 
-                // Si el turno está ocupado, no lo agregamos a la disponibilidad
-                if (!turnosSet.has(`${fecha}-${horaActual}`)) {
-                    horarios.push({
-                        dia_semana: d.dia_semana,
-                        hora_inicio: horaActual,
-                        hora_fin: horaFin
-                    });
-                }
-
-                horaActual = horaFin; // Pasar al siguiente intervalo
+        for (const d of rows) {
+            if (!d.dia_semana) {
+                console.error("❌ Error: d.dia_semana es undefined o null.");
+                continue;
             }
 
-            return horarios;
-        });
+            const diaNormalizado = d.dia_semana.trim().toLowerCase();
+            console.log("🔹 Día de la semana normalizado:", diaNormalizado);
 
-        return horariosDisponibles;
+            const fechasPosibles = Disponibilidad.calcularFechasDesdeDiaSemana(d.dia_semana);
+
+            if (!fechasPosibles.length) {
+                console.error(`⚠️ No se encontraron fechas para el día: "${d.dia_semana}"`);
+                continue;
+            }
+
+            for (const fecha of fechasPosibles) {
+                if (!fecha) continue;
+
+                let horaActual = d.hora_inicio;
+
+                while (horaActual < d.hora_fin) {
+                    let [horas, minutos] = horaActual.split(":").map(Number);
+                    let horaFin = `${String(horas + 1).padStart(2, "0")}:00:00`;
+
+                    const claveTurno = `${fecha}-${horaActual}`;
+
+                    if (!turnosSet.has(claveTurno)) {
+                        if (!horariosDisponibles[fecha]) {
+                            horariosDisponibles[fecha] = [];
+                        }
+
+                        if (!horariosDisponibles[fecha].some(h => h.hora_inicio === horaActual)) {
+                            horariosDisponibles[fecha].push({
+                                hora_inicio: horaActual,
+                                hora_fin: horaFin
+                            });
+                        }
+                    }
+
+                    horaActual = horaFin;
+                }
+            }
+        }
+
+
+        console.log("✅ Disponibilidad filtrada correctamente:", horariosDisponibles);
+
+        // 🔹 Convertimos `horariosDisponibles` en array antes de retornarlo
+        return Object.keys(horariosDisponibles).flatMap(fecha =>
+            horariosDisponibles[fecha].map(horario => ({
+                fecha,
+                hora_inicio: horario.hora_inicio,
+                hora_fin: horario.hora_fin
+            }))
+        );
     }
-
 
 
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { gapi } from "gapi-script";
 
 const CLIENT_ID = "1005376109174-8j00pst6p2d1g0a5o330brpavnnbc731.apps.googleusercontent.com";
-export const SCOPES = "https://www.googleapis.com/auth/calendar";
+export const SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.events.readonly";
 
 export const useGoogleAuth = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);

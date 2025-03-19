@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { Modal, Button } from "react-bootstrap";
 import axios from "axios";
 import { PayPalButtons } from "@paypal/react-paypal-js";
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
 const url = import.meta.env.VITE_API_BASE_URL;
+
 
 interface ConfirmBookingModalProps {
     show: boolean;
@@ -13,13 +15,17 @@ interface ConfirmBookingModalProps {
     id_usuario: number;
     precio: number;  // 🔹 Precio para Mercado Pago
     precioInternacional: number;  // 🔹 Precio para PayPal
+    profesionalName: string | null;
 }
 
-const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide, selectedDateTime, id_profesional, id_usuario, precio, precioInternacional }) => {
-    const [orderID, setOrderID] = useState<string | null>(null);
+const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide, selectedDateTime, id_profesional, id_usuario, precio, precioInternacional, profesionalName }) => {
+    // ✅ Inicializa Mercado Pago solo una vez
+    initMercadoPago('APP_USR-9e2bda9f-ed96-4a5e-bcdd-aed83328c4a6', { locale: 'es-AR' });
+
+    const [, setOrderID] = useState<string | null>(null);
     const [showPayPal, setShowPayPal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [loadingMP, setLoadingMP] = useState(false); // ✅ Estado para Mercado Pago
+    const [preferenceId, setPreferenceId] = useState(null);
 
     // 🔹 Crear orden de pago en PayPal
     const handleCreateOrder = async (): Promise<string> => {
@@ -69,30 +75,36 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
         }
     };
 
-    // 🔹 Crear orden de pago en Mercado Pago
-    const handleMercadoPago = async () => {
-        try {
-            setLoadingMP(true);
-            const [fecha_turno, hora_turno] = selectedDateTime?.split(" - ") ?? [];
-            const precioNumerico = Number(precio);
-            if (isNaN(precioNumerico)) throw new Error("El precio no es un número válido.");
 
-            const response = await axios.post(`${url}/api/turnos/mercadopago/create-order`, {
+    // CREAR ORDEN DE PAGO
+    const create_preference = async () => {
+        try {
+            const response = await axios.post(`${url}/api/mercadopago/create-order`, {
+                title: profesionalName,
+                quantity: 1,
+                price: precio,
                 id_profesional,
                 id_usuario,
-                fecha_turno,
-                hora_turno,
-                precio: precioNumerico.toFixed(2),
+                fecha_turno: selectedDateTime?.split(" - ")[0],
+                hora_turno: selectedDateTime?.split(" - ")[1],
             });
 
-            // ✅ Redirigir a la URL de pago de Mercado Pago
-            window.location.href = response.data.init_point;
+            const { id } = response.data;
+            return id;
         } catch (error) {
-            console.error("❌ Error creando la orden en Mercado Pago:", error);
-        } finally {
-            setLoadingMP(false);
+            console.error('Error al crear la preferencia de pago:', error);
         }
     };
+
+
+    const handleBuy = async () => {
+        const id = await create_preference();
+        if (id) {
+            setPreferenceId(id);
+        }
+    };
+
+
 
     return (
         <>
@@ -107,14 +119,15 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
                 <Modal.Footer style={{ backgroundColor: "var(--verde)" }} className="d-flex flex-column align-items-center border-0">
                     {!showPayPal ? (
                         <>
-                            {/* 🔹 Botón de Mercado Pago */}
+                            {/* 🔹 Botón de Mercado Pago Checkout Pro */}
                             <Button
                                 style={{ backgroundColor: "white", color: "var(--verde)", border: "2px solid white", width: "80%" }}
-                                className="fw-bold px-4 py-2 mb-2"
-                                onClick={handleMercadoPago}
-                                disabled={loadingMP}
+                                className="fw-bold px-4 py-2"
+                                onClick={handleBuy}
                             >
-                                {loadingMP ? "Redirigiendo..." : "Pagar con Mercado Pago"}
+                                {preferenceId && <Wallet initialization={{ preferenceId: preferenceId }} />}
+
+                                Pagar con Mercado Pago
                             </Button>
 
                             {/* 🔹 Botón de PayPal */}

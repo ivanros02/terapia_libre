@@ -5,6 +5,7 @@ import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/DashboardProfesional.css";
 import axios from 'axios';
+import { Link } from "react-router-dom"; // 👈 Importamos Link
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate(); // 👈 Hook para redirigir
@@ -91,13 +92,13 @@ const Sidebar: React.FC = () => {
             <House size={24} />
           </button>
         </li>
-        {esProfesional && (
-          <li className="nav-item">
-            <a href="/dashboard/profesional/calendario_profesional" className="nav-link text-white py-3">
-              <Calendar size={24} />
-            </a>
-          </li>
-        )}
+
+        <li className="nav-item">
+          <Link to="/dashboard/calendario" className="nav-link text-white py-3">
+            <Calendar size={24} />
+          </Link>
+        </li>
+
         <li className="nav-item position-relative">
           <button onClick={handleMessagesClick} className="nav-link text-white py-3 bg-transparent border-0 w-100 position-relative">
             <MessageCircle size={24} />

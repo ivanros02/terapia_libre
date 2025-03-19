@@ -39,25 +39,35 @@ exports.obtenerDisponibilidadesHoras = async (req, res) => {
 
         const horarios = await Disponibilidad.obtenerDisponibilidadesHoras(id_profesional);
 
-        // Agrupar por día de la semana correctamente
-        const disponibilidadPorDia = horarios.reduce((acc, horario) => {
-            const dia = horario.dia_semana;
-            if (!acc[dia]) {
-                acc[dia] = [];
+        console.log("🔹 Horarios obtenidos antes de agrupar:", JSON.stringify(horarios, null, 2));
+
+        // Agrupar por fecha
+        const disponibilidadPorFecha = horarios.reduce((acc, horario) => {
+            const { fecha, hora_inicio, hora_fin } = horario;
+
+            if (!fecha || !hora_inicio || !hora_fin) {
+                console.warn(`⚠️ Horario con datos faltantes: ${JSON.stringify(horario)}`);
+                return acc;
             }
-            acc[dia].push({
-                hora_inicio: horario.hora_inicio,
-                hora_fin: horario.hora_fin,
-            });
+
+            if (!acc[fecha]) {
+                acc[fecha] = [];
+            }
+            acc[fecha].push({ hora_inicio, hora_fin });
+
             return acc;
         }, {});
 
-        res.json(disponibilidadPorDia);
+        console.log("✅ Disponibilidad agrupada correctamente:", JSON.stringify(disponibilidadPorFecha, null, 2));
+
+        res.json(disponibilidadPorFecha);
     } catch (error) {
-        console.error("Error al obtener disponibilidades:", error);
+        console.error("❌ Error al obtener disponibilidades:", error);
         res.status(500).json({ message: "Error interno" });
     }
 };
+
+
 
 
 

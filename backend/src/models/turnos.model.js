@@ -32,6 +32,20 @@ class Turno {
         );
         return result.affectedRows;
     }
+
+    static async obtenerTurnosPorUsuario(id_usuario) {
+        try {
+            const [rows] = await pool.execute(
+                `SELECT * FROM turnos WHERE id_usuario = ? ORDER BY fecha_turno, hora_turno`,
+                [id_usuario]
+            );
+            return rows;
+        } catch (error) {
+            console.error("Error en la consulta de turnos del usuario:", error);
+            throw new Error("Error al obtener los turnos del usuario.");
+        }
+    }
+    
 }
 
 module.exports = Turno;

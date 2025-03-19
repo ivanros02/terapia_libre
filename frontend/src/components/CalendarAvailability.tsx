@@ -39,8 +39,16 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
         const fetchAvailability = async () => {
             try {
                 const response = await axios.get(`${url}/disponibilidad/horas?id_profesional=${id_profesional}`);
-                setAvailableDays(Object.keys(response.data));
-                setAvailableTimes(response.data);
+                console.log("📆 Disponibilidad recibida:", response.data);
+
+                if (!response.data || typeof response.data !== "object") {
+                    console.error("❌ Respuesta inválida del backend");
+                    return;
+                }
+
+                setAvailableDays(Object.keys(response.data)); // Obtiene las fechas disponibles
+                setAvailableTimes(response.data); // Asigna los horarios disponibles
+
             } catch (error) {
                 console.error("Error al obtener disponibilidad:", error);
             }
@@ -48,6 +56,9 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
 
         if (showModal) fetchAvailability();
     }, [showModal, id_profesional]);
+
+
+
 
 
 
@@ -77,17 +88,17 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
 
     const [precioFinal, setPrecioFinal] = useState<number>(0); // 🔹 Precio en ARS (MercadoPago)
     const [precioFinalInternacional, setPrecioFinalInternacional] = useState<number>(0); // 🔹 Precio en USD (PayPal)
+    const [profesionalName, setProfesionalName] = useState<string>(""); // 🔹 Nombre del profesional
 
     const handleSelectTime = (hora_inicio: string, hora_fin: string) => {
         if (selectedDate && professional) {
             // ✅ Convertir la fecha seleccionada a `YYYY-MM-DD`
             const formattedDate = selectedDate.toISOString().split("T")[0];
 
-            console.log("📌 Fecha antes de enviar:", formattedDate); // Depuración
-
             setSelectedDateTime(`${formattedDate} - ${hora_inicio} a ${hora_fin}`);
             setPrecioFinal(Number(professional.valor) || 0); // 🔹 Precio en ARS para Mercado Pago
             setPrecioFinalInternacional(Number(professional.valor_internacional) || 0); // 🔹 Precio en USD para PayPal
+            setProfesionalName(professional.nombre || "");
             setShowConfirmModal(true);
         } else {
             console.error("El profesional aún no está cargado, intenta nuevamente.");
@@ -104,8 +115,8 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
                     <Calendar
                         onChange={(value) => handleDateChange(value as Date | Date[] | null)}
                         value={selectedDate}
-                        tileDisabled={({ date }) => !availableDays.includes(obtenerDiaSemana(date))}
-                        tileClassName={({ date }) => availableDays.includes(obtenerDiaSemana(date)) ? "available-day" : ""}
+                        tileDisabled={({ date }) => !availableDays.includes(date.toISOString().split("T")[0])} // Cambiado aquí
+                        tileClassName={({ date }) => availableDays.includes(date.toISOString().split("T")[0]) ? "available-day" : ""}
                         className="custom-calendar"
                     />
                 </div>
@@ -114,8 +125,8 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
                     <h5 className="text-center mb-3">
                         {selectedDate ? selectedDate.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" }) : "Selecciona un día"}
                     </h5>
-                    {selectedDate && availableTimes[obtenerDiaSemana(selectedDate)]?.length > 0 ? (
-                        availableTimes[obtenerDiaSemana(selectedDate)].map((time, index) => (
+                    {selectedDate && availableTimes[selectedDate.toISOString().split("T")[0]]?.length > 0 ? (
+                        availableTimes[selectedDate.toISOString().split("T")[0]].map((time, index) => (
                             <button
                                 key={index}
                                 className="btn btn-outline-success my-1 w-100"
@@ -140,6 +151,7 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
                 id_usuario={parseInt(localStorage.getItem("id") || "0")}
                 precio={precioFinal}  // 🔹 Mercado Pago (ARS)
                 precioInternacional={precioFinalInternacional}  // 🔹 PayPal (USD)
+                profesionalName={profesionalName} //Nombre profesional
             />
 
         </>
