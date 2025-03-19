@@ -3,152 +3,100 @@
 
 }
 
-.sidebar {
-    background-color: var(--verde) !important;
-    width: 80px;
-    border-radius: 25px 0 0 25px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem 0;
-}
-
-@media (max-width: 1024px) {
-    /* Estilos para móviles y tablets (horizontal y vertical) */
-    .sidebar {
-        width: 100%;
-        height: 60px;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        border-radius: 0;
-        bottom: 0;
-        top: auto;
-        padding: 0;
-    }
-
-    .sidebar ul {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100%;
-        justify-content: space-around;
-        margin: 0;
-        padding: 0;
-    }
-
-    .sidebar ul li {
-        margin-top: 0 !important;
-    }
-
-    .sidebar .mt-auto {
-        margin-top: 0 !important;
-    }
-
-    .sidebar img {
-        display: none;
-    }
-}
-
 .parent {
     display: grid;
-    grid-template-columns: 100px 1fr 300px;
-    /* Sidebar de 100px, área principal flexible, calendario de 300px */
-    grid-template-rows: 60px 1fr 1fr;
-    /* Barra de búsqueda fija, el resto flexible */
-    grid-gap: 0;
-    /* Eliminar espacio entre elementos */
+    grid-template-columns: 100px 1fr 350px; /* Sidebar - Contenido - Calendario (más ancho) */
+    grid-template-rows: 60px 1fr 1fr; /* Search bar - Cards */
+    grid-gap: 15px;
     height: 100vh;
-    /* Altura completa de la ventana */
     padding: 0;
-    /* Eliminar padding general */
     box-sizing: border-box;
 }
 
-.div1 {
-    grid-area: 1 / 2 / 2 / 4;
-    /* Fila 1, columnas 2 a 4 (barra de búsqueda) */
-    padding: 10px;
-    margin-left: 10px;
-    /* Alejar la barra de búsqueda del sidebar */
-}
-
+/* Sidebar a la izquierda */
 .div2 {
     grid-area: 1 / 1 / 4 / 2;
-    /* Fila 1 a 4, columna 1 (sidebar) */
     padding: 10px;
     width: 100px;
-    /* Ancho fijo para el sidebar */
-    box-sizing: border-box;
-    /* Asegura que el padding no aumente el tamaño */
-    margin: 0;
-    /* Eliminar márgenes */
-    position: relative;
-    /* Permite ajustes finos de posición */
-    top: -10px;
-    /* Mover el sidebar un poco más arriba */
-    left: -10px;
-    /* Mover el sidebar más a la izquierda */
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
 }
 
+/* Search bar en la parte superior */
+.div1 {
+    grid-area: 1 / 2 / 2 / 4;
+    padding: 10px;
+    margin-left: 110px; /* Dejar espacio para el sidebar */
+}
+
+/* Primera card horizontal (próximo paciente) */
 .div3 {
     grid-area: 2 / 2 / 3 / 3;
-    padding: 6.5px;
-    margin-left: -45px;
-    max-width: 90%; /* Limitar el ancho en pantallas grandes */
+    padding: 10px;
+    margin-left: 5vh; /* Pegamos más al sidebar */
+    margin-top: 8vh; /* Reducimos el margen superior */
+    width: 95%; /* Hacemos la card más ancha */
 }
 
-/* Ajuste en pantallas más pequeñas como notebooks */
-@media (max-width: 1366px) {
-    .div3 {
-        margin-left: -10px; /* Menos desplazamiento a la izquierda */
-    }
-}
-
+/* Segunda card horizontal (historia clínica/lista de pacientes) */
 .div4 {
     grid-area: 3 / 2 / 4 / 3;
-    padding: 6.5px;
-    margin-left: -30px;
-    
+    padding: 10px;
+    margin-top: 2vh; /* Reducimos el espacio entre la primera y segunda card */
+    margin-left: 6vh; /* Pegamos más al sidebar */
+    width: 95%; /* Hacemos la card más ancha */
 }
 
-/* Ajuste en notebooks */
-@media (max-width: 1366px) {
-    .div4 {
-        margin-left: -10px; /* Reducir desplazamiento */
+/* Calendario (más ancho y más alineado) */
+.div5 {
+    grid-area: 2 / 3 / 4 / 4;
+    padding: 10px;
+    margin-left: -25vh; /* Acercamos más a las cards */
+    margin-top: 15vh; /* Alineamos mejor con la primera card */
+    
+    height: auto; /* Permitimos que crezca verticalmente */
+}
+
+/* Ajuste responsivo */
+@media (max-width: 1024px) {
+    .div5 {
+        width: 100%; /* En pantallas más pequeñas, usamos todo el ancho disponible */
+        margin-left: 0;
     }
 }
 
-.div5 {
-    grid-area: 2 / 3 / 4 / 4;
-    /* Fila 2 a 4, columna 3 (calendario) */
-    /* Color de fondo */
-    padding: 3px;
-    margin-top: 59.9px;
-    margin-left: -350px;
-    width: 500px !important;
-}
 
-
-
+/* Ajuste responsivo */
 @media only screen and (max-width: 768px) {
     .parent {
         grid-template-columns: 1fr;
-        /* Una columna en pantallas pequeñas */
         grid-template-rows: auto auto auto auto auto;
-        /* Filas ajustadas al contenido */
     }
 
-    .div1,
-    .div2,
-    .div3,
-    .div4,
-    .div5 {
+    .div1, .div2, .div3, .div4, .div5 {
         grid-area: auto;
-        /* Restablecer áreas para pantallas pequeñas */
     }
+
+    .div2 {
+        width: 100%;
+        height: 60px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        top: unset;
+        background-color: white !important;
+        border-top: 1px solid #ddd;
+        display: flex !important;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0.5rem 0;
+        z-index: 9999 !important;
+    }
+}
+
+.calendarioAncho {
+    width: 150% !important; /* Hace el calendario más ancho */
 }

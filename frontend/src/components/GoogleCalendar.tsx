@@ -8,6 +8,7 @@ import Button from "react-bootstrap/Button";
 import axios from 'axios';
 const url = import.meta.env.VITE_API_BASE_URL;
 import { useGoogleAuth } from "./useGoogleAuth";
+import { Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 declare global {
@@ -35,6 +36,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
   const [selectedTurno, setSelectedTurno] = useState<Turno | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showMeetModal, setShowMeetModal] = useState(false);
+  const [meetEmbedded, setMeetEmbedded] = useState(false);
   const [meetUrl, setMeetUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -217,42 +219,97 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
     }
   };
 
+  const abrirMeetEnPopup = (url: string, turno: Turno) => {
+    const width = 900;
+    const height = 600;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+
+    const meetWindow = window.open(
+      url,
+      "GoogleMeetPopup",
+      `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+    );
+
+    if (!meetWindow) {
+      alert("No se pudo abrir la videollamada. Habilita las ventanas emergentes.");
+      return;
+    }
+
+    // 🔥 Monitoreamos cada 1 segundo si la ventana de Meet se cerró
+    const checkPopupClosed = setInterval(() => {
+      if (meetWindow.closed) {
+        clearInterval(checkPopupClosed);
+        console.log("✅ La llamada de Meet ha finalizado.");
+
+        // 🔹 Ejecuta aquí la acción que necesites
+        registrarFinDeLlamada(turno);
+      }
+    }, 1000);
+  };
+
+  // 📌 Función para realizar acciones cuando finaliza la llamada
+  const registrarFinDeLlamada = async (turno: Turno) => {
+    console.log(`📌 Registrando fin de la videollamada para el turno ${turno.id_turno}`);
+
+    try {
+      // 🔥 Llamar al backend para registrar el fin de la llamada
+      axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno })
+        .then(() => console.log("✅ Fin de llamada registrado en la base de datos"))
+        .catch((error) => console.error("❌ Error al registrar el fin de la llamada:", error));
+    } catch (error) {
+      console.error("❌ Error al registrar el fin de la llamada:", error);
+    }
+
+    // 🔥 Opcional: Actualizar estado o mostrar mensaje al usuario
+    alert("La videollamada ha finalizado.");
+  };
 
 
   const iniciarSesionVideo = async (turno: Turno) => {
     const url = await crearVideollamadaMeet(turno);
     if (url) {
-      setMeetUrl(url);
-      setShowMeetModal(true); // 🔹 Muestra el modal en lugar de abrir una nueva pestaña
+      abrirMeetEnPopup(url, turno);
     }
   };
 
   const unirseAVideo = (turno: Turno) => {
     if (turno.meet_url) {
-      setMeetUrl(turno.meet_url);
-      setShowMeetModal(true); // 🔹 Muestra el modal en lugar de abrir una nueva pestaña
+      abrirMeetEnPopup(turno.meet_url, turno);
     } else {
       alert("La sesión aún no tiene una videollamada asociada.");
     }
   };
 
+
+
   return (
     <div className="container mt-4">
       {isSignedIn ? (
         <>
-          <div className="d-flex gap-2 mb-4">
-            <Button variant="danger" onClick={signOut}>Cerrar sesión</Button>
-            <Button variant="primary" onClick={fetchGoogleEvents}>Cargar eventos</Button>
-          </div>
 
-          <h3 className="mb-3">Turnos agendados</h3>
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="timeGridWeek"
-            locale="es"
-            events={formattedEvents}
-            eventClick={handleEventClick}
-          />
+
+
+          <Container fluid className="d-flex justify-content-center align-items-center py-3">
+            <Row className="w-100 justify-content-center">
+              <Col xs={12} md={10} lg={8}>
+                <div className="d-flex gap-2 mb-4">
+                  <Button variant="danger" onClick={signOut}>Cerrar sesión</Button>
+                  <Button variant="primary" onClick={fetchGoogleEvents}>Cargar eventos</Button>
+                </div>
+
+                <h3 className="mb-3">Turnos agendados</h3>
+
+                <FullCalendar
+                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                  initialView="timeGridWeek"
+                  locale="es"
+                  events={formattedEvents}
+                  eventClick={handleEventClick}
+                />
+              </Col>
+            </Row>
+          </Container>
 
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
@@ -296,10 +353,10 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
           <Modal.Title>Videollamada en curso</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
-          {meetUrl ? (
+          {meetUrl && selectedTurno ? (  // 🔹 Asegurar que `selectedTurno` no sea null
             <>
               <p>Haz clic en el botón para unirte a la videollamada:</p>
-              <Button variant="success" onClick={() => window.location.href = meetUrl}>
+              <Button variant="success" onClick={() => abrirMeetEnPopup(meetUrl, selectedTurno)}>
                 Unirse a la llamada
               </Button>
             </>
@@ -308,6 +365,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
           )}
         </Modal.Body>
       </Modal>
+
 
     </div>
   );

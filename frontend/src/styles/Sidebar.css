@@ -1,0 +1,129 @@
+/* 🔹 Sidebar vertical en escritorio */
+.sidebar {
+    background-color: transparent !important;
+    width: 120px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050 !important; /* Asegurar que esté por encima */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    justify-content: space-between;
+    z-index: 9999 !important; /* Asegura que esté por encima de todo */
+    
+}
+
+
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem; /* Espaciado entre íconos */
+}
+
+.sidebar .nav-item {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    
+}
+
+.nav{
+    margin-top: 5rem !important;
+}
+
+.sidebar .nav-link {
+    color: var(--verde) !important; /* Color de íconos */
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+/* Primer icono resaltado */
+.sidebar .nav-item:first-child .nav-link {
+    background-color: rgba(0, 128, 0, 0.2); /* Suave fondo resaltado */
+    border-radius: 10px;
+}
+
+/* Notificación en el icono de mensajes */
+.sidebar .nav-item .notification {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* Espaciado para el logo al final */
+.sidebar .sidebar-logo {
+    margin-bottom: 50px;
+}
+
+.sidebar-logo img {
+    width: 60px; /* Ajuste de tamaño */
+}
+
+/* 🔹 Sidebar horizontal en móviles */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: 60px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        top: unset;
+        background-color: white !important;
+        border-top: 1px solid #ddd;
+        display: flex !important;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0.5rem 0;
+        z-index: 9999 !important; /* Asegura que esté por encima de todo */
+    }
+
+    .nav{
+        margin-top: 0rem !important;
+    }
+
+    .sidebar ul {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .sidebar .nav-item {
+        width: auto;
+    }
+
+    .sidebar .nav-link {
+        width: auto;
+        font-size: 22px;
+    }
+
+    /* Ocultar logo en móviles */
+    .sidebar-logo {
+        display: none;
+    }
+}

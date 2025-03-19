@@ -16,6 +16,7 @@ interface ProfesionalData {
 interface TurnoHoy {
   nombre_paciente: string;
   hora_turno: string;
+  meet_url: string;
 }
 
 interface Turno {
@@ -48,52 +49,47 @@ const DashboardProfesional = () => {
   const [proximosTurnos, setProximosTurnos] = useState<Turno[]>([]);
   const [loading, setLoading] = useState(true);
   const [, setError] = useState<string | null>(null);
+  const [eventos, setEventos] = useState<string[]>([]);
+
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         const id = localStorage.getItem("id");
-        const token = localStorage.getItem("token");
-
-        if (!id || !token) {
-          throw new Error("No se encontró el ID o el token de autenticación.");
+        if (!id) {
+          throw new Error("No se encontró el ID del profesional.");
         }
 
         // 🔹 Obtener datos del profesional
-        const profesionalResponse = await axios.get(`${url}/api/profesionales/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const profesionalResponse = await axios.get(`${url}/api/profesionales/${id}`);
         setProfesionalData(profesionalResponse.data);
 
-        // 🔹 Obtener turno del día
-        const turnoResponse = await axios.get(`${url}/api/profesionales/${id}/turno-hoy`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // 🔹 Obtener el próximo turno más cercano
+        const turnoResponse = await axios.get(`${url}/api/turnos/${id}/turno-hoy`);
+        const turnoMasCercano = turnoResponse.data || null; // ✅ Manejar el caso `null`
 
-        if (turnoResponse.data) {
-          setTurnoHoy({
-            nombre_paciente: turnoResponse.data.nombre_paciente,
-            hora_turno: turnoResponse.data.hora_turno,
-          });
-        } else {
-          setTurnoHoy(null); // No hay turno hoy
-        }
+        setTurnoHoy(turnoMasCercano);
 
-        // 🔹 Obtener próximos turnos
-        const proximosTurnosResponse = await axios.get(`${url}/api/profesionales/${id}/proximos-turnos`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // 🔹 Obtener turnos del profesional
+        const turnosResponse = await axios.get(`${url}/api/turnos/profesionalDashboard/${id}`);
+        const turnos = Array.isArray(turnosResponse.data) ? turnosResponse.data : [];
 
-        const turnosFormateados: Turno[] = proximosTurnosResponse.data.map((turno: any) => ({
+        
+
+        // 🔹 Extraer próximos turnos (máximo 5)
+        const proximosTurnos = turnos.map((turno: any) => ({
           fecha: turno.fecha_turno,
           paciente: turno.nombre_paciente,
         }));
 
-        setProximosTurnos(turnosFormateados);
+    
+
+        setProximosTurnos(proximosTurnos);
+        setEventos([...new Set(turnos.map((turno: any) => turno.fecha_turno))]); // ✅ Fechas únicas
+
+
 
       } catch (error: any) {
-        console.error("Error en el dashboard:", error);
         setError(error.response?.data?.message || "Error al cargar los datos");
       } finally {
         setLoading(false);
@@ -104,9 +100,7 @@ const DashboardProfesional = () => {
   }, []);
 
   if (loading) return <div>Cargando...</div>;
-  
 
-  const eventos = proximosTurnos.map(t => t.fecha); // Extraer solo la fecha
   return (
     <div className="parent">
       <div className="div1">
@@ -123,15 +117,13 @@ const DashboardProfesional = () => {
           name={profesionalData?.nombre || "Profesional"}
           patientName={turnoHoy?.nombre_paciente || "Sin paciente hoy"}
           appointmentTime={turnoHoy ? `${turnoHoy.hora_turno}` : "Sin turnos"}
-          sessionLink="https://tusitio.com/sesion"
           newPatients={3}
-          progress={51}
         />
       </div>
       <div className="div4">
         <PatientHistory patients={samplePatients} selectedPatient={sampleSelectedPatient} />
       </div>
-      <div className="div5">
+      <div className="div5 calendarioAncho">
         <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />
       </div>
     </div>

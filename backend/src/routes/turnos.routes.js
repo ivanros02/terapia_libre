@@ -10,6 +10,9 @@ router.get("/", turnosController.obtenerTurnos);
 router.put("/cancelar", turnosController.cancelarTurno);
 router.get("/usuario/:id_usuario", turnosController.obtenerTurnosPorUsuario);
 router.get("/profesional/:id_profesional", turnosController.obtenerTurnosPorProfesional);
-
+router.get("/profesionalDashboard/:id_profesional", turnosController.obtenerTurnosPorProfesionalDashboard);
+router.get("/:id/turno-hoy", turnosController.getTurnoDelDia);
+router.get("/:id/nuevos-pacientes", turnosController.getNuevosPacientes);
+router.get("/:id/progreso", turnosController.getProgress);
 
 module.exports = router;

@@ -1,0 +1,61 @@
+/* Ajuste del navbar */
+.navbar-custom {
+    margin-left: 100px; 
+    height: 120px;
+}
+
+/* Estilo de la barra de búsqueda */
+.search-bar {
+    background-color: #dddddd !important; /* Fondo gris claro */
+    border-radius: 12px !important; /* Bordes redondeados */
+    border: none !important; /* Eliminar bordes */
+    height: 45px; /* Más grosor */
+    padding-left: 15px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de texto */
+}
+
+.search-bar:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Contenedor del perfil */
+.profile-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Contenido del perfil */
+.profile-content {
+    padding: 8px 12px;
+}
+
+/* Imagen de perfil */
+.profile-image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+/* 🔹 Responsividad en móviles */
+@media (max-width: 991px) {
+    .search-container {
+        display: none !important; /* Oculta la barra de búsqueda */
+    }
+
+    .navbar-custom {
+        margin-left: 0px !important; /* Elimina el margen izquierdo en móviles */
+        height: auto; /* Ajuste automático de altura */
+    }
+
+    /* Centrar perfil en móviles */
+    .profile-container {
+        justify-content: center !important; /* Centra el perfil */
+    }
+
+    /* Ocultar el nombre en móviles pequeños */
+    .profile-content span {
+        display: none;
+    }
+}

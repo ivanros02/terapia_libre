@@ -82,18 +82,14 @@ const DashboardCalendar = () => {
 
 
   return (
-    <div className="parent">
-      <div className="div1">
-        <SearchNavbar
-          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
-          profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
-        />
-      </div>
-      <div className="div2">
-        <Sidebar />
-      </div>
+    <div>
+      <SearchNavbar
+      profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+      profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}/>
+      <Sidebar />
       <GoogleCalendar turnos={turnos} usuarioRol={esProfesional ? "profesional" : "usuario"} />
     </div>
+
   );
 };
 

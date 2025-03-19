@@ -140,6 +140,11 @@ exports.obtenerTurnosPorProfesional = async (req, res) => {
         }
 
         const turnos = await Turno.obtenerTurnosPorProfesional(id_profesional);
+
+        if (!turnos.length) {
+            return res.status(200).json([]); // Devuelve un array vacío si no hay turnos
+        }
+
         res.status(200).json(turnos);
     } catch (error) {
         console.error("Error al obtener turnos del profesional:", error);
@@ -147,6 +152,28 @@ exports.obtenerTurnosPorProfesional = async (req, res) => {
     }
 };
 
+exports.obtenerTurnosPorProfesionalDashboard = async (req, res) => {
+    try {
+        const { id_profesional } = req.params;
+
+        if (!id_profesional) {
+            return res.status(400).json({ message: "ID del profesional es requerido" });
+        }
+
+        const turnos = await Turno.obtenerTurnosPorProfesionalDashboard(id_profesional);
+
+        console.log("📅 Turnos obtenidos:", turnos); // 🛠 Debug
+
+        if (!turnos.length) {
+            return res.status(200).json([]); // Si no hay turnos, devuelve array vacío
+        }
+
+        res.json(turnos);
+    } catch (error) {
+        console.error("Error al obtener turnos del profesional:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
 
 exports.cancelarTurno = async (req, res) => {
     try {
@@ -164,5 +191,44 @@ exports.cancelarTurno = async (req, res) => {
     } catch (error) {
         console.error("Error al cancelar turno:", error);
         res.status(500).json({ message: "Error interno" });
+    }
+};
+
+exports.getTurnoDelDia = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ message: "ID del profesional es requerido" });
+
+        const turno = await Turno.obtenerProximoTurno(id);
+        res.json(turno);
+    } catch (error) {
+        console.error("Error al obtener el próximo turno:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+exports.getNuevosPacientes = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ message: "ID del profesional es requerido" });
+
+        const nuevosPacientes = await Turno.obtenerNuevosPacientes(id);
+        res.json({ nuevosPacientes });
+    } catch (error) {
+        console.error("Error al obtener nuevos pacientes:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+exports.getProgress = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ message: "ID del profesional es requerido" });
+
+        const progress = await Turno.obtenerProgreso(id);
+        res.json({ progress });
+    } catch (error) {
+        console.error("Error al obtener progreso:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
     }
 };

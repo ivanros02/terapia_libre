@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // 👈 Importamos useNavigate
 import { House, Calendar, MessageCircle, Settings, LogOut } from "lucide-react";
 import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../styles/DashboardProfesional.css";
+import "../../styles/SideBar.css";
 import axios from 'axios';
 import { Link } from "react-router-dom"; // 👈 Importamos Link
 
@@ -86,8 +86,8 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="sidebar">
-      <ul className="nav flex-column w-100 text-center">
-        <li className="nav-item" style={{ marginTop: "5rem" }}>
+      <ul className="nav">
+        <li className="nav-item">
           <button onClick={handleHomeClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
             <House size={24} />
           </button>
@@ -115,14 +115,14 @@ const Sidebar: React.FC = () => {
             <Settings size={24} />
           </button>
         </li>
-        <li className="nav-item mt-auto">
+        <li className="nav-item">
           <button onClick={handleLogout} className="nav-link text-white py-3 bg-transparent border-0 w-100">
             <LogOut size={24} />
           </button>
         </li>
       </ul>
-      <div className="mt-3">
-        <img src="/logo.png" alt="Logo" style={{ width: "40px" }} />
+      <div className="sidebar-logo">
+        <img src="/logo.png" alt="Logo" />
       </div>
     </div>
   );

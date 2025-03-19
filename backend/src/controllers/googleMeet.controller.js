@@ -107,3 +107,26 @@ exports.guardarMeet = async (req, res) => {
     }
 };
 
+// Registrar el fin de una videollamada en la base de datos
+exports.terminarMeet = async (req, res) => {
+    try {
+        const { id_turno } = req.body;
+
+        if (!id_turno) {
+            return res.status(400).json({ message: "ID del turno es requerido" });
+        }
+
+        // Actualizar la base de datos indicando que la videollamada ha finalizado
+        const actualizado = await GoogleMeet.registrarFinDeLlamada(id_turno);
+        if (!actualizado) {
+            return res.status(500).json({ message: "Error al registrar el fin de la llamada" });
+        }
+
+        res.json({ message: "Fin de la videollamada registrado correctamente" });
+    } catch (error) {
+        console.error("❌ Error al registrar el fin de la videollamada:", error);
+        res.status(500).json({ message: "Error interno" });
+    }
+};
+
+

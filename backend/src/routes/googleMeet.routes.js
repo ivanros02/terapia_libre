@@ -8,5 +8,6 @@ router.post("/crear-meet", googleMeetController.crearMeet);
 router.post("/guardar-meet", googleMeetController.guardarMeet);
 // Obtener una videollamada existente
 router.get("/:id_turno", googleMeetController.obtenerMeet);
-
+// Registrar el fin de la llamada de Meet
+router.post("/terminar-llamada", googleMeetController.terminarMeet);
 module.exports = router;
