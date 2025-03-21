@@ -193,7 +193,7 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                             }}
                         />
                     </Form.Group>
-                    <Button type="submit" variant="success">Guardar</Button>
+                    <Button type="submit" style={{backgroundColor:"var(--naranja)",borderColor:"var(--naranja)",paddingLeft:"20px",paddingRight:"20px",color:"white"}} variant="success">Guardar</Button>
                 </Form>
             </Modal.Body>
         </Modal>

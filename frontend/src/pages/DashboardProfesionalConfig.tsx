@@ -15,7 +15,7 @@ const Dashboard = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Detectar si es profesional o usuario
   const esProfesional = localStorage.getItem("esProfesional") === "true";
 
@@ -30,7 +30,7 @@ const Dashboard = () => {
         }
 
         // Determinar la API correcta según el tipo de usuario
-        const apiUrl = esProfesional 
+        const apiUrl = esProfesional
           ? `${url}/api/profesionales/${id}`  // Si es profesional, obtiene su info
           : `${url}/api/auth/usuario/${id}`; // Si es usuario, obtiene su info
 
@@ -60,17 +60,13 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="parent">
-      <div className="div1">
-        <SearchNavbar
-          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
-          profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
-        />
-      </div>
-      <div className="div2">
-        <Sidebar />
-      </div>
-      <ProfesionalConfigComponent/>
+    <div>
+      <SearchNavbar
+        profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+        profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
+      />
+      <Sidebar />
+      <ProfesionalConfigComponent />
     </div>
   );
 };

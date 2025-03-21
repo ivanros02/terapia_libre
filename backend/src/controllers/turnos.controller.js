@@ -162,7 +162,26 @@ exports.obtenerTurnosPorProfesionalDashboard = async (req, res) => {
 
         const turnos = await Turno.obtenerTurnosPorProfesionalDashboard(id_profesional);
 
-        console.log("📅 Turnos obtenidos:", turnos); // 🛠 Debug
+        if (!turnos.length) {
+            return res.status(200).json([]); // Si no hay turnos, devuelve array vacío
+        }
+
+        res.json(turnos);
+    } catch (error) {
+        console.error("Error al obtener turnos del profesional:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+exports.obtenerTurnosPorUsuarioDashboard = async (req, res) => {
+    try {
+        const { id_usuario } = req.params;
+
+        if (!id_usuario) {
+            return res.status(400).json({ message: "ID del profesional es requerido" });
+        }
+
+        const turnos = await Turno.obtenerTurnosPorUsuarioDashboard(id_usuario);
 
         if (!turnos.length) {
             return res.status(200).json([]); // Si no hay turnos, devuelve array vacío
@@ -207,6 +226,19 @@ exports.getTurnoDelDia = async (req, res) => {
     }
 };
 
+exports.getTurnoDelDiaPaciente = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ message: "ID del paciente es requerido" });
+
+        const turno = await Turno.obtenerProximoTurnoPaciente(id);
+        res.json(turno);
+    } catch (error) {
+        console.error("Error al obtener el próximo turno:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
 exports.getNuevosPacientes = async (req, res) => {
     try {
         const { id } = req.params;
@@ -232,3 +264,55 @@ exports.getProgress = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
+exports.guardarGoogleEvent = async (req, res) => {
+    try {
+        const { id_turno, google_event_id } = req.body;
+
+        if (!id_turno || !google_event_id) {
+            return res.status(400).json({ message: "id_turno y google_event_id son obligatorios" });
+        }
+
+        const actualizado = await Turno.guardarGoogleEvent(id_turno, google_event_id);
+
+        if (actualizado) {
+            return res.status(200).json({ message: "Google Event ID guardado correctamente" });
+        } else {
+            return res.status(404).json({ message: "No se encontró el turno o ya estaba actualizado" });
+        }
+    } catch (error) {
+        console.error("❌ Error al guardar Google Event ID:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+exports.obtenerHistorialUsuario = async (req, res) => {
+    try {
+        const { id_usuario } = req.params;
+        if (!id_usuario) {
+            return res.status(400).json({ message: "ID de usuario es requerido" });
+        }
+
+        const historial = await Turno.obtenerHistorialUsuario(id_usuario);
+        res.status(200).json(historial);
+    } catch (error) {
+        console.error("Error al obtener historial de sesiones:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+exports.obtenerTerapeutaUsuario = async (req, res) => {
+    try {
+        const { id_usuario } = req.params;
+        if (!id_usuario) {
+            return res.status(400).json({ message: "ID de usuario es requerido" });
+        }
+
+        const terapeuta = await Turno.obtenerTerapeutaUsuario(id_usuario);
+        res.status(200).json(terapeuta);
+    } catch (error) {
+        console.error("Error al obtener información del terapeuta:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+

@@ -74,8 +74,7 @@ function ProfesionalConfigComponent() {
     const handleCloseProfesional = () => setShowModalProfesional(false);
 
     return (
-        <div className="container mt-5">
-            <h1 className="mb-4">Gestión de Disponibilidades</h1>
+        <div className="container" style={{ marginTop: "7rem" }}>
             <DisponibilidadForm
                 show={showModalDisponibilidad}
                 handleClose={handleCloseDisponibilidad}
@@ -88,8 +87,6 @@ function ProfesionalConfigComponent() {
                 onAdd={() => setShowModalDisponibilidad(true)}
                 fetchDisponibilidades={fetchDisponibilidades}
             />
-
-            <h1 className="mb-4 mt-5">Gestión de Datos del Profesional</h1>
             <ProfesionalData
                 profesional={profesional} // 🔹 Pasa los datos directamente
                 onEdit={handleEditProfesional}

@@ -49,26 +49,27 @@ app.use("/api/chat", (req, res, next) => {
 
 // Socket.io
 io.on("connection", (socket) => {
-    console.log("Usuario conectado:", socket.id);
+    console.log("🔌 Usuario conectado:", socket.id);
 
-    // Unirse a una sala de chat
+    // Manejo de unión a sala personal basada en userId
+    socket.on("join_user", (userId) => {
+        if (userId) {
+            socket.join(userId.toString());
+            console.log(`✅ Usuario ${userId} se unió a su sala personal`);
+        }
+    });
+
+    // Evento de unirse a un chat específico
     socket.on("join_chat", (chatId) => {
         socket.join(chatId);
-        console.log(`Usuario ${socket.id} se unió al chat ${chatId}`);
+        console.log(`🛎️ Usuario ${socket.id} se unió al chat ${chatId}`);
     });
 
-    // Escuchar mensajes
-    socket.on("send_message", (data) => {
-        const { chatId, senderId, message } = data;
-        io.to(chatId).emit("receive_message", { senderId, message });
-        console.log(`Mensaje enviado al chat ${chatId}: ${message}`);
-    });
-
-    // Desconexión
     socket.on("disconnect", () => {
-        console.log("Usuario desconectado:", socket.id);
+        console.log("⛔ Usuario desconectado:", socket.id);
     });
 });
+
 
 module.exports = { app, server }; // NO exportamos `io` aquí para evitar la dependencia circular
 

@@ -1,0 +1,93 @@
+/* Bordes redondeados en el contenedor del calendario */
+.fc {
+    border-radius: 15px;
+    overflow: hidden;
+    /* Evita que el contenido sobresalga */
+    border: 1px solid #ddd;
+    /* Opcional: agregar un borde sutil */
+}
+
+/* Bordes redondeados en las celdas de la grilla */
+.fc-daygrid-day {
+    border-radius: 8px;
+}
+
+/* Bordes redondeados en la cabecera del calendario */
+.fc-header-toolbar {
+    border-radius: 12px;
+    background-color: #f8f9fa;
+    /* Opcional: mejora la visibilidad */
+    padding: 8px;
+}
+
+/* Aumentar la altura de los eventos */
+.fc-event {
+    min-height: 40px;
+    /* Aumenta el tamaño del evento */
+    padding: 5px;
+    /* Ajusta el espacio dentro del evento */
+    font-size: 12px;
+    /* Reduce el tamaño del texto */
+    line-height: 1.3;
+    /* Ajusta la separación entre líneas */
+    overflow: hidden;
+    /* Evita que el texto salga del evento */
+    white-space: nowrap;
+    /* Evita que el texto haga salto de línea */
+    text-overflow: ellipsis;
+    /* Muestra "..." si el texto es muy largo */
+}
+
+/* Asegurar que el contenido del evento tenga suficiente espacio */
+.fc-daygrid-event {
+    height: auto !important;
+    display: flex;
+    align-items: center;
+}
+
+
+.fc-toolbar {
+    text-align: left !important;
+}
+
+/* Centrar el contenido principal sin afectar el sidebar */
+.calendar-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 100vh;
+    /* Para que no se pegue arriba */
+    padding-top: 20px;
+    /* Espacio debajo del buscador */
+}
+
+/* Definir el tamaño máximo del contenido */
+.content-box {
+    max-width: 900px;
+    /* Ajusta el ancho del calendario */
+    width: 100%;
+}
+
+/* Asegurar que el título y calendario estén bien alineados */
+h3 {
+    text-align: center;
+    width: 100%;
+}
+
+/* Alinear la cabecera del FullCalendar a la izquierda */
+.fc-toolbar {
+    text-align: left !important;
+}
+
+/* Ajustar altura del calendario */
+.calendar-wrapper .fc {
+    min-height: 600px; /* 🔹 Asegura un mínimo de altura */
+}
+
+/* En móviles, darle más espacio */
+@media (max-width: 768px) {
+    .calendar-wrapper .fc {
+        min-height: 700px; /* 🔹 Aumenta la altura en móviles */
+    }
+}

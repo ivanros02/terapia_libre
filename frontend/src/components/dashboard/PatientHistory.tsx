@@ -3,7 +3,7 @@ import { Card, Container, Row, Col, ListGroup, Badge } from "react-bootstrap";
 
 interface Patient {
     name: string;
-    frequency: string;
+    frequency: null | string;
 }
 
 interface PatientHistoryProps {
@@ -15,13 +15,14 @@ interface PatientHistoryProps {
         lastVisit: string;
         observations: string;
         details: string;
-    };
+    } | null;
 }
+
 
 const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatient }) => {
     return (
         <Container fluid>
-            <Card className="shadow-lg p-3 rounded-4 border-0" style={{maxWidth: "79%"}}>
+            <Card className="shadow-lg p-3 rounded-4 border-0" style={{ maxWidth: "79%" }}>
                 <Row>
                     {/* Lista de Pacientes */}
                     <Col md={5} className="border-end">
@@ -52,26 +53,31 @@ const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatie
                             <a href="#" className="text-primary fw-semibold" style={{ fontSize: "0.9rem" }}>Ver todas</a>
                         </div>
 
-                        <Card className="p-2 shadow-sm rounded-4 border border-light">
-                            <div className="d-flex align-items-center mb-1">
-                                <div className="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center me-2"
-                                    style={{ width: "40px", height: "40px", fontWeight: "bold", fontSize: "0.9rem" }}>
-                                    {selectedPatient.name.substring(0, 2).toUpperCase()}
+                        {selectedPatient ? (
+                            <Card className="p-2 shadow-sm rounded-4 border border-light">
+                                <div className="d-flex align-items-center mb-1">
+                                    <div className="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center me-2"
+                                        style={{ width: "40px", height: "40px", fontWeight: "bold", fontSize: "0.9rem" }}>
+                                        {selectedPatient.name.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <h6 className="mb-0 fw-bold" style={{ fontSize: "0.9rem" }}>{selectedPatient.name}</h6>
+                                        <p className="text-muted mb-0" style={{ fontSize: "0.8rem" }}>{selectedPatient.gender} - {selectedPatient.age}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h6 className="mb-0 fw-bold" style={{ fontSize: "0.9rem" }}>{selectedPatient.name}</h6>
-                                    <p className="text-muted mb-0" style={{ fontSize: "0.8rem" }}>{selectedPatient.gender} - {selectedPatient.age}</p>
-                                </div>
-                            </div>
-                            <hr className="my-2" />
-                            <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Última consulta</p>
-                            <p className="text-muted mb-2" style={{ fontSize: "0.8rem" }}>{selectedPatient.lastVisit}</p>
-                            <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Observaciones</p>
-                            <p className="text-muted mb-2" style={{ fontSize: "0.8rem" }}>{selectedPatient.observations}</p>
-                            <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Detalles</p>
-                            <p className="text-muted mb-0" style={{ fontSize: "0.8rem" }}>{selectedPatient.details}</p>
-                        </Card>
+                                <hr className="my-2" />
+                                <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Última consulta</p>
+                                <p className="text-muted mb-2" style={{ fontSize: "0.8rem" }}>{selectedPatient.lastVisit}</p>
+                                <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Observaciones</p>
+                                <p className="text-muted mb-2" style={{ fontSize: "0.8rem" }}>{selectedPatient.observations}</p>
+                                <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Detalles</p>
+                                <p className="text-muted mb-0" style={{ fontSize: "0.8rem" }}>{selectedPatient.details}</p>
+                            </Card>
+                        ) : (
+                            <p className="text-muted">Seleccione un paciente para ver la historia clínica.</p>
+                        )}
                     </Col>
+
                 </Row>
             </Card>
         </Container>

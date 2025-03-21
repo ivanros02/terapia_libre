@@ -82,7 +82,7 @@ function DisponibilidadForm({ show, handleClose, disponibilidad, onSave, fetchDi
                         <label className="form-label">Hora fin:</label>
                         <input type="time" name="hora_fin" value={formData.hora_fin} onChange={handleChange} className="form-control" />
                     </div>
-                    <Button type="submit" variant="success">Guardar</Button>
+                    <Button type="submit" style={{backgroundColor:"var(--naranja)",borderColor:"var(--naranja)",paddingLeft:"20px",paddingRight:"20px",color:"white"}} variant="success">Guardar</Button>
                 </form>
             </Modal.Body>
         </Modal>

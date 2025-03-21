@@ -51,22 +51,61 @@ function DisponibilidadList({ onEdit, onAdd, fetchDisponibilidades }: Disponibil
 
     return (
         <div className="container mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2>Disponibilidades</h2>
-                <Button variant="success" onClick={onAdd}>Agregar Disponibilidad</Button>
+            {/* Contenedor flexible para el título y botón */}
+            <div className="row align-items-center mb-3">
+                <div className="col-12 col-md-6">
+                    <h2 className="text-center text-md-start">Disponibilidades</h2>
+                </div>
+                <div className="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
+                    <Button
+                        variant="success"
+                        onClick={onAdd}
+                        className="px-4 py-2 fw-bold"
+                        style={{
+                            backgroundColor: "var(--naranja)",
+                            borderColor: "var(--naranja)",
+                        }}
+                    >
+                        Agregar
+                    </Button>
+                </div>
             </div>
+
+            {/* Lista de disponibilidades */}
             <ul className="list-group">
                 {disponibilidades.map((disp) => (
-                    <li key={disp.id_disponibilidad} className="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{disp.dia_semana}: {disp.hora_inicio} - {disp.hora_fin}</span>
+                    <li
+                        key={disp.id_disponibilidad}
+                        className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center"
+                    >
+                        <span className="mb-2 mb-md-0">
+                            {disp.dia_semana}: {disp.hora_inicio} - {disp.hora_fin}
+                        </span>
                         <div>
-                            <Button variant="primary" size="sm" className="me-2" onClick={() => onEdit(disp)}>Editar</Button>
-                            <Button variant="danger" size="sm" onClick={() => handleDelete(disp.id_disponibilidad)}>Eliminar</Button>
+                            <Button
+                                variant="primary"
+                                className="me-2 px-3"
+                                style={{ backgroundColor: "var(--verde)", borderColor: "var(--verde)" }}
+                                size="sm"
+                                onClick={() => onEdit(disp)}
+                            >
+                                Editar
+                            </Button>
+                            <Button
+                                variant="danger"
+                                className="px-3"
+                                style={{ backgroundColor: "grey", borderColor: "grey" }}
+                                size="sm"
+                                onClick={() => handleDelete(disp.id_disponibilidad)}
+                            >
+                                Eliminar
+                            </Button>
                         </div>
                     </li>
                 ))}
             </ul>
         </div>
+
     );
 }
 

@@ -4,16 +4,13 @@ import { House, Calendar, MessageCircle, Settings, LogOut } from "lucide-react";
 import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/SideBar.css";
-import axios from 'axios';
 import { Link } from "react-router-dom"; // 👈 Importamos Link
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate(); // 👈 Hook para redirigir
   const socket = useSocket();
   const [hasNewMessages, setHasNewMessages] = useState(false);
-  const [chatId] = useState<number | null>(null);
   const userId = localStorage.getItem("id");
-  // Obtener si es profesional o usuario
   const esProfesional = localStorage.getItem("esProfesional") === "true";
   const homeRoute = esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
   const configRoute = esProfesional ? "/dashboard/profesional/config_profesional" : "/dashboard/usuario/config_usuario";
@@ -36,53 +33,35 @@ const Sidebar: React.FC = () => {
     navigate(configRoute);
   };
 
-  // Función para marcar los mensajes como leídos al entrar a la pantalla de mensajes
-  const handleMessagesClick = () => {
+  // 🔹 Unir el usuario a su sala personal de Socket.io al cargar la app
+  useEffect(() => {
+    if (socket && userId) {
+      socket.emit("join_user", userId);
+    }
+  }, [socket, userId]);
+
+  // 🔹 Escuchar notificaciones de nuevos mensajes
+  useEffect(() => {
+    if (!socket || !userId) return;
+
+    const handleNotification = (data: any) => {
+      console.log("🔔 Notificación recibida en Sidebar:", data);
+      setHasNewMessages(true);
+    };
+
+    socket.on("notification", handleNotification);
+
+    return () => {
+      socket.off("notification", handleNotification);
+    };
+  }, [socket, userId]);
+
+  // 🔹 Marcar mensajes como leídos al hacer clic en el botón de mensajes
+  const handleMessagesClick = async () => {
     setHasNewMessages(false);
     navigate("/messages");
   };
 
-  // 🔹 Escuchar eventos de notificación de mensajes en todo momento
-  useEffect(() => {
-    if (socket && userId) {
-      console.log("📡 Sidebar escuchando notificaciones para usuario:", userId);
-
-      socket.on("notification", (data) => {
-        console.log("🔔 Notificación recibida en Sidebar:", data);
-
-        if (data.senderId !== parseInt(userId)) {
-          console.log("✅ Activando el punto rojo en el sidebar...");
-          setHasNewMessages((prev) => {
-            console.log("🔴 Estado previo de hasNewMessages:", prev);
-            return true;
-          });
-        }
-      });
-
-      return () => {
-        socket.off("notification");
-      };
-    }
-  }, [socket, userId]);
-
-
-
-  useEffect(() => {
-    if (chatId !== null && userId) {
-      const marcarMensajesComoLeidos = async () => {
-        try {
-          await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/chat/${chatId}/marcar-leidos`, {
-            userId: parseInt(userId),
-          });
-          console.log("✅ Mensajes marcados como leídos en el chat", chatId);
-        } catch (error) {
-          console.error("❌ Error al marcar los mensajes como leídos:", error);
-        }
-      };
-
-      marcarMensajesComoLeidos();
-    }
-  }, [chatId, userId]); // 🔹 `c
 
   return (
     <div className="sidebar">
@@ -110,6 +89,7 @@ const Sidebar: React.FC = () => {
             )}
           </button>
         </li>
+
         <li className="nav-item">
           <button onClick={handleConfigClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
             <Settings size={24} />

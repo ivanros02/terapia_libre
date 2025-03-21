@@ -70,6 +70,7 @@ class Profesional {
         FROM profesionales p
         LEFT JOIN profesional_especialidad pe ON p.id_profesional = pe.id_profesional
         LEFT JOIN especialidades e ON pe.id_especialidad = e.id_especialidad
+        WHERE p.estado = 1
         GROUP BY p.id_profesional
         LIMIT ? OFFSET ?
     `, [limit, offset]);

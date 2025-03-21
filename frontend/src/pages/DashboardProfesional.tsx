@@ -24,29 +24,18 @@ interface Turno {
   paciente: string;
 }
 
+interface ListaPacientes {
+  name: string; // ✅ Debe llamarse `name` en lugar de `paciente`
+  frequency: string; // ✅ Debe llamarse `frequency` en lugar de `frecuencia`
+}
 
 
-// Datos de ejemplo para PatientHistory
-const samplePatients = [
-  { name: "Agustina Perez", frequency: "Mensual" },
-  { name: "Sofia Perez", frequency: "Semanal" },
-  { name: "Ana Diaz", frequency: "Quincenal" },
-  { name: "Ana Diaz", frequency: "Quincenal" }
-];
-
-const sampleSelectedPatient = {
-  name: "Agustina Perez",
-  gender: "Mujer",
-  age: "28 Años 3 Meses",
-  lastVisit: "2 de Septiembre",
-  observations: "Crisis de ansiedad",
-  details: "Pidió una consulta con urgencia, estaba atravesando una crisis laboral que resultó en sintomatología clínica de ataques de pánico."
-};
 
 const DashboardProfesional = () => {
   const [profesionalData, setProfesionalData] = useState<ProfesionalData | null>(null);
   const [turnoHoy, setTurnoHoy] = useState<TurnoHoy | null>(null);
   const [proximosTurnos, setProximosTurnos] = useState<Turno[]>([]);
+  const [listaPacientes, setListaPacientes] = useState<ListaPacientes[]>([]);
   const [loading, setLoading] = useState(true);
   const [, setError] = useState<string | null>(null);
   const [eventos, setEventos] = useState<string[]>([]);
@@ -74,7 +63,7 @@ const DashboardProfesional = () => {
         const turnosResponse = await axios.get(`${url}/api/turnos/profesionalDashboard/${id}`);
         const turnos = Array.isArray(turnosResponse.data) ? turnosResponse.data : [];
 
-        
+
 
         // 🔹 Extraer próximos turnos (máximo 5)
         const proximosTurnos = turnos.map((turno: any) => ({
@@ -82,9 +71,17 @@ const DashboardProfesional = () => {
           paciente: turno.nombre_paciente,
         }));
 
-    
+        // 🔹 Extraer próximos turnos (máximo 5)
+        const listaPacientes = turnos.slice(0, 5).map((turno: any) => ({
+          name: turno.nombre_paciente,  // 🔹 Nombre del paciente
+          frequency: "Semanal",         // 🔹 Se establece "Semanal" fijo
+        }));
+
+
+
 
         setProximosTurnos(proximosTurnos);
+        setListaPacientes(listaPacientes);
         setEventos([...new Set(turnos.map((turno: any) => turno.fecha_turno))]); // ✅ Fechas únicas
 
 
@@ -121,7 +118,7 @@ const DashboardProfesional = () => {
         />
       </div>
       <div className="div4">
-        <PatientHistory patients={samplePatients} selectedPatient={sampleSelectedPatient} />
+        <PatientHistory patients={listaPacientes} selectedPatient={null} />
       </div>
       <div className="div5 calendarioAncho">
         <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />

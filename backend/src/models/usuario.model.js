@@ -45,6 +45,34 @@ class Usuario {
     );
     return rows[0]; // Retorna el profesional si existe
   }
+
+  static async editarUsuario(id_usuario, { nombre, correo_electronico, contrasena_hash }) {
+    let query = "UPDATE usuarios SET ";
+    let fields = [];
+    let values = [];
+
+    if (nombre) {
+      fields.push("nombre = ?");
+      values.push(nombre);
+    }
+    if (correo_electronico) {
+      fields.push("correo_electronico = ?");
+      values.push(correo_electronico);
+    }
+    if (contrasena_hash) {
+      fields.push("contrasena_hash = ?");
+      values.push(contrasena_hash);
+    }
+
+    if (fields.length === 0) return false; // Si no hay datos, no actualiza nada
+
+    query += fields.join(", ") + " WHERE id_usuario = ?";
+    values.push(id_usuario);
+
+    const [result] = await pool.execute(query, values);
+    return result.affectedRows > 0;
+  }
+
 }
 
 module.exports = Usuario;

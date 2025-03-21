@@ -46,7 +46,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
     const eventosNormalizados = eventos.map(fecha => moment(fecha).format("YYYY-MM-DD"));
 
     return (
-        <Container fluid>
+        <Container fluid style={{paddingBottom:"25px"}}>
             <Card className="shadow-sm p-3 rounded-4">
                 <h1>Calendario</h1>
                 {/* Encabezado con botones de navegación */}

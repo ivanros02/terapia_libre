@@ -95,7 +95,6 @@ const Messages: React.FC = () => {
 
     if (socket) {
       socket.emit("join_chat", selectedChat.id_chat);
-      console.log(`📡 Uniendo al chat: ${selectedChat.id_chat}`);
 
       const handleReceiveMessage = (newMessage: SocketMessage) => {
         if (!selectedChat || newMessage.id_chat !== selectedChat.id_chat) return;
@@ -203,8 +202,6 @@ const Messages: React.FC = () => {
         }
       );
 
-      console.log("📡 Datos de los chats recibidos:", response.data);
-
       if (Array.isArray(response.data)) {
         setChats(response.data);
       } else {
@@ -261,27 +258,31 @@ const Messages: React.FC = () => {
 
 
   return (
-    <div className="d-flex vh-100 bg-light">
-      {/* Lista de chats */}
-      <div className="col-3 border-end p-3">
-        <h5>Chats</h5>
-        <ListGroup>
-          {chats.map((chat) => (
-            <ListGroup.Item
-              key={`chat-${chat.id_chat}`} // 🔹 Se asegura un key único agregando un prefijo
-              action
-              onClick={() => setSelectedChat(chat)}
-            >
-              {esProfesional
-                ? chat.nombre_usuario || "Usuario desconocido"
-                : chat.nombre_profesional || "Profesional desconocido"}
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+    <div className="d-flex flex-column flex-md-row vh-100 bg-light justify-content-center align-items-center" style={{marginBottom: "80px", marginTop: "50px"}}>
+      {/* Contenedor principal */}
+      <div className="container-fluid h-100 d-flex flex-column flex-md-row align-items-center justify-content-center">
 
-        <Button variant="primary" className="mt-3" onClick={() => setShowNewChatModal(true)}>
-          Nuevo Chat
-        </Button>
+        {/* 📌 Lista de chats (en móviles ocupa todo el ancho) */}
+        <div className="col-12 col-md-3 border-end p-3 bg-white shadow-sm d-flex flex-column align-items-center">
+          <h5 className="text-center text-md-start">Chats</h5>
+          <ListGroup>
+            {chats.map((chat) => (
+              <ListGroup.Item
+                key={`chat-${chat.id_chat}`} // 🔹 Se asegura un key único agregando un prefijo
+                action
+                onClick={() => setSelectedChat(chat)}
+              >
+                {esProfesional
+                  ? chat.nombre_usuario || "Usuario desconocido"
+                  : chat.nombre_profesional || "Profesional desconocido"}
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+
+          <Button variant="primary" className="mt-3" onClick={() => setShowNewChatModal(true)}>
+            Nuevo Chat
+          </Button>
+        </div>
 
         {/* Modal para crear un nuevo chat */}
         <Modal show={showNewChatModal} onHide={() => setShowNewChatModal(false)}>
@@ -317,10 +318,12 @@ const Messages: React.FC = () => {
       </div>
 
       {/* Chat seleccionado */}
-      <div className="col-9 d-flex flex-column">
+      <div className="col-12 col-md-9 d-flex flex-column align-items-center justify-content-center">
+
         {selectedChat ? (
           <>
-            <div className="chat-container d-flex flex-column bg-white border rounded shadow-sm mt-5" style={{ height: "70vh", maxWidth: "60%" }}>
+           <div className="chat-container bg-white border rounded shadow-sm p-3 d-flex flex-column w-100" style={{ maxWidth: "900px", height: "80vh" }}>
+
 
               {/* 🔹 Header del chat (siempre visible) */}
               <div className="chat-header bg-primary text-white p-3 rounded-top">

@@ -15,7 +15,7 @@ const DashboardMensajes = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Detectar si es profesional o usuario
   const esProfesional = localStorage.getItem("esProfesional") === "true";
 
@@ -30,7 +30,7 @@ const DashboardMensajes = () => {
         }
 
         // Determinar la API correcta según el tipo de usuario
-        const apiUrl = esProfesional 
+        const apiUrl = esProfesional
           ? `${url}/api/profesionales/${id}` // Si es profesional, obtener desde profesionales
           : `${url}/api/auth/usuario/${id}`; // Si es usuario, obtener desde usuarios
 
@@ -60,16 +60,12 @@ const DashboardMensajes = () => {
   }
 
   return (
-    <div className="parent">
-      <div className="div1">
-        <SearchNavbar
-          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
-          profileName={userData?.nombre || "Usuario"}
-        />
-      </div>
-      <div className="div2">
-        <Sidebar />
-      </div>
+    <div>
+      <SearchNavbar
+        profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+        profileName={userData?.nombre || "Usuario"}
+      />
+      <Sidebar />
       <Messages />
     </div>
   );

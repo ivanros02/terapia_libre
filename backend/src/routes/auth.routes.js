@@ -8,5 +8,6 @@ router.post("/login", authController.login);
 router.post("/google-login", authController.loginConGoogle); // 🚀 Nueva ruta para Google
 // Ruta para obtener datos del usuario
 router.get("/usuario/:id", authenticate, authController.getUserData);
+router.put("/usuario/:id", authenticate, authController.editarUsuario);
 
 module.exports = router;

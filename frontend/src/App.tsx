@@ -14,6 +14,7 @@ import DashboardCalendar from "./pages/DashboardCalendar";
 import ProfessionalDetails from "./pages/ProfessionalDetails";
 import DashboardMensajes from "./pages/DashboardMsg";
 import DashboardProfesionalConfig from "./pages/DashboardProfesionalConfig";
+import DashboardUsuarioConfig from "./pages/DashboardUsuarioConfig";
 import AdminProfesionales from "./pages/AdminProfesionales";
 import "./index.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -38,6 +39,7 @@ const App: React.FC = () => {
               <Route path="/messages" element={<DashboardMensajes />} />
               <Route path="/profesional/:id" element={<ProfessionalDetails />} />
               <Route path="/dashboard/profesional/config_profesional" element={<DashboardProfesionalConfig />} />
+              <Route path="/dashboard/usuario/config_usuario" element={<DashboardUsuarioConfig />} />
               <Route path="/admin" element={<AdminProfesionales />} />
             </Routes>
           </Router>

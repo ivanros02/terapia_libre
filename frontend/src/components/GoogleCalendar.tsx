@@ -10,7 +10,7 @@ const url = import.meta.env.VITE_API_BASE_URL;
 import { useGoogleAuth } from "./useGoogleAuth";
 import { Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import "../styles/GoogleCalendar.css"
 declare global {
   interface Window {
     gapi: any;
@@ -22,8 +22,15 @@ interface Turno {
   fecha_turno: string;
   hora_turno: string;
   estado: string;
-  meet_url?: string; // 🔹 Hacemos meet_url opcional
+  meet_url?: string; // 🔹 URL opcional de Google Meet
+  nombre_paciente: string;
+  email_paciente: string;  // 🔹 Correo del paciente
+  nombre_profesional: string; // 🔹 Nombre del profesional
+  email_profesional: string; // 🔹 Correo del profesional
+  google_event_id?: string | null; // 🔹 ID del evento en Google Calendar
 }
+
+
 
 interface GoogleCalendarProps {
   turnos: Turno[];
@@ -36,61 +43,130 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
   const [selectedTurno, setSelectedTurno] = useState<Turno | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showMeetModal, setShowMeetModal] = useState(false);
-  const [meetEmbedded, setMeetEmbedded] = useState(false);
-  const [meetUrl, setMeetUrl] = useState<string | null>(null);
+  const [meetUrl] = useState<string | null>(null);
+  const [calendarView, setCalendarView] = useState("timeGridWeek");
+  const [headerConfig, setHeaderConfig] = useState({});
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        // 🔹 En móviles: Solo mostrar "prev" y "next"
+        setCalendarView("timeGridDay");
+        setHeaderConfig({
+          left: "prev,next",
+          center: "title",
+          right: "" // 🔹 No mostrar botones de vista
+        });
+      } else {
+        // 🔹 En pantallas grandes: Mostrar todos los botones
+        setCalendarView("timeGridWeek");
+        setHeaderConfig({
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay"
+        });
+      }
+    };
+
+    handleResize(); // Ejecutar al montar el componente
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
+
+
+  const formatearFechaHora = (fecha: string, hora: string): string | null => {
+    if (!fecha || !hora) return null;
+
+    const fechaISO = fecha.split("T")[0]; // Asegurar que es solo YYYY-MM-DD
+    const fechaHora = new Date(`${fechaISO}T${hora}`);
+
+    if (isNaN(fechaHora.getTime())) {
+      console.warn(`⚠️ Fecha/Hora inválida: ${fecha} ${hora}`);
+      return null;
+    }
+
+    return fechaHora.toISOString();
+  };
+
+  const esEmailValido = (email: string | undefined | null): boolean => {
+    if (!email) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Expresión regular para validar emails
+    return emailRegex.test(email);
+  };
 
   useEffect(() => {
     if (isSignedIn) {
-      fetchGoogleEvents();
+      subirEventosAGoogleCalendar();
     }
   }, [isSignedIn]);
 
-  const fetchGoogleEvents = async () => {
+
+  const subirEventosAGoogleCalendar = async () => {
     if (!isSignedIn) return;
 
     try {
-      const response = await window.gapi.client.calendar.events.list({
-        calendarId: "primary",
-        timeMin: new Date().toISOString(),
-        showDeleted: false,
-        singleEvents: true,
-        maxResults: 10,
-        orderBy: "startTime",
-      });
+      for (const turno of turnos) {
+        if (turno.google_event_id) {
+          continue; // 🔹 Evita subir eventos duplicados
+        }
 
-      // ✅ Definimos una interfaz para los eventos de Google Calendar
-      interface GoogleCalendarEvent {
-        id: string;
-        summary: string;
-        start: { dateTime?: string; date?: string };
-        end: { dateTime?: string; date?: string };
+        const fechaHoraInicio = formatearFechaHora(turno.fecha_turno, turno.hora_turno);
+        if (!fechaHoraInicio) continue;
+
+        const horaFin = String(parseInt(turno.hora_turno.slice(0, 2)) + 1).padStart(2, "0") + ":00:00";
+        const fechaHoraFin = formatearFechaHora(turno.fecha_turno, horaFin);
+        if (!fechaHoraFin) continue;
+
+        // 🔹 Validar emails
+        const emailPaciente = esEmailValido(turno.email_paciente) ? turno.email_paciente : null;
+        const emailProfesional = esEmailValido(turno.email_profesional) ? turno.email_profesional : null;
+
+        const attendees = [];
+        if (emailPaciente) attendees.push({ email: emailPaciente });
+        if (emailProfesional) attendees.push({ email: emailProfesional });
+
+        if (attendees.length === 0) {
+          continue;
+        }
+
+        try {
+          const response = await window.gapi.client.calendar.events.insert({
+            calendarId: "primary",
+            conferenceDataVersion: 1,
+            resource: {
+              summary: `Sesión de Terapia - ${turno.nombre_paciente || turno.nombre_profesional}`,
+              description: `Videollamada con ${turno.nombre_profesional || "Profesional"} el ${turno.fecha_turno} a las ${turno.hora_turno}`,
+              start: { dateTime: fechaHoraInicio, timeZone: "America/Argentina/Buenos_Aires" },
+              end: { dateTime: fechaHoraFin, timeZone: "America/Argentina/Buenos_Aires" },
+              attendees,
+              conferenceData: {
+                createRequest: {
+                  requestId: `meet-${turno.id_turno}`,
+                  conferenceSolutionKey: { type: "hangoutsMeet" }
+                }
+              }
+            }
+          });
+
+          const googleEventId = response.result.id; // 🔹 Obtener el ID del evento en Google Calendar
+
+          // 🔹 Guardar el Google Event ID en la base de datos
+          await axios.post(`${url}/api/turnos/guardar-google-event`, {
+            id_turno: turno.id_turno,
+            google_event_id: googleEventId
+          });
+
+        } catch (error) {
+          console.error(`❌ Error al subir evento para ${turno.nombre_paciente}:`, error);
+        }
       }
-
-      const items: GoogleCalendarEvent[] = response.result.items || [];
-
-      // ✅ Crear eventos de Google Calendar con IDs únicos
-      const googleEvents = items.map((event) => ({
-        id: event.id,
-        title: event.summary || "Sin título",
-        start: event.start?.dateTime || event.start?.date,
-        end: event.end?.dateTime || event.end?.date,
-      }));
-
-      console.log("✅ Eventos de Google Calendar antes de combinar:", googleEvents);
-
-      // ✅ Fusionar eventos de Google con `turnos`
-      setEvents((prevEvents) => {
-        const uniqueEvents = [...prevEvents, ...formattedEvents].filter((event, index, self) =>
-          index === self.findIndex(e => e.id === event.id)
-        );
-        return uniqueEvents;
-      });
-
-
     } catch (error) {
-      console.error("Error al cargar eventos de Google Calendar:", error);
+      console.error("❌ Error al subir eventos:", error);
     }
   };
+
 
   const formattedEvents = [
     ...events.filter(event => event && event.start && event.id),
@@ -121,12 +197,15 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
           // ✅ 🔹 Verificar la zona horaria correctamente sin restar manualmente
           const fechaFinal = fechaUTC.toISOString();
 
-          console.log(`📆 Turno corregido ID ${turno.id_turno} → ${fechaFinal}`);
+          // ✅ 🔹 Título dinámico según el tipo de usuario
+          const tituloEvento = usuarioRol === "profesional"
+            ? `${turno.nombre_paciente || "Desconocido"}`
+            : `${turno.nombre_profesional || "Desconocido"}`;
 
           return {
             id: `turno-${turno.id_turno}`,
-            title: "Turno reservado",
-            start: fechaFinal,  // ❌ Antes restaba 3 horas, ahora no.
+            title: tituloEvento,
+            start: fechaFinal,
             allDay: false,
             extendedProps: { ...turno },
           };
@@ -160,34 +239,30 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
       return;
     }
 
-    // 🔹 Convertir fecha y hora en un solo `DateTime`
-    const fechaISO = turno.fecha_turno.split("T")[0]; // Extrae solo la fecha (YYYY-MM-DD)
-    const fechaHoraInicio = new Date(`${fechaISO}T${turno.hora_turno}`).toISOString();
-    const horaFin = String(parseInt(turno.hora_turno.slice(0, 2)) + 1).padStart(2, "0") + ":00:00";
-    const fechaHoraFin = new Date(`${fechaISO}T${horaFin}`).toISOString();
+    // 🔹 Validar los correos antes de enviarlos a Google Meet
+    const emailPaciente = esEmailValido(turno.email_paciente) ? turno.email_paciente : null;
+    const emailProfesional = esEmailValido(turno.email_profesional) ? turno.email_profesional : null;
 
-    // ✅ Verificar datos correctos antes de enviar a Google
-    console.log("📌 Enviando a Google Meet:", { fechaHoraInicio, fechaHoraFin });
+    const attendees = [];
+    if (emailPaciente) attendees.push({ email: emailPaciente });
+    if (emailProfesional) attendees.push({ email: emailProfesional });
+
+    if (attendees.length === 0) {
+      console.warn("⚠️ No se agregaron asistentes porque los correos no son válidos.");
+      return;
+    }
 
     try {
+      // 🔹 Crear solo una videollamada sin evento de Google Calendar
       const response = await window.gapi.client.calendar.events.insert({
         calendarId: "primary",
         conferenceDataVersion: 1,
         resource: {
           summary: "Sesión de Terapia",
-          description: `Videollamada programada para ${turno.fecha_turno} a las ${turno.hora_turno}`,
-          start: {
-            dateTime: fechaHoraInicio,
-            timeZone: "America/Argentina/Buenos_Aires"
-          },
-          end: {
-            dateTime: fechaHoraFin,
-            timeZone: "America/Argentina/Buenos_Aires"
-          },
-          attendees: [
-            { email: "correoPaciente@example.com" }, // 📌 Cambia esto por emails reales
-            { email: "correoProfesional@example.com" }
-          ],
+          description: `Videollamada programada`,
+          start: { dateTime: new Date().toISOString(), timeZone: "America/Argentina/Buenos_Aires" },
+          end: { dateTime: new Date(Date.now() + 3600000).toISOString(), timeZone: "America/Argentina/Buenos_Aires" },
+          attendees,
           conferenceData: {
             createRequest: {
               requestId: `meet-${turno.id_turno}`,
@@ -197,13 +272,11 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
         }
       });
 
-      console.log("📌 Respuesta de Google:", response);
-
       const meetUrl = response.result?.conferenceData?.entryPoints?.[0]?.uri;
       if (meetUrl) {
         console.log("✅ Meet creado:", meetUrl);
 
-        // Guardar la URL en la base de datos
+        // Guardar la URL en la base de datos sin subir a Google Calendar
         await axios.post(`${url}/google-meet/guardar-meet`, {
           id_turno: turno.id_turno,
           meet_url: meetUrl,
@@ -218,6 +291,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
       console.error("❌ Error al crear Meet:", error);
     }
   };
+
 
   const abrirMeetEnPopup = (url: string, turno: Turno) => {
     const width = 900;
@@ -250,8 +324,6 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
   // 📌 Función para realizar acciones cuando finaliza la llamada
   const registrarFinDeLlamada = async (turno: Turno) => {
-    console.log(`📌 Registrando fin de la videollamada para el turno ${turno.id_turno}`);
-
     try {
       // 🔥 Llamar al backend para registrar el fin de la llamada
       axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno })
@@ -284,32 +356,36 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
 
   return (
-    <div className="container mt-4">
+    <div className="calendar-page d-flex justify-content-center align-items-start mt-5">
       {isSignedIn ? (
         <>
-
-
-
           <Container fluid className="d-flex justify-content-center align-items-center py-3">
             <Row className="w-100 justify-content-center">
-              <Col xs={12} md={10} lg={8}>
-                <div className="d-flex gap-2 mb-4">
-                  <Button variant="danger" onClick={signOut}>Cerrar sesión</Button>
-                  <Button variant="primary" onClick={fetchGoogleEvents}>Cargar eventos</Button>
+              <Col xs={12} md={10} lg={8} className="content-box">
+                <div className="d-flex flex-column align-items-center w-100">
+                  <h3 className="mb-3 text-center w-100">Agenda</h3>
+
+                  <div className="calendar-wrapper w-100">
+                    <FullCalendar
+                      plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                      initialView={calendarView}
+                      locale="es"
+                      headerToolbar={headerConfig} // 🔹 Usa configuración dinámica
+                      buttonText={{
+                        today: "Hoy",
+                        month: "Mes",
+                        week: "Semana",
+                        day: "Día"
+                      }}
+                      events={formattedEvents}
+                      eventClick={handleEventClick}
+                    />
+                  </div>
                 </div>
-
-                <h3 className="mb-3">Turnos agendados</h3>
-
-                <FullCalendar
-                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                  initialView="timeGridWeek"
-                  locale="es"
-                  events={formattedEvents}
-                  eventClick={handleEventClick}
-                />
               </Col>
             </Row>
           </Container>
+
 
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
@@ -345,7 +421,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
           </Modal>
         </>
       ) : (
-        <Button variant="primary" onClick={signIn}>Iniciar sesión con Google</Button>
+        <Button style={{ marginTop: "7rem" }} variant="primary" onClick={signIn}>Iniciar sesión con Google</Button>
       )}
 
       <Modal show={showMeetModal} onHide={() => setShowMeetModal(false)} size="lg">

@@ -4,6 +4,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
+import "../styles/Header.css";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 type HeadProps = {
@@ -68,15 +69,15 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Helmet>
       <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom p-3 fixed-top shadow mb-5">
-        <div className="container-fluid">
-          {/* Logo */}
-          <a className="navbar-brand d-flex align-items-center ms-4" href="/">
-            <img src="/logo.png" alt="Logo" style={{ height: "40px", marginRight: "10px" }} />
-            <span style={{ fontSize: "1.5rem", color: "var(--verde)" }}>Terapia Libre</span>
+        <div className="container-fluid d-flex align-items-center justify-content-between">
+          {/* Logo (más grande en escritorio, más a la izquierda en móviles) */}
+          <a className="navbar-brand d-flex align-items-center logo-container" href="/">
+            <img src="/logo.png" alt="Logo" className="logo-img" />
+            <span className="brand-text fw-bold fs-5">Terapia Libre</span>
           </a>
 
-          {/* Sección Atención Inmediata */}
-          <div className="d-flex align-items-center">
+          {/* Sección Atención Inmediata (Pantallas grandes: Original, Móviles: Ajustado) */}
+          <div className="d-none d-lg-flex align-items-center">
             <img src="/atencion_psiquiatrica.png" alt="Atención Psiquiátrica" style={{ height: "70px", marginRight: "10px", paddingLeft: "10px" }} />
             <span style={{ color: "var(--naranja)", fontWeight: "bold" }}>
               <span style={{ fontSize: "0.9rem" }}>ATENCIÓN INMEDIATA</span>
@@ -85,8 +86,14 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
             </span>
           </div>
 
-          {/* Botón de menú responsive */}
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          {/* En móviles: Todo en una línea, pero el número debajo */}
+          <div className="d-lg-none d-flex flex-column align-items-center atencion-movil">
+            <span className="atencion-text">ATENCIÓN INMEDIATA</span>
+            <span className="atencion-numero">0810 666 3372</span>
+          </div>
+
+          {/* Botón de menú hamburguesa */}
+          <button className="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
 

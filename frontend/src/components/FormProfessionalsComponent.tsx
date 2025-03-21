@@ -1,4 +1,4 @@
-import { Card, Form, Row, Col, Container } from "react-bootstrap";
+import { Card, Form, Row, Col, Container, Modal, Button } from "react-bootstrap";
 import "../styles/FormProfessionalsComponent.css"; // Ajusta la ruta según corresponda
 import EspecialidadSelect from "./EspecialidadSelect";
 import axios from "axios";
@@ -6,6 +6,11 @@ import React, { useState } from "react";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 const FormProfessionalsComponent = () => {
+
+    const [termsChecked, setTermsChecked] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(false);
+
     const [formData, setFormData] = useState({
         nombre: "",
         telefono: "",
@@ -40,8 +45,11 @@ const FormProfessionalsComponent = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!termsChecked) {
+            alert("Debes aceptar los Términos y Condiciones para continuar.");
+            return;
+        }
 
-        // Validar antes de enviar
         if (!validateForm()) {
             alert("Por favor, complete todos los campos obligatorios.");
             return;
@@ -282,7 +290,27 @@ const FormProfessionalsComponent = () => {
                                 </Col>
                             </Row>
 
-                            {/* Botón Enviar */}
+                            {/* Checkbox: Aceptar términos y condiciones */}
+                            <Form.Group controlId="formTerms" className="mb-3 d-flex justify-content-center mt-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label={
+                                        <div className="text-center">
+                                            He leído y acepto los{" "}
+                                            <span
+                                                style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+                                                onClick={() => setShowTermsModal(true)}
+                                            >
+                                                Términos y Condiciones
+                                            </span>
+                                        </div>
+                                    }
+                                    checked={termsChecked}
+                                    disabled={!termsAccepted}
+                                    onChange={(e) => setTermsChecked(e.target.checked)}
+                                />
+                            </Form.Group>
+
                             {/* Botón Enviar */}
                             <div className="d-flex justify-content-center mt-4">
                                 <button
@@ -307,6 +335,38 @@ const FormProfessionalsComponent = () => {
                     </Card.Body>
                 </Card>
             </div>
+
+
+            {/* Modal de Términos y Condiciones */}
+            <Modal show={showTermsModal} onHide={() => setShowTermsModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Términos y Condiciones</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada, nunc sit amet posuere
+                        ullamcorper, urna erat fermentum ligula, vel lacinia libero lectus in magna.
+                    </p>
+                    <p>
+                        Al hacer clic en "Aceptar", confirma que ha leído y acepta nuestros términos y condiciones.
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowTermsModal(false)}>
+                        Cerrar
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() => {
+                            setTermsAccepted(true);
+                            setTermsChecked(true); // 🔹 Marcar automáticamente el checkbox
+                            setShowTermsModal(false);
+                        }}
+                    >
+                        Aceptar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };

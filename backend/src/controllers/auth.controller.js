@@ -126,10 +126,48 @@ exports.getUserData = async (req, res) => {
     res.json({
       nombre: usuario.nombre,
       correo_electronico: usuario.correo_electronico,
-      // Agregar más campos si es necesario
+      created_at: usuario.created_at,  // ✅ Ahora enviamos la fecha de creación
+      id_google: usuario.id_google,
     });
   } catch (error) {
     console.error("Error al obtener datos del usuario:", error);
     res.status(500).json({ message: "Error al obtener datos del usuario" });
+  }
+};
+
+exports.editarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, correo_electronico, contrasena } = req.body;
+
+    // Validar que al menos un campo esté presente
+    if (!nombre && !correo_electronico && !contrasena) {
+      return res.status(400).json({ message: "No se enviaron datos para actualizar" });
+    }
+
+    // Obtener el usuario actual
+    let usuario = await Usuario.findById(id);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    let contrasena_hash = usuario.contrasena_hash; // Mantener la contraseña actual si no se cambia
+
+    if (contrasena) {
+      const salt = await bcrypt.genSalt(10);
+      contrasena_hash = await bcrypt.hash(contrasena, salt);
+    }
+
+    // Actualizar el usuario en la base de datos
+    const actualizado = await Usuario.editarUsuario(id, { nombre, correo_electronico, contrasena_hash });
+
+    if (actualizado) {
+      res.json({ message: "Usuario actualizado correctamente" });
+    } else {
+      res.status(500).json({ message: "Error al actualizar usuario" });
+    }
+  } catch (error) {
+    console.error("Error al editar usuario:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };

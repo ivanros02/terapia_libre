@@ -25,23 +25,33 @@ interface ProfesionalDataProps {
 
 function ProfesionalData({ profesional, onEdit }: ProfesionalDataProps) {
     return (
-        <div className="container mt-4">
-            <h2>Datos del Profesional</h2>
+        <div className="container mt-4" style={{marginBottom:"80px"}}>
+            <h2>Datos del profesional</h2>
+
             {profesional ? (
-                <div className="card p-3">
-                    <p><strong>Nombre:</strong> {profesional.nombre}</p>
-                    <p><strong>Título Universitario:</strong> {profesional.titulo_universitario}</p>
-                    <p><strong>Matrícula Nacional:</strong> {profesional.matricula_nacional}</p>
-                    <p><strong>Descripción:</strong> {profesional.descripcion || "N/A"}</p>
-                    <p><strong>Teléfono:</strong> {profesional.telefono}</p>
-                    <p><strong>Correo Electrónico:</strong> {profesional.correo_electronico}</p>
-                    <p><strong>Disponibilidad:</strong> {profesional.disponibilidad}</p>
-                    <Button variant="primary" onClick={() => onEdit(profesional)}>Editar</Button>
+                <div className="card p-4 shadow-sm rounded bg-light">
+                    <div className="d-flex flex-column">
+                        <p className="mb-1"><strong>Nombre:</strong> {profesional.nombre}</p>
+                        <p className="mb-1"><strong>Título Universitario:</strong> {profesional.titulo_universitario}</p>
+                        <p className="mb-1"><strong>Matrícula Nacional:</strong> {profesional.matricula_nacional}</p>
+                        <p className="mb-1"><strong>Descripción:</strong> {profesional.descripcion || "N/A"}</p>
+                        <p className="mb-1"><strong>Teléfono:</strong> {profesional.telefono}</p>
+                        <p className="mb-1"><strong>Correo Electrónico:</strong> {profesional.correo_electronico}</p>
+                        <p className="mb-1"><strong>Disponibilidad:</strong> {profesional.disponibilidad}</p>
+                    </div>
+
+                    {/* Botón alineado a la derecha */}
+                    <div className="d-flex justify-content-end mt-1 ">
+                        <Button variant="warning" style={{backgroundColor:"var(--naranja)",borderColor:"var(--naranja)",paddingLeft:"20px",paddingRight:"20px",color:"white"}} className=" px-4 py-2" onClick={() => onEdit(profesional)}>
+                            Editar
+                        </Button>
+                    </div>
                 </div>
             ) : (
-                <p>Cargando datos...</p>
+                <p className="text-muted">Cargando datos...</p>
             )}
         </div>
+
     );
 }
 
