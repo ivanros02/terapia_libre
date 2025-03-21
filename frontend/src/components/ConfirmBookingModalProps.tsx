@@ -3,7 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import axios from "axios";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
-
+import { useNavigate } from "react-router-dom";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -26,7 +26,8 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     const [showPayPal, setShowPayPal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [preferenceId, setPreferenceId] = useState(null);
-
+    const navigate = useNavigate();
+    
     // 🔹 Crear orden de pago en PayPal
     const handleCreateOrder = async (): Promise<string> => {
         try {
@@ -69,6 +70,11 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
             if (response.data.message === "Pago exitoso y turno reservado") {
                 setShowSuccessModal(true);
                 onHide();
+                
+                // Redirigir después de un pequeño retraso
+                setTimeout(() => {
+                    navigate("/dashboard/calendario");
+                }, 2000); // Redirige después de 2 segundos para mostrar el modal
             }
         } catch (error) {
             console.error("❌ Error al capturar el pago:", error);

@@ -18,7 +18,7 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
   const navigate = useNavigate(); // Hook para redireccionar
   const [usuario, setUsuario] = useState<{ nombre: string; esProfesional: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUsuarioData = async () => {

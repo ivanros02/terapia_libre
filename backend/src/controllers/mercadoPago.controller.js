@@ -31,9 +31,9 @@ exports.crearOrdenMercadoPago = async (req, res) => {
                 },
             ],
             back_urls: {
-                success: "https://terapialibre.com.ar/usuario/dashboard/dashboard.php",
-                failure: "https://terapialibre.com.ar/psicologos/psicologosOnline.php#",
-                pending: "https://terapialibre.com.ar/psicologos/psicologosOnline.php#",
+                success: "https://terapialibre.com.ar/dashboard/calendario",
+                failure: "https://terapialibre.com.ar",
+                pending: "https://terapialibre.com.ar",
             },
             auto_return: "approved",
             notification_url: "https://de52-181-46-136-46.ngrok-free.app/api/mercadopago/webhook", // 🔹 URL DEL WEBHOOK

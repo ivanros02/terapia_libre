@@ -38,8 +38,8 @@ interface GoogleCalendarProps {
 }
 
 const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) => {
-  const { isSignedIn, signIn, signOut } = useGoogleAuth();
-  const [events, setEvents] = useState<any[]>([]);
+  const { isSignedIn, signIn,  } = useGoogleAuth();
+  const [events, ] = useState<any[]>([]);
   const [selectedTurno, setSelectedTurno] = useState<Turno | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showMeetModal, setShowMeetModal] = useState(false);

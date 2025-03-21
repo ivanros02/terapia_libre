@@ -75,12 +75,7 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
         fetchProfessional();
     }, [id_profesional]);
 
-    const obtenerDiaSemana = (fecha: Date): string => {
-        return new Intl.DateTimeFormat("es-ES", { weekday: "long" })
-            .format(fecha)
-            .replace(/^\w/, (c) => c.toUpperCase());
-    };
-
+    
     const handleDateChange = (value: Date | Date[] | null) => {
         if (!value || Array.isArray(value)) return;
         setSelectedDate(value);
