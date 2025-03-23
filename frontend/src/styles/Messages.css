@@ -1,0 +1,70 @@
+/* 📌 Sidebar de chats */
+/* 📌 Sidebar de chats */
+.chat-sidebar {
+    height: 90vh; /* 🔹 Evita que sea muy alto */
+    max-height: 600px;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: space-between; /* 🔹 Distribuye el espacio */
+    margin-top: 250px; /* 🔹 Baja la posición */
+    margin-left: auto; /* 🔹 Centrado por defecto */
+    margin-right: auto; /* 🔹 Centrado por defecto */
+}
+
+/* 📌 En pantallas grandes (≥ 992px), mover a la derecha */
+@media (min-width: 992px) {
+    .chat-sidebar {
+        margin-left: 250px !important; /* 🔹 Mueve el sidebar a la derecha */
+        margin-right: 0;
+    }
+}
+
+
+/* 📌 Contenedor de la lista de chats */
+.chat-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 450px; /* 🔹 Aumenta el alto para más espacio */
+    width: 100%;
+}
+
+/* 📌 Chats en la lista (más grandes y estilizados) */
+.chat-list-item {
+    font-size: 1rem; /* 🔹 Aumenta el tamaño del texto */
+    padding: 12px 15px; /* 🔹 Hace que cada chat sea más grande */
+    border-radius: 8px; /* 🔹 Bordes más suaves */
+    transition: all 0.3s ease-in-out;
+}
+
+.chat-list-item:hover {
+    background-color: rgba(0, 0, 255, 0.1); /* 🔹 Efecto hover */
+    transform: scale(1.03); /* 🔹 Ligeramente más grande al pasar el mouse */
+}
+
+/* 📌 Scroll estilizado */
+.chat-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-list-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+
+/* 📌 Ajustes para móviles */
+@media (max-width: 767px) {
+    .chat-sidebar {
+        height: auto;
+        max-height: 80vh;
+        max-width: 100%; /* 🔹 Ocupa todo el ancho en móviles */
+    }
+
+    .chat-list-container {
+        max-height: 300px; /* 🔹 Menos altura en pantallas pequeñas */
+    }
+
+    .chat-list-item {
+        font-size: 0.9rem; /* 🔹 Texto más pequeño en móviles */
+    }
+}

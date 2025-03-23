@@ -43,7 +43,7 @@ const Footer = () => {
                             </div>
                             <div className="d-flex align-items-center mt-2">
                                 <a
-                                    href="https://www.linkedin.com/company/terapialibre"
+                                    href="https://www.linkedin.com/company/terapia-libre"
                                     className="text-light"
                                     target="_blank"
                                     rel="noopener noreferrer"

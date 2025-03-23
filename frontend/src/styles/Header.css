@@ -30,3 +30,20 @@
     font-weight: bold;
     color: var(--naranja);
 }
+
+@media (max-width: 360px) { /* Galaxy S8+ tiene 360px de ancho en modo vertical */
+    .atencion-movil {
+        max-width: 40%; /* Evita que ocupe demasiado espacio */
+        font-size: 0.65rem; /* Reduce tamaño de fuente */
+    }
+
+    .atencion-text {
+        font-size: 0.6rem;
+    }
+
+    .atencion-numero {
+        font-size: 0.85rem;
+    }
+
+    
+}

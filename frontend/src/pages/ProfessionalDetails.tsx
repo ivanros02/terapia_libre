@@ -48,7 +48,7 @@ const ProfessionalDetails: React.FC = () => {
             <Head links={menuLinks} />
 
             {/* Contenedor principal para centrar la card */}
-            <main className="flex-grow-1 d-flex justify-content-center align-items-center">
+            <main className="flex-grow-1 d-flex justify-content-center align-items-center p-1" style={{ marginTop: "80px" }}>
                 <div className="container">
                     <ProfessionalDetailsComponent professional={professional} />
                 </div>

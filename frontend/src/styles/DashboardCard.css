@@ -68,3 +68,13 @@
         text-align: center;
     }
 }
+
+/* 🔥 Responsividad en notebooks (pantallas medianas de 1280px a 1440px) */
+@media (max-width: 1440px) {
+    .imagen-decorativa {
+        width: 300px; /* 🔹 Reduce ligeramente el tamaño */
+        top: -30px;  /* 🔹 Ajusta la posición */
+        right: -10px; /* 🔹 Evita que se desplace demasiado */
+    }
+}
+

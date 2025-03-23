@@ -27,7 +27,7 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [preferenceId, setPreferenceId] = useState(null);
     const navigate = useNavigate();
-    
+
     // 🔹 Crear orden de pago en PayPal
     const handleCreateOrder = async (): Promise<string> => {
         try {
@@ -70,7 +70,7 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
             if (response.data.message === "Pago exitoso y turno reservado") {
                 setShowSuccessModal(true);
                 onHide();
-                
+
                 // Redirigir después de un pequeño retraso
                 setTimeout(() => {
                     navigate("/dashboard/calendario");
@@ -128,13 +128,21 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
                             {/* 🔹 Botón de Mercado Pago Checkout Pro */}
                             <Button
                                 style={{ backgroundColor: "white", color: "var(--verde)", border: "2px solid white", width: "80%" }}
-                                className="fw-bold px-4 py-2"
+                                className="fw-bold px-4 py-2 d-flex flex-column align-items-center justify-content-center"
                                 onClick={handleBuy}
                             >
-                                {preferenceId && <Wallet initialization={{ preferenceId: preferenceId }} />}
+                                {/* 🔹 Contenedor centrado del Wallet */}
+                                {preferenceId && (
+                                    <div className="wallet-container" style={{ display:"flex", justifyContent:"center" }}>
+                                        <Wallet initialization={{ preferenceId: preferenceId }} />
+                                    </div>
+                                )}
 
-                                Pagar con Mercado Pago
+                                {/* 🔹 Texto centrado correctamente */}
+                                <span className="text-center w-100 mt-2">Pagar con Mercado Pago</span>
                             </Button>
+
+
 
                             {/* 🔹 Botón de PayPal */}
                             <Button
