@@ -59,7 +59,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: usuario.id_usuario, correo_electronico, esProfesional },
       SECRET_KEY,
-      { expiresIn: "1h" }
+      { expiresIn: "7d" }
     );
 
     res.json({
@@ -96,7 +96,7 @@ exports.loginConGoogle = async (req, res) => {
     const token = jwt.sign(
       { id: usuario.id_usuario, correo_electronico, esProfesional: false },
       SECRET_KEY,
-      { expiresIn: "1h" }
+      { expiresIn: "7d" }
     );
 
     res.json({

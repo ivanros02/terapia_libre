@@ -35,18 +35,21 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
         const response = await axios.get(`${url}/api/profesionales`, {
           params: {
             page: currentPage,
-            limit: 12, // Límite de 10 profesionales por página
+            limit: 12,
+            especialidad: selectedEspecialidad || undefined,
+            disponibilidad: selectedDisponibilidad || undefined,
+            orden: selectedOrden || undefined,
           },
         });
         setProfessionals(response.data.professionals);
-        setTotalPages(response.data.totalPages); // Total de páginas desde el backend
+        setTotalPages(response.data.totalPages);
       } catch (error) {
         console.error("Error al obtener profesionales:", error);
       }
     };
 
     fetchProfessionals();
-  }, [currentPage]); // Recargar datos cuando cambie la página
+  }, [currentPage, selectedEspecialidad, selectedDisponibilidad, selectedOrden]); // 🔹 Dependencias correctas
 
   useEffect(() => {
     let filtered = professionals;
@@ -54,8 +57,9 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
     // Filtrar por especialidad
     if (selectedEspecialidad) {
       filtered = filtered.filter((prof) =>
-        prof.especialidades.split(", ").includes(selectedEspecialidad)
+        (prof.especialidades ? prof.especialidades.split(", ") : []).includes(selectedEspecialidad)
       );
+
     }
 
     // Filtrar por disponibilidad
@@ -77,21 +81,37 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
     setCurrentPage(newPage);
   };
 
+  const getGoogleDriveImageUrl = (url: string) => {
+    if (!url) return "/placeholder.jpg"; // 🔹 Si no hay URL, muestra un placeholder
+
+    let fileId = "";
+
+    // Detectar diferentes formatos de URL de Google Drive
+    if (url.includes("/d/")) {
+      fileId = url.split("/d/")[1]?.split("/")[0]; // Extraer ID de formato "/d/"
+    } else if (url.includes("id=")) {
+      fileId = url.split("id=")[1]?.split("&")[0]; // Extraer ID de formato "id="
+    }
+
+    return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "/placeholder.jpg";
+  };
+
   return (
     <div className="container mt-4 p-3">
       <div className="row g-4">
         {filteredProfessionals.map((prof) => (
           <div key={prof.id_profesional} className="col-12 col-md-6 col-lg-3">
             <ProfessionalCard
-              id={prof.id_profesional} // Pasamos el ID del profesional
+              id={prof.id_profesional}
               name={prof.nombre}
-              image={prof.foto_perfil_url || "default-profile.jpg"}
-              specialties={prof.especialidades.split(", ")}
-              availability={prof.disponibilidad}
-              price={`$${prof.valor}`}
+              image={getGoogleDriveImageUrl(prof.foto_perfil_url) || "default-profile.jpg"}
+              specialties={prof.especialidades ? prof.especialidades.split(", ") : []}  // 🔹 Evita el error
+              availability={prof.disponibilidad || "No especificado"}
+              price={`$${prof.valor || 0}`}
             />
           </div>
         ))}
+
       </div>
 
       {/* Paginación */}

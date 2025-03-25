@@ -5,6 +5,7 @@
     width: 130% !important; /* 🔹 Aumenta el ancho del calendario */
     background: transparent !important;
     font-family: "Montserrat", sans-serif !important;
+    margin-top: 5rem;
 }
 
 /* 📌 Ajustes para mejorar el estilo de los días */
@@ -61,7 +62,7 @@
     border-radius: 12px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     max-width: 90%;
-    width: 1050px; /* Ajustado para pantallas grandes */
+    width: 1060px !important; /* Ajustado para pantallas grandes */
     text-align: center;
     position: relative;
     z-index: 1001;
@@ -91,12 +92,12 @@
 .available-times {
     flex-grow: 2;
     max-width: 700px; /* Ajustado para pantallas grandes */
-    min-width: 300px;
-    height: 350px;
+    min-width: 400px;
+    height: 350px; 
     border-radius: 12px;
     border: 1px solid #ccc;
     background: transparent;
-    padding: 25px;
+    padding: 1px !important;
     overflow-y: auto;
     border-color: transparent;
 }
@@ -123,29 +124,19 @@
 
 /* 🔹 RESPONSIVE para móviles y tablets */
 @media (max-width: 1024px) {
-    .floating-calendar-container {
-        width: 95%;
-        max-width: 700px; /* Más pequeño en pantallas medianas */
-        padding: 20px;
+    
+    .available-times {
+        margin-top: -10rem;
     }
 
     .calendar-container {
         flex-direction: column; /* Cambiar a diseño en columna */
         align-items: center;
-        max-width: 100%;
+        max-width: 100% !important;
         padding: 20px;
         gap: 20px;
     }
-
-    .available-times {
-        max-width: 100%;
-        min-width: 100%;
-        height: auto;
-    }
-
-    .calendar-wrapper {
-        max-width: 100%;
-    }
+    
 }
 
 /* 🔹 RESPONSIVE para móviles pequeños */

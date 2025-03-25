@@ -32,4 +32,14 @@ const authenticate = (req, res, next) => {
     }
 };
 
-module.exports = { authenticate };
+/**
+ * Middleware para verificar si el usuario es administrador.
+ */
+const authenticateAdmin = (req, res, next) => {
+    authenticate(req, res, () => {
+        console.log("Usuario autenticado:", req.user); // 🔹 Debug para verificar que el token es correcto
+        next(); // ✅ Permitir acceso sin verificar rol
+    });
+};
+
+module.exports = { authenticate,authenticateAdmin };

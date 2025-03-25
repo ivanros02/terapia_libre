@@ -15,8 +15,11 @@ const googleAuthRoutes = require('./src/routes/googleAuth.routes');
 const chatRoutes = require('./src/routes/chat.routes'); // Nueva ruta para el chat
 const mercadoPagoRoutes = require("./src/routes/mercadoPago.routes");
 const googleMeetRoutes = require("./src/routes/googleMeet.routes");
+const adminRoutes = require("./src/routes/admin.routes"); // Nueva ruta para el chat
+const suscripcionRoutes = require("./src/routes/suscripcion.routes");
 const app = express();
 const server = http.createServer(app);
+
 
 // Configuración de Socket.io
 const io = new Server(server, {
@@ -41,6 +44,9 @@ app.use("/api/turnos", turnosRoutes);
 app.use('/google', googleAuthRoutes);
 app.use("/google-meet", googleMeetRoutes);
 app.use("/api/mercadopago", mercadoPagoRoutes);
+app.use("/api/admin", adminRoutes); // 🔹 Agregamos la ruta de administración
+app.use("/api/suscripcion", suscripcionRoutes);
+
 // Pasar `io` al cargar las rutas del chat
 app.use("/api/chat", (req, res, next) => {
     req.io = io;

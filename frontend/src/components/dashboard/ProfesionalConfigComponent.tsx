@@ -4,7 +4,7 @@ import DisponibilidadList from "./DisponibilidadList";
 import DisponibilidadForm from "./DisponibilidadForm";
 import ProfesionalData from "./ProfesionalData";
 import ProfesionalForm from "./ProfesionalForm";
-
+import SuscripcionInfo from "./SuscripcionInfo";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 interface Profesional {
@@ -40,8 +40,9 @@ function ProfesionalConfigComponent() {
     const [showModalProfesional, setShowModalProfesional] = useState(false);
     const [profesional, setProfesional] = useState<Profesional | null>(null);
 
+    const idProfesional = localStorage.getItem("id");
     const fetchProfesionalData = useCallback(async () => {
-        const idProfesional = localStorage.getItem("id");
+
         if (!idProfesional) return;
 
         try {
@@ -104,6 +105,9 @@ function ProfesionalConfigComponent() {
                     fetchProfesionalData={fetchProfesionalData}
                 />
             )}
+            {/* 🔹 Mostrar la información de la suscripción */}
+            {profesional?.correo_electronico && <SuscripcionInfo email={profesional.correo_electronico} />}
+
         </div>
     );
 }

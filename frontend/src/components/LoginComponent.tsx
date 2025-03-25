@@ -5,6 +5,7 @@ import { Form, Container, Row, Col, Card } from "react-bootstrap";
 import "../styles/LoginComponent.css";
 import GoogleLoginButton from "./GoogleLoginButton";
 const url = import.meta.env.VITE_API_BASE_URL;
+import { toast } from "react-toastify";
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -27,6 +28,12 @@ const Login: React.FC = () => {
             localStorage.setItem("esProfesional", response.data.esProfesional);
             localStorage.setItem("id", response.data.id);
 
+            // Mostrar mensaje de éxito
+            toast.success("Inicio de sesión exitoso 🎉", {
+                position: "top-center",
+                autoClose: 3000, // Se cierra en 3 segundos
+            });
+
             // Recuperar la URL previa si existe, y redirigir
             const prevPath = localStorage.getItem("prevPath") || null;
             if (prevPath) {
@@ -38,7 +45,11 @@ const Login: React.FC = () => {
                 navigate(dashboardRoute);
             }
         } catch (error: any) {
-            alert(error.response?.data?.message || "Error en el inicio de sesión");
+            // Mostrar mensaje de error
+            toast.error(error.response?.data?.message || "Error en el inicio de sesión", {
+                position: "top-center",
+                autoClose: 5000, // Más tiempo para que el usuario lo lea
+            });
         }
     };
 

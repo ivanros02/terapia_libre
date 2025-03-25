@@ -14,6 +14,25 @@ class Profesional {
       throw new Error("El correo electrónico ya está registrado.");
     }
 
+    // 🔹 Verificar si la matrícula provincial ya existe
+    const [existingMatricula] = await pool.execute(
+      `SELECT matricula_provincial FROM profesionales WHERE matricula_provincial = ?`,
+      [matricula_provincial]
+    );
+
+    if (existingMatricula.length > 0) {
+      throw new Error("La matrícula provincial ya está registrada. Verifica los datos.");
+    }
+
+    const [existingMatriculaNacional] = await pool.execute(
+      `SELECT matricula_nacional FROM profesionales WHERE matricula_provincial = ?`,
+      [matricula_nacional]
+    );
+
+    if (existingMatriculaNacional.length > 0) {
+      throw new Error("La matrícula provincial ya está registrada. Verifica los datos.");
+    }
+
     // Si el correo no existe, proceder con la inserción
     const [result] = await pool.execute(
       `INSERT INTO profesionales (nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional) 
@@ -63,28 +82,82 @@ class Profesional {
     await pool.query(`INSERT INTO profesional_especialidad (id_profesional, id_especialidad) VALUES ?`, [values]);
   }
 
-  static async getAll(limit, offset) {
-    const [rows] = await pool.execute(`
+  static async getAll(limit, offset, especialidad = null, disponibilidad = null, orden = null) {
+    let whereClauses = ["p.estado = 1"]; // 🔹 Filtrar solo profesionales activos
+
+    let queryParams = [];
+
+    // 🔹 Filtrar por especialidad si está definida
+    if (especialidad) {
+      whereClauses.push("e.nombre LIKE ?");
+      queryParams.push(`%${especialidad}%`);
+    }
+
+    // 🔹 Filtrar por disponibilidad si está definida
+    if (disponibilidad) {
+      whereClauses.push("p.disponibilidad = ?");
+      queryParams.push(disponibilidad);
+    }
+
+    // 🔹 Construir la consulta SQL dinámicamente
+    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+
+    // 🔹 Ordenar por precio si se especifica
+    let orderClause = "";
+    if (orden === "asc") {
+      orderClause = "ORDER BY p.valor ASC";
+    } else if (orden === "desc") {
+      orderClause = "ORDER BY p.valor DESC";
+    } else {
+      orderClause = "ORDER BY p.creado_en DESC"; // Orden predeterminado
+    }
+
+    const [rows] = await pool.execute(
+      `
         SELECT p.id_profesional, p.nombre, p.foto_perfil_url, p.disponibilidad, p.valor, p.estado, 
-               GROUP_CONCAT(e.nombre SEPARATOR ', ') AS especialidades
+               GROUP_CONCAT(e.nombre SEPARATOR ', ') AS especialidades, p.correo_electronico, p.creado_en
         FROM profesionales p
         LEFT JOIN profesional_especialidad pe ON p.id_profesional = pe.id_profesional
         LEFT JOIN especialidades e ON pe.id_especialidad = e.id_especialidad
-        WHERE p.estado = 1
+        ${whereClause}
         GROUP BY p.id_profesional
+        ${orderClause}
         LIMIT ? OFFSET ?
-    `, [limit, offset]);
+        `,
+      [...queryParams, limit, offset]
+    );
 
-    console.log("Profesionales obtenidos:", rows); // 🔹 Log para verificar
     return rows;
   }
 
 
+
+
   // Nuevo método para obtener el total de profesionales
-  static async getTotalCount() {
-    const [total] = await pool.execute("SELECT COUNT(*) AS total FROM profesionales");
+  static async getTotalCount(especialidad = null, disponibilidad = null) {
+    let whereClauses = ["estado = 1"];
+    let queryParams = [];
+
+    if (especialidad) {
+      whereClauses.push("id_profesional IN (SELECT pe.id_profesional FROM profesional_especialidad pe JOIN especialidades e ON pe.id_especialidad = e.id_especialidad WHERE e.nombre LIKE ?)");
+      queryParams.push(`%${especialidad}%`);
+    }
+
+    if (disponibilidad) {
+      whereClauses.push("disponibilidad = ?");
+      queryParams.push(disponibilidad);
+    }
+
+    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+
+    const [total] = await pool.execute(
+      `SELECT COUNT(*) AS total FROM profesionales ${whereClause}`,
+      queryParams
+    );
+
     return total[0].total;
   }
+
 
   static async findByEmail(correo_electronico) {
     const [rows] = await pool.execute(

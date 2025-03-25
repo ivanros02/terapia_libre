@@ -8,6 +8,7 @@ import DashboardCard from "../components/dashboard/DashboardCard";
 import PatientHistory from "../components/dashboard/PatientHistory";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
 import "../styles/DashboardProfesional.css"
+import { useNavigate } from "react-router-dom";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos
@@ -42,7 +43,7 @@ const DashboardProfesional = () => {
   const [, setError] = useState<string | null>(null);
   const [eventos, setEventos] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -126,7 +127,7 @@ const DashboardProfesional = () => {
       {/* 🔹 Estas tarjetas SOLO aparecen en móviles */}
       {isMobile && (
         <>
-          <div className="div8">
+          <div className="div8"  onClick={() => navigate('/dashboard/calendario')} style={{ cursor: "pointer" }}>
             <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
               <FaCalendarAlt size={24} className="text-secondary mb-2" />
               <span className="fw-bold text-secondary">CALENDARIO</span>
@@ -134,16 +135,16 @@ const DashboardProfesional = () => {
           </div>
 
 
-          <div className="div7">
+          <div className="div7"  onClick={() => navigate('/dashboard/profesional/config_profesional')} style={{ cursor: "pointer" }}>
             <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
               <FaCalendarAlt size={24} className="text-secondary mb-2" />
-              <span className="fw-bold text-secondary">CALENDARIO</span>
+              <span className="fw-bold text-secondary">CONFIGURACION</span>
             </Card>
           </div>
           <div className="div9">
             <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
               <FaCalendarAlt size={24} className="text-secondary mb-2" />
-              <span className="fw-bold text-secondary">CALENDARIO</span>
+              <span className="fw-bold text-secondary">HISTORIAS CLINICAS</span>
             </Card>
           </div>
 

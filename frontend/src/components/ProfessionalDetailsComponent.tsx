@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ⬅️ Para la redirección
 import CalendarAvailability from "./CalendarAvailability";
-
+import "../styles/CalendarAvailability.css";
 
 interface Professional {
     id_profesional: number;
@@ -35,6 +35,20 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
         setShowCalendar(true);
     };
     
+    const getGoogleDriveImageUrl = (url: string) => {
+        if (!url) return "/placeholder.jpg"; // 🔹 Si no hay URL, muestra un placeholder
+    
+        let fileId = "";
+    
+        // Detectar diferentes formatos de URL de Google Drive
+        if (url.includes("/d/")) {
+          fileId = url.split("/d/")[1]?.split("/")[0]; // Extraer ID de formato "/d/"
+        } else if (url.includes("id=")) {
+          fileId = url.split("id=")[1]?.split("&")[0]; // Extraer ID de formato "id="
+        }
+    
+        return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "/placeholder.jpg";
+      };
 
     return (
         <div className="container mt-5">
@@ -43,7 +57,7 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
                 <div className="col-12 col-md-4 d-flex justify-content-center">
                     <div className="card shadow-lg rounded-4 p-0 h-100" style={{ width: "300px", height: "300px", overflow: "hidden" }}>
                         <img
-                            src={professional.foto_perfil_url}
+                            src={getGoogleDriveImageUrl(professional.foto_perfil_url)}
                             alt={professional.nombre}
                             className="w-100 h-100"
                             style={{ objectFit: "cover", maxWidth: "100%", maxHeight: "100%" }}

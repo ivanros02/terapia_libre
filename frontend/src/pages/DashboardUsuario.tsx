@@ -7,6 +7,8 @@ import Sidebar from "../components/dashboard/Sidebar";
 import DashboardCard from "../components/dashboard/DashboardCard";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
 import HistorialSesiones from "../components/dashboard/HistorialSesiones";
+import { useNavigate } from "react-router-dom";
+
 import "../styles/DashboardProfesional.css"
 const url = import.meta.env.VITE_API_BASE_URL;
 
@@ -34,7 +36,7 @@ const DashboardUsuario = () => {
   const [terapeuta, setTerapeuta] = useState(null);
   const userId = localStorage.getItem("id"); // 🔹 Obtener el ID almacenado en localStorage
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -176,12 +178,13 @@ const DashboardUsuario = () => {
           </div>
 
 
-          <div className="div7">
+          <div className="div7" onClick={() => navigate('/dashboard/usuario/config_usuario')} style={{ cursor: "pointer" }}>
             <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
               <FaCalendarAlt size={24} className="text-secondary mb-2" />
-              <span className="fw-bold text-secondary">CONFIGURACION</span>
+              <span className="fw-bold text-secondary">CONFIGURACIÓN</span>
             </Card>
           </div>
+
           <div className="div9">
             <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
               <FaCalendarAlt size={24} className="text-secondary mb-2" />

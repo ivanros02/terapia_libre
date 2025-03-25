@@ -4,6 +4,8 @@ import EspecialidadSelect from "./EspecialidadSelect";
 import axios from "axios";
 import React, { useState } from "react";
 const url = import.meta.env.VITE_API_BASE_URL;
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FormProfessionalsComponent = () => {
 
@@ -45,22 +47,35 @@ const FormProfessionalsComponent = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!termsChecked) {
-            alert("Debes aceptar los Términos y Condiciones para continuar.");
+            toast.warning("Debes aceptar los Términos y Condiciones para continuar.", {
+                position: "top-center",
+                autoClose: 3000,
+            });
             return;
         }
 
         if (!validateForm()) {
-            alert("Por favor, complete todos los campos obligatorios.");
+            toast.error("Por favor, complete todos los campos obligatorios.", {
+                position: "top-center",
+                autoClose: 3000,
+            });
             return;
         }
 
         try {
             const response = await axios.post(`${url}/api/profesionales`, formData);
-            alert(`Profesional registrado con éxito: ${JSON.stringify(response.data)}`);
+            toast.success(`Profesional registrado con éxito 🎉`, {
+                position: "top-center",
+                autoClose: 3000,
+            });
         } catch (error: any) {
             console.error("Error al registrar profesional:", error);
-            alert(`Error: ${error.response?.data?.message || error.message}`);
+            toast.error(`Error: ${error.response?.data?.message || error.message}`, {
+                position: "top-center",
+                autoClose: 5000,
+            });
         }
     };
 

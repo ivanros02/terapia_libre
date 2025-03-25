@@ -39,7 +39,6 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
         const fetchAvailability = async () => {
             try {
                 const response = await axios.get(`${url}/disponibilidad/horas?id_profesional=${id_profesional}`);
-                console.log("📆 Disponibilidad recibida:", response.data);
 
                 if (!response.data || typeof response.data !== "object") {
                     console.error("❌ Respuesta inválida del backend");

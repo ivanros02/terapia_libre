@@ -4,20 +4,22 @@ const nodemailer = require("nodemailer"); // Importar nodemailer
 
 exports.getProfesionales = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; // Página actual (por defecto 1)
-        const limit = parseInt(req.query.limit) || 12; // Límite de registros por página (por defecto 10)
-        const offset = (page - 1) * limit; // Cálculo del offset
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 12;
+        const offset = (page - 1) * limit;
 
-        // Obtener profesionales de la página actual
-        const profesionales = await Profesional.getAll(limit, offset);
+        const especialidad = req.query.especialidad || null;
+        const disponibilidad = req.query.disponibilidad || null;
+        const orden = req.query.orden || null; // "asc" o "desc"
 
-        // Obtener el total de profesionales
-        const totalProfesionales = await Profesional.getTotalCount();
+        // Obtener profesionales con filtros
+        const profesionales = await Profesional.getAll(limit, offset, especialidad, disponibilidad, orden);
 
-        // Calcular el total de páginas
+        // Obtener el total de profesionales con los filtros aplicados
+        const totalProfesionales = await Profesional.getTotalCount(especialidad, disponibilidad);
+
         const totalPages = Math.ceil(totalProfesionales / limit);
 
-        // Devolver los profesionales y el total de páginas
         res.json({
             professionals: profesionales,
             totalPages: totalPages,
@@ -28,12 +30,21 @@ exports.getProfesionales = async (req, res) => {
     }
 };
 
+
 exports.createProfesional = async (req, res) => {
     try {
         const { nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena, foto_perfil_url, valor, valor_internacional, especialidades } = req.body;
 
         if (!contrasena) {
             return res.status(400).json({ message: "La contraseña es obligatoria" });
+        }
+
+        // Convertir la URL de Google Drive a formato directo si es necesario
+        let fotoFinal = foto_perfil_url;
+        const driveMatch = foto_perfil_url.match(/drive\.google\.com\/file\/d\/([^/]+)\//);
+        if (driveMatch) {
+            const fileId = driveMatch[1];
+            fotoFinal = `https://drive.google.com/uc?export=view&id=${fileId}`;
         }
 
         // Encriptar contraseña
@@ -43,7 +54,7 @@ exports.createProfesional = async (req, res) => {
         // Insertar profesional
         const id_profesional = await Profesional.create({
             nombre, titulo_universitario, matricula_nacional, matricula_provincial,
-            descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional
+            descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url: fotoFinal, valor, valor_internacional
         });
 
         // Insertar especialidades si hay
@@ -52,7 +63,7 @@ exports.createProfesional = async (req, res) => {
         }
 
         /*
-        // 馃敼 Configurar el transporter de Nodemailer
+        //  Configurar el transporter de Nodemailer
         const transporter = nodemailer.createTransport({
             host: 'localhost',
             port: 25,
@@ -65,17 +76,17 @@ exports.createProfesional = async (req, res) => {
             }
         });
 
-        // 馃敼 Definir el contenido del correo
+        //  Definir el contenido del correo
         const mailOptions = {
             from: 'terapialibre@terapialibre.com.ar',
             to: correo_electronico,
-            subject: "隆Bienvenido a Terapia Libre!",
+            subject: "¡Bienvenido a Terapia Libre!",
             html: `
-                <h2>Hola, ${nombre} 馃憢</h2>
+                <h2>Hola, ${nombre}</h2>
                 <p>Gracias por registrarte como profesional en Terapia Libre.</p>
-                <p>Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesi贸n y gestionar tus consultas.</p>
+                <p>Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión y gestionar tus consultas.</p>
                 <br>
-                <p>Si no realizaste este registro, por favor cont谩ctanos.</p>
+                <p>Si no realizaste este registro, por favor contáctanos.</p>
                 <br>
                 <p>Atentamente,</p>
                 <p><strong>El equipo de Terapia Libre</strong></p>
@@ -98,7 +109,7 @@ exports.createProfesional = async (req, res) => {
             to: correo_electronico,
             subject: "¡Bienvenido a Terapia Libre!",
             html: `
-                <h2>Hola, ${nombre} 👋</h2>
+                <h2>Hola, ${nombre}</h2>
                 <p>Gracias por registrarte como profesional en Terapia Libre.</p>
                 <p>Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión y gestionar tus consultas.</p>
                 <br>
