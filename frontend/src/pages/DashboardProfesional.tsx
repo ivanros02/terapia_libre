@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Card } from "react-bootstrap";
+import { FaCalendarAlt } from "react-icons/fa";
 import axios from "axios";
 import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
@@ -39,7 +41,7 @@ const DashboardProfesional = () => {
   const [loading, setLoading] = useState(true);
   const [, setError] = useState<string | null>(null);
   const [eventos, setEventos] = useState<string[]>([]);
-
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -96,33 +98,61 @@ const DashboardProfesional = () => {
     fetchDashboardData();
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (loading) return <div>Cargando...</div>;
 
   return (
     <div className="parent">
-      <div className="div1">
-        <SearchNavbar
-          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
-          profileName={profesionalData?.nombre || "Profesional"} // Usar el nombre del profesional
-        />
-      </div>
-      <div className="div2">
-        <Sidebar />
-      </div>
-      <div className="div3">
-        <DashboardCard
-          name={profesionalData?.nombre || "Profesional"}
-          patientName={turnoHoy?.nombre_paciente || "Sin paciente hoy"}
-          appointmentTime={turnoHoy ? `${turnoHoy.hora_turno}` : "Sin turnos"}
-          newPatients={3}
-        />
-      </div>
-      <div className="div4">
-        <PatientHistory patients={listaPacientes} selectedPatient={null} />
-      </div>
-      <div className="div5 calendarioAncho">
-        <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />
-      </div>
+      {!isMobile && <div className="div1"><Sidebar /></div>}
+      <div className="div2"><SearchNavbar
+        profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+        profileName={profesionalData?.nombre || "Profesional"} // Usar el nombre del profesional
+      /></div>
+      <div className="div3"><DashboardCard
+        name={profesionalData?.nombre || "Profesional"}
+        patientName={turnoHoy?.nombre_paciente || "Sin paciente hoy"}
+        appointmentTime={turnoHoy ? `${turnoHoy.hora_turno}` : "Sin turnos"}
+        newPatients={3}
+      /></div>
+      {!isMobile && <div className="div4"><PatientHistory patients={listaPacientes} selectedPatient={null} /></div>}
+
+      {/* 🔹 Estas tarjetas SOLO aparecen en móviles */}
+      {isMobile && (
+        <>
+          <div className="div8">
+            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
+              <FaCalendarAlt size={24} className="text-secondary mb-2" />
+              <span className="fw-bold text-secondary">CALENDARIO</span>
+            </Card>
+          </div>
+
+
+          <div className="div7">
+            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
+              <FaCalendarAlt size={24} className="text-secondary mb-2" />
+              <span className="fw-bold text-secondary">CALENDARIO</span>
+            </Card>
+          </div>
+          <div className="div9">
+            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
+              <FaCalendarAlt size={24} className="text-secondary mb-2" />
+              <span className="fw-bold text-secondary">CALENDARIO</span>
+            </Card>
+          </div>
+
+        </>
+      )}
+
+      <div className="div5"><CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} /></div>
+
+
     </div>
   );
 };

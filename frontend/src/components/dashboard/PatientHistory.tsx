@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Card, Container, Row, Col, ListGroup, Badge } from "react-bootstrap";
-
+import "../../styles/PatientHistory.css";
 interface Patient {
     name: string;
     frequency: null | string;
@@ -22,7 +22,7 @@ interface PatientHistoryProps {
 const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatient }) => {
     return (
         <Container fluid>
-            <Card className="shadow-lg p-3 rounded-4 border-0" style={{ maxWidth: "79%" }}>
+            <Card className="shadow-lg p-3 rounded-4 border-0 patient-history-card">
                 <Row>
                     {/* Lista de Pacientes */}
                     <Col md={5} className="border-end">
@@ -30,16 +30,17 @@ const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatie
                         <ListGroup variant="flush">
                             {patients.map((patient, index) => (
                                 <ListGroup.Item key={index} className="d-flex align-items-center border-0">
-                                    <div className="rounded-circle bg-light text-dark d-flex align-items-center justify-content-center me-3"
-                                        style={{ width: "40px", height: "40px", fontWeight: "bold" }}>
-                                        {patient.name
-                                            .split(" ") // Divide el nombre en palabras
-                                            .map(word => word.charAt(0).toUpperCase()) // Toma la primera letra de cada palabra
-                                            .join("")} {/* Une las iniciales */}
+                                    <div className="circle-container">
+                                        <div className="circle-inner">
+                                            {patient.name
+                                                .split(" ")
+                                                .map(word => word.charAt(0).toUpperCase())
+                                                .join("")}
+                                        </div>
                                     </div>
                                     <div>
-                                        <p className="mb-0 fw-semibold">{patient.name}</p>
-                                        <Badge bg="secondary">{patient.frequency}</Badge>
+                                        <p className="mb-0 fw-semibold" style={{marginLeft:"5px"}}>{patient.name}</p>
+                                        <Badge className="transparent-badge">{patient.frequency}</Badge>
                                     </div>
                                 </ListGroup.Item>
                             ))}

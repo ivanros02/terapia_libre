@@ -5,16 +5,6 @@
     --verde-rgb: 86, 124, 111; /* Definir la variable en formato RGB */
 }
 
-/*
-@font-face {
-    font-family: 'Montserrat', sans-serif;
-    font-family: 'Things Serif';
-    src: url('./fuente/things-serif-font/things.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-}
-*/
-/* src/fonts.css */
 @font-face {
     font-family: 'Montserrat' !important;
     src: url('./fonts/Montserrat-Regular.woff2') format('woff2'),
@@ -30,11 +20,7 @@
     font-weight: bold !important;
     font-style: normal !important;
 }
-h1,
-h2,
-h3 {
-    font-family: 'Things Serif', serif;
-}
+
 
 h2 {
     font-size: 3rem !important;

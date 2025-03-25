@@ -3,6 +3,7 @@ import axios from "axios";
 import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
 import Messages from "../components/dashboard/Messages";
+import "../styles/DashboardCalendar.css";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos
@@ -60,14 +61,19 @@ const DashboardMensajes = () => {
   }
 
   return (
-    <div>
-      <SearchNavbar
-        profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
-        profileName={userData?.nombre || "Usuario"}
-      />
-      <Sidebar />
-      <Messages />
+
+    <div className="parent">
+      <div className="div1"><Sidebar /></div>
+      <div className="div2">
+        <SearchNavbar
+          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+          profileName={userData?.nombre || "Usuario"}
+        />
+      </div>
+      <div className="div6"><Messages /></div>
     </div>
+
+
   );
 };
 

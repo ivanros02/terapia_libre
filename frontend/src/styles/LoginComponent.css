@@ -10,13 +10,14 @@
 
 .rounded-personalizado{
     border-radius: 5% !important;
-    height: 450px !important;
+    height: 390px !important;
+    width: 331px !important;
 }
 
 .login-container {
     background: url("../assets/home.jpg") no-repeat center center;
     background-size: cover;
-    height: 100vh;
+    height: 110vh;
     display: flex;
     align-items: center;
     justify-content: center;

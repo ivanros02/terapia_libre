@@ -4,7 +4,7 @@ import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
 import GoogleCalendar from "../components/GoogleCalendar";
 const url = import.meta.env.VITE_API_BASE_URL;
-
+import "../styles/DashboardCalendar.css"
 // Tipos de datos
 interface Turno {
   id_turno: number;
@@ -29,6 +29,7 @@ const DashboardCalendar = () => {
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [, setLoading] = useState(true);
   const [, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const esProfesional = localStorage.getItem("esProfesional") === "true";
   const id = localStorage.getItem("id");
@@ -94,14 +95,25 @@ const DashboardCalendar = () => {
   }, [id, token]);
 
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    <div>
-      <SearchNavbar
-        profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
-        profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")} />
-      <Sidebar />
-      <GoogleCalendar turnos={turnos} usuarioRol={esProfesional ? "profesional" : "usuario"} />
+    <div className="parent">
+      {!isMobile && <div className="div1"><Sidebar /></div>} 
+      <div className="div2">
+        <SearchNavbar
+          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+          profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")} />
+      </div>
+      <div className="div6">
+        <GoogleCalendar turnos={turnos} usuarioRol={esProfesional ? "profesional" : "usuario"} />
+      </div>
     </div>
 
   );

@@ -1,0 +1,50 @@
+/* 🔹 Contenedor del Google Calendar */
+.div6 {
+    grid-column: span 3 / span 4;
+    grid-row: span 1 / span 1;
+    grid-column-start: 2;
+    grid-row-start: 2;
+}
+
+/* 🔹 Ajuste para reducir el tamaño de la barra de herramientas */
+.fc-header-toolbar {
+    font-size: 0.9rem !important; /* 🔹 Reduce el tamaño del texto */
+    height: auto !important; /* 🔹 Evita que la barra se expanda demasiado */
+    padding: 0.2rem 0 !important; /* 🔹 Reduce el padding superior e inferior */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* 🔹 Ajuste para reducir el tamaño de los botones de navegación */
+.fc-button {
+    font-size: 0.8rem !important; /* 🔹 Reduce el tamaño del texto de los botones */
+    padding: 0.2rem 0.5rem !important; /* 🔹 Reduce el padding interno */
+}
+
+/* 🔹 Ajustar los títulos de la vista */
+.fc-toolbar-title {
+    font-size: 1.2rem !important; /* 🔹 Reduce el tamaño del título */
+    font-weight: bold;
+}
+
+/* 🔹 Ajustes para móviles */
+@media (max-width: 768px) {
+    .div6 {
+        grid-column: span 4 / span 4 !important; /* 🔹 Expande en móviles */
+        grid-row: span 1 / span 1 !important;
+        grid-column-start: 1 !important;
+        width: 100% !important; /* 🔹 Asegura que el calendario ocupe el 100% */
+        margin: 0; /* 🔹 Elimina cualquier margen que reduzca el ancho */
+    }
+
+    .calendar-wrapper {
+        width: 100% !important; /* 🔹 Permite que el calendario use todo el ancho */
+        padding: 0 !important; /* 🔹 Evita márgenes internos en móviles */
+    }
+
+    .content-box {
+        width: 100% !important; /* 🔹 Se asegura que la columna del calendario sea completa */
+        padding: 0 !important;
+    }
+}

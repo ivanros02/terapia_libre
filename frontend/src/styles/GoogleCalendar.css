@@ -1,10 +1,10 @@
 /* Bordes redondeados en el contenedor del calendario */
 .fc {
-    border-radius: 15px;
-    overflow: hidden;
-    /* Evita que el contenido sobresalga */
-    border: 1px solid #ddd;
-    /* Opcional: agregar un borde sutil */
+    width: 100% !important;
+    height: 100% !important; /* 🔹 Se ajusta al contenedor */
+    max-height: inherit; /* 🔹 Evita que se reduzca demasiado */
+    flex-grow: 1; /* 🔹 Permite que ocupe el espacio disponible */
+    
 }
 
 /* Bordes redondeados en las celdas de la grilla */
@@ -17,7 +17,9 @@
     border-radius: 12px;
     background-color: #f8f9fa;
     /* Opcional: mejora la visibilidad */
-    padding: 8px;
+    padding: 4px; /* 🔹 Reducir padding para hacerla más delgada */
+    font-size: 1px !important; /* 🔹 Reducir tamaño de fuente */
+    height: 35px !important; /* 🔹 Ajustar altura automáticamente */
 }
 
 /* Aumentar la altura de los eventos */
@@ -45,7 +47,6 @@
     align-items: center;
 }
 
-
 .fc-toolbar {
     text-align: left !important;
 }
@@ -56,38 +57,57 @@
     justify-content: center;
     align-items: flex-start;
     width: 100%;
-    min-height: 100vh;
+    min-height: 80vh;
     /* Para que no se pegue arriba */
     padding-top: 20px;
     /* Espacio debajo del buscador */
 }
 
-/* Definir el tamaño máximo del contenido */
+/* Ajustar tamaño del contenedor para ocupar todo el ancho */
 .content-box {
-    max-width: 900px;
-    /* Ajusta el ancho del calendario */
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 /* Asegurar que el título y calendario estén bien alineados */
 h3 {
     text-align: center;
     width: 100%;
+    margin-bottom: 10px; /* 🔹 Reducir espacio debajo del título */
 }
 
 /* Alinear la cabecera del FullCalendar a la izquierda */
 .fc-toolbar {
-    text-align: left !important;
+    padding: 0px 0 !important; /* 🔹 Reduce el grosor del encabezado */
+    font-size: 14px !important; /* 🔹 Reduce el tamaño de la fuente */
+    min-height: -1px !important; /* 🔹 Limita la altura mínima */
 }
 
-/* Ajustar altura del calendario */
+
+/* Ajustar altura y ancho del calendario dentro de div6 */
+.calendar-wrapper {
+    width: 100% !important;
+    height: calc(100vh - 190px) !important; /* 🔹 Ajustar altura restando menos espacio del encabezado */
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .calendar-wrapper .fc {
-    min-height: 600px; /* 🔹 Asegura un mínimo de altura */
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%; /* 🔹 Ajustar al tamaño del contenedor */
+    flex-grow: 1;
 }
 
-/* En móviles, darle más espacio */
+/* En móviles, ajustar la altura */
 @media (max-width: 768px) {
-    .calendar-wrapper .fc {
-        min-height: 700px; /* 🔹 Aumenta la altura en móviles */
+    .calendar-wrapper {
+        height: calc(100vh - 80px) !important; /* 🔹 Ajusta en móviles */
+    }
+
+    .fc {
+        height: auto !important;
     }
 }

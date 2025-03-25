@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Card } from "react-bootstrap";
+import { FaCalendarAlt } from "react-icons/fa";
 import axios from "axios";
 import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
@@ -31,12 +33,13 @@ const DashboardUsuario = () => {
   const [sesiones, setSesiones] = useState([]);
   const [terapeuta, setTerapeuta] = useState(null);
   const userId = localStorage.getItem("id"); // 🔹 Obtener el ID almacenado en localStorage
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const historialResponse = await axios.get(`${url}/api/turnos/usuario/${userId}/historial`);
-        
+
 
         const sesionesFormateadas = historialResponse.data.map((sesion: any) => ({
           fecha: new Date(sesion.fecha_turno).toLocaleDateString("es-ES"), // Formato legible de fecha
@@ -104,14 +107,14 @@ const DashboardUsuario = () => {
         // 🔹 Obtener el próximo turno más cercano
         const turnoResponse = await axios.get(`${url}/api/turnos/${id}/turnos-hoy-paciente`);
         const turnoMasCercano = turnoResponse.data || null; // ✅ Manejar el caso `null`
-        
+
         setTurnoHoy(turnoMasCercano);
 
         // 🔹 Obtener turnos del profesional
         const turnosResponse = await axios.get(`${url}/api/turnos/usuarioDashboard/${id}`);
         const turnos = Array.isArray(turnosResponse.data) ? turnosResponse.data : [];
 
-        
+
 
         // 🔹 Extraer próximos turnos (máximo 5)
         const proximosTurnos = turnos.map((turno: any) => ({
@@ -134,18 +137,24 @@ const DashboardUsuario = () => {
     fetchDashboardData();
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (loading) return <div>Cargando...</div>;
 
   return (
     <div className="parent">
-      <div className="div1">
+      {!isMobile && <div className="div1"><Sidebar /></div>}
+      <div className="div2">
         <SearchNavbar
           profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={userName || "Usuario"} // 🔹 Mostrar el nombre del usuario o un valor por defecto
         />
-      </div>
-      <div className="div2">
-        <Sidebar />
       </div>
       <div className="div3">
         <DashboardCard
@@ -155,14 +164,42 @@ const DashboardUsuario = () => {
           newPatients={3}
         />
       </div>
-      <div className="divHistorialSesiones">
+
+      {/* 🔹 Estas tarjetas SOLO aparecen en móviles */}
+      {isMobile && (
+        <>
+          <div className="div8">
+            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
+              <FaCalendarAlt size={24} className="text-secondary mb-2" />
+              <span className="fw-bold text-secondary">AGENDAR NUEVO TURNO</span>
+            </Card>
+          </div>
+
+
+          <div className="div7">
+            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
+              <FaCalendarAlt size={24} className="text-secondary mb-2" />
+              <span className="fw-bold text-secondary">CONFIGURACION</span>
+            </Card>
+          </div>
+          <div className="div9">
+            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
+              <FaCalendarAlt size={24} className="text-secondary mb-2" />
+              <span className="fw-bold text-secondary">MI TERAPEUTA</span>
+            </Card>
+          </div>
+
+        </>
+      )}
+
+      <div className={isMobile ? "div5" : "div4"}>
         {terapeuta && (
           <HistorialSesiones sesiones={sesiones} terapeuta={terapeuta} onCambiarTerapeuta={() => alert("Cambiar terapeuta")} />
         )}
       </div>
-      <div className="div5 calendarioAncho">
+      {!isMobile && <div className="div5 calendarioAncho">
         <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />
-      </div>
+      </div>}
     </div>
   );
 };

@@ -46,91 +46,91 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
     const eventosNormalizados = eventos.map(fecha => moment(fecha).format("YYYY-MM-DD"));
 
     return (
-        <Container fluid style={{paddingBottom:"25px"}}>
+        <Container fluid style={{ paddingBottom: "25px" }}>
             <Card className="shadow-sm p-3 rounded-4">
-                <h1>Calendario</h1>
-                {/* Encabezado con botones de navegación */}
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                    <Button variant="light" size="sm" onClick={() => cambiarMes(-1)}>
-                        <FaChevronLeft />
-                    </Button>
-                    <h6 className="m-0">{fechaActual.format("MMMM YYYY")}</h6>
-                    <Button variant="light" size="sm" onClick={() => cambiarMes(1)}>
-                        <FaChevronRight />
-                    </Button>
-                </div>
+                {/* 🔹 Solo se muestra en pantallas medianas en adelante */}
+                <div className="d-none d-md-block">
+                    <h1>Calendario</h1>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                        <Button variant="light" size="sm" onClick={() => cambiarMes(-1)}>
+                            <FaChevronLeft />
+                        </Button>
+                        <h6 className="m-0">{fechaActual.format("MMMM YYYY")}</h6>
+                        <Button variant="light" size="sm" onClick={() => cambiarMes(1)}>
+                            <FaChevronRight />
+                        </Button>
+                    </div>
 
-                {/* Días de la semana */}
-                <div className="d-flex justify-content-around text-muted small">
-                    {diasSemana.map((dia, index) => (
-                        <div key={index} style={{ width: "14%", textAlign: "center" }}>
-                            {dia}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Días del mes */}
-                <div className="d-flex flex-wrap">
-                    {generarCalendario().map((dia, index) => {
-                        const esDelMes = dia.month() === fechaActual.month();
-                        const tieneEvento = eventosNormalizados.includes(dia.format("YYYY-MM-DD"));
-
-                        return (
-                            <div
-                                key={index}
-                                className={`text-center small fw-bold ${esDelMes ? "text-dark" : "text-muted"}`}
-                                style={{ width: "14%", position: "relative", padding: "5px" }}
-                            >
-                                {dia.date()}
-                                {tieneEvento && (
-                                    <div
-                                        style={{
-                                            width: "6px",
-                                            height: "6px",
-                                            backgroundColor: "red",
-                                            borderRadius: "50%",
-                                            position: "absolute",
-                                            bottom: "3px",
-                                            left: "50%",
-                                            transform: "translateX(-50%)",
-                                        }}
-                                    ></div>
-                                )}
+                    <div className="d-flex justify-content-around text-muted small">
+                        {diasSemana.map((dia, index) => (
+                            <div key={index} style={{ width: "14%", textAlign: "center" }}>
+                                {dia}
                             </div>
-                        );
-                    })}
-                </div>
+                        ))}
+                    </div>
 
-                {/* Línea divisoria */}
-                <hr className="my-2" />
+                    <div className="d-flex flex-wrap">
+                        {generarCalendario().map((dia, index) => {
+                            const esDelMes = dia.month() === fechaActual.month();
+                            const tieneEvento = eventosNormalizados.includes(dia.format("YYYY-MM-DD"));
 
-                {/* Lista de Próximos Turnos */}
-                <h6 className="text-muted mb-2">Próximos Turnos</h6>
-                <div className="d-flex flex-column">
-                    {proximosTurnos.length > 0 ? (
-                        proximosTurnos.map((turno, index) => (
-                            <div key={index} className="d-flex align-items-center p-2 rounded mb-1 " style={{backgroundColor:"#ece2c6"}}>
+                            return (
                                 <div
-                                    className="rounded-circle bg-secondary text-white text-center proxTurno"
-                                    style={{ width: "30px", height: "30px", lineHeight: "30px", fontSize: "12px" }}
+                                    key={index}
+                                    className={`text-center small fw-bold ${esDelMes ? "text-dark" : "text-muted"}`}
+                                    style={{ width: "14%", position: "relative", padding: "5px" }}
                                 >
-                                    {turno.paciente ? turno.paciente.charAt(0).toUpperCase() : "?"}
+                                    {dia.date()}
+                                    {tieneEvento && (
+                                        <div
+                                            style={{
+                                                width: "6px",
+                                                height: "6px",
+                                                backgroundColor: "red",
+                                                borderRadius: "50%",
+                                                position: "absolute",
+                                                bottom: "3px",
+                                                left: "50%",
+                                                transform: "translateX(-50%)",
+                                            }}
+                                        ></div>
+                                    )}
                                 </div>
-                                <div className="ms-2 ">
-                                    <span className="fw-bold" >{turno.paciente}</span>
-                                    <br />
-                                    <span className="text-muted small">
-                                        {moment(turno.fecha).format("DD/MM/YYYY")}
-                                    </span>
+                            );
+                        })}
+                    </div>
+
+                    <hr className="my-2" />
+                </div>
+
+                {/* 🔹 Siempre visible, pero con visibilidad adaptada a móvil */}
+                <div className="d-block">
+                    <h6 className="text-muted mb-2">Próximos Turnos</h6>
+                    <div className="d-flex flex-column">
+                        {proximosTurnos.length > 0 ? (
+                            proximosTurnos.map((turno, index) => (
+                                <div key={index} className="d-flex align-items-center p-2 rounded mb-1" style={{ backgroundColor: "#ece2c6" }}>
+                                    <div
+                                        className="rounded-circle text-white text-center proxTurno"
+                                        style={{ width: "30px", height: "30px", lineHeight: "30px", fontSize: "12px", backgroundColor: "var(--naranja)" }}
+                                    >
+                                        {turno.paciente ? turno.paciente.charAt(0).toUpperCase() : "?"}
+                                    </div>
+                                    <div className="ms-2">
+                                        <span className="fw-bold">{turno.paciente}</span>
+                                        <br />
+                                        <span className="text-muted small">
+                                            {moment(turno.fecha).format("DD/MM/YYYY")}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="text-center text-muted small">No hay turnos programados.</p>
-                    )}
+                            ))
+                        ) : (
+                            <p className="text-center text-muted small">No hay turnos programados.</p>
+                        )}
+                    </div>
                 </div>
             </Card>
-
         </Container>
 
     );

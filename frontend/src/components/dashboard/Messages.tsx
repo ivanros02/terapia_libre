@@ -258,7 +258,7 @@ const Messages: React.FC = () => {
 
 
   return (
-    <div className="d-flex flex-column flex-md-row vh-100 bg-light justify-content-center align-items-center" style={{marginBottom: "80px", marginTop: "50px"}}>
+    <div className="d-flex flex-column flex-md-row bg-light justify-content-center align-items-center">
       {/* Contenedor principal */}
       <div className="container-fluid h-100 d-flex flex-column flex-md-row align-items-center justify-content-center">
 

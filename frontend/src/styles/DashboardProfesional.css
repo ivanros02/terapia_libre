@@ -1,120 +1,96 @@
-.proxTurno {
-    background-color: var(--naranja) !important;
-
-}
-
 .parent {
     display: grid;
-    grid-template-columns: 100px 1fr 350px; /* Sidebar - Contenido - Calendario (más ancho) */
-    grid-template-rows: 60px 1fr 1fr; /* Search bar - Cards */
-    grid-gap: 15px;
+    width: 100vw;
     height: 100vh;
-    padding: 0;
+    grid-template-columns: 120px 2.5fr 2.5fr 3fr;
+    /* 🔹 Sidebar con ancho fijo */
+    grid-template-rows: 0.5fr 2.2fr 2.2fr;
+    gap: 8px;
+    padding: 10px;
     box-sizing: border-box;
-    background-color:#fafbfd ;
+    overflow-y: scroll !important;
 }
 
-/* Sidebar a la izquierda */
-.div2 {
-    grid-area: 1 / 1 / 4 / 2;
-    padding: 10px;
-    width: 100px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-}
-
-/* Search bar en la parte superior */
+/* Sidebar */
 .div1 {
-    grid-area: 1 / 2 / 2 / 4;
-    padding: 10px;
-    margin-left: 110px; /* Dejar espacio para el sidebar */
+    grid-row: 1 / 4;
+    grid-column: 1 / 2;
+    display: flex;
+    justify-content: center;
 }
 
-/* Primera card horizontal (próximo paciente) */
+
+/* Search Bar */
+.div2 {
+    grid-column: 2 / 5;
+    /* Ocupar todas las columnas excepto la del sidebar */
+    grid-row: 1 / 2;
+}
+
+/* Card 1 (Principal) */
 .div3 {
-    grid-area: 2 / 2 / 3 / 3;
-    padding: 10px;
-    margin-left: 5vh; /* Pegamos más al sidebar */
-    margin-top: 8vh; /* Reducimos el margen superior */
-    width: 95%; /* Hacemos la card más ancha */
+    grid-column: 2 / 4;
+    /* Se reduce su ancho */
+    grid-row: 2 / 3;
+
 }
 
-/* Segunda card horizontal (historia clínica/lista de pacientes) */
+/* Card 2 */
 .div4 {
-    grid-area: 3 / 2 / 4 / 3;
-    padding: 10px;
-    margin-top: 2vh; /* Reducimos el espacio entre la primera y segunda card */
-    margin-left: 6vh; /* Pegamos más al sidebar */
-    width: 95%; /* Hacemos la card más ancha */
+    grid-column: 2 / 4;
+    /* Se reduce su ancho */
+    grid-row: 3 / 4;
+
 }
 
-.divHistorialSesiones{
-    grid-area: 3 / 2 / 4 / 3;
-    padding: 10px;
-    margin-top: -6vh; /* Reducimos el espacio entre la primera y segunda card */
-    margin-left: -9vh; /* Pegamos más al sidebar */
-    width: 95%; /* Hacemos la card más ancha */
-}
-
-/* Calendario (más ancho y más alineado) */
+/* Card 3 (Calendario) */
 .div5 {
-    grid-area: 2 / 3 / 4 / 4;
-    padding: 10px;
-    margin-left: -25vh; /* Acercamos más a las cards */
-    margin-top: 15vh; /* Alineamos mejor con la primera card */
-    height: auto; /* Permitimos que crezca verticalmente */
+    grid-column: 4 / 5;
+    /* Ahora es más ancho */
+    grid-row: 2 / 4;
+    /* Mantiene la altura ocupando el espacio sobrante */
 }
 
-.calendarioAncho {
-    width: 150% !important; /* Hace el calendario más ancho */
-    
-}
+@media screen and (max-width: 768px) {
 
-/* Ajuste responsivo */
-@media (max-width: 1024px) {
-    .div5 {
-        width: 100%; /* En pantallas más pequeñas, usamos todo el ancho disponible */
-        margin-left: 0;
-    }
-}
-
-
-/* Ajuste responsivo */
-@media only screen and (max-width: 768px) {
     .parent {
-        display: flex; /* Cambiamos el grid a flex para apilar en columna */
-        flex-direction: column;
-        align-items: center;
-        height: auto; /* Permitimos que crezca según el contenido */
-        padding: 15px;
-    }
-
-    .div1, .div3, .div4, .div5, .divHistorialSesiones {
-        width: 100%; /* Ocupan todo el ancho */
-        max-width: 90%; /* Limita el ancho máximo */
-        margin: 10px 0; /* Espaciado entre los elementos */
-        padding: 15px;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(5, 1fr) !important;
+        gap: 8px    !important;
+        overflow: scroll !important;
     }
 
     .div2 {
-        width: 100%;
-        height: 60px;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        top: unset;
-        background-color: white !important;
-        border-top: 1px solid #ddd;
-        display: flex !important;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-around;
-        padding: 0.5rem 0;
-        z-index: 9999 !important;
+        grid-column: span 2 / span 2 !important;
     }
+
+    .div3 {
+        grid-column: span 2 / span 2 !important; 
+        grid-row-start: 2 !important;
+    }
+
+    .div5 {
+        grid-column: span 5 / span 2 !important;
+        grid-column-start: 1 !important;
+        grid-row-start: 5 !important;
+        margin-top: 6rem;
+    }
+
+    .div9 {
+        grid-column-start: 2 !important;
+        grid-row-start: 4 !important;
+    }
+
+    .div7 {
+        grid-column-start: 1 !important;
+        grid-row-start: 4 !important;
+    }
+
+    .div8 {
+        grid-column: span 2 / span 2 !important;
+        grid-column-start: 1 !important;
+        grid-row-start: 3 !important;
+    }
+
 }
-
-
-

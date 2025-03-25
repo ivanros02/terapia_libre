@@ -1,0 +1,81 @@
+/* 🔹 Ajustar ancho y largo del Card principal */
+.patient-history-card {
+    max-width: 100% !important; /* Aumentar el ancho */
+    min-height: 360px; /* Aumentar la altura */
+    padding: 2rem; /* Más espacio interno */
+}
+
+/* 🔹 Ajustar la lista de pacientes */
+.patient-list {
+    max-height: 350px; /* Limita el tamaño de la lista */
+    overflow-y: auto; /* Agregar scroll si hay demasiados pacientes */
+}
+
+/* Contenedor del círculo externo */
+.circle-container {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #ccc; /* Borde gris */
+    background-color: white; /* Espacio en blanco entre los círculos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Círculo interno */
+  .circle-inner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f1f3f4; /* Color de fondo similar a la imagen */
+    color: black;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+  }
+  
+  /* Badge transparente */
+  .transparent-badge {
+    background-color: transparent !important;
+    border: none !important;
+    color: inherit; /* Mantiene el color del texto */
+  }
+  
+
+/* 🔹 Ajuste para la historia clínica */
+.patient-history {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 🔥 Responsividad en tablets */
+@media (max-width: 1024px) {
+    .patient-history-card {
+        max-width: 100%;
+        min-height: 400px;
+    }
+}
+
+/* 🔥 Responsividad en móviles */
+@media (max-width: 768px) {
+    .patient-history-card {
+        max-width: 100%;
+        min-height: auto; /* Permitir que la altura se ajuste automáticamente */
+        padding: 1rem;
+    }
+
+    .patient-list {
+        max-height: 250px;
+    }
+
+    .patient-history {
+        flex-direction: column;
+        align-items: center;
+    }
+}

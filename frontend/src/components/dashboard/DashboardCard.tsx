@@ -13,7 +13,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
     const esProfesional = localStorage.getItem("esProfesional") === "true";
     return (
         <Container fluid>
-            <h1 className="fw-bold">
+            {/* 🔹 Se oculta en móvil */}
+            <h1 className="d-none d-md-block">
                 Buen día, <span style={{ color: "var(--naranja)" }}>{name}!</span>
             </h1>
 
@@ -36,10 +37,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
 
                     {/* Tarjeta pequeña: Pacientes nuevos */}
                     {esProfesional && (
-                        <Card className="p-2 rounded-4 border-0 w-50 card-nueva">
+                        <Card className="p-2 rounded-4 border-0  card-nueva d-none d-md-block">
                             <h6 className="fw-bold mb-1">Pacientes Nuevos</h6>
                             <div className="d-flex align-items-center">
-                                <h2 className="fw-bold me-3">{newPatients}</h2>
+                                <h2 className=" me-3">{newPatients}</h2>
                             </div>
                         </Card>
                     )}

@@ -1,9 +1,18 @@
 /* 🔹 Ajustes generales */
+/* 🔹 Ajuste para hacer la tarjeta más ancha */
 .card-responsive {
-    background: var(--verde);
-    max-width: 80%;
-    
+    background: #567C6F;
+    max-width: 100%; /* 🔹 Aumentar el ancho */
+    min-height: 306px; /* 🔹 Aumentar la altura mínima */
+    padding: 2rem; /* 🔹 Más espacio interno */
 }
+
+/* 🔹 Ajuste para hacer que el contenedor se expanda */
+.position-relative.w-100 {
+    width: 100%;
+    max-width: 100%;
+}
+
 
 /* 🔹 Tarjeta interna (Próximo paciente) */
 .card-interna {
@@ -28,9 +37,9 @@
 /* 🔹 Imagen decorativa RESPONSIVA */
 .imagen-decorativa {
     position: absolute;
-    right: -16px;
-    top: -120px;
-    width: 380px;
+    right: -45px;
+    top: -100px;
+    width: 430px;
     height: auto;
     z-index: 1;
     max-width: 100%;
@@ -53,21 +62,32 @@
 @media (max-width: 768px) {
     .card-responsive {
         max-width: 100%;
-        padding: 1rem;
+        padding: 0.5rem; /* 🔹 Reducimos padding */
+        min-height: 175px; /* 🔹 Limitar altura mínima */
     }
 
-    .card-interna, .card-nueva {
-        max-width: 100%;
+    /* 🔹 Ajustamos la tarjeta interna para que sea más pequeña */
+    .card-interna {
+        max-width: 50%; /* 🔹 Reduce el tamaño al 50% del ancho */
+        padding: 0.5rem; /* 🔹 Reduce padding */
+        text-align: left; /* 🔹 Mantiene alineación del texto */
     }
 
+    .card-interna h5 {
+        font-size: 0.9rem; /* 🔹 Reduce el tamaño del título */
+    }
+
+    .card-interna p {
+        font-size: 0.75rem; /* 🔹 Reduce tamaño de texto */
+    }
+
+    /* 🔹 Ajustamos la imagen para que sea más pequeña */
     .imagen-decorativa {
-        position: static; /* Eliminar posición absoluta */
-        width: 100%;
-        margin-top: 10px;
-        display: block;
-        text-align: center;
+        width: 155px !important; /* 🔹 Reduce el tamaño */
+        margin-top: 2rem;
     }
 }
+
 
 /* 🔥 Responsividad en notebooks (pantallas medianas de 1280px a 1440px) */
 @media (max-width: 1440px) {

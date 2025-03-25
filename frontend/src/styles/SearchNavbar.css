@@ -1,7 +1,16 @@
 /* Ajuste del navbar */
 .navbar-custom {
-    margin-left: 100px; 
-    height: 120px;
+    height: 150px;
+    display: flex;
+    align-items: center; /* Centrar verticalmente */
+}
+
+/* Contenedor principal dentro del navbar */
+.navbar-custom .container-fluid {
+    display: flex;
+    align-items: center; /* Asegurar alineación vertical */
+    justify-content: space-between; /* Espaciado entre elementos */
+    height: 100%;
 }
 
 /* Estilo de la barra de búsqueda */
@@ -24,11 +33,8 @@
 .profile-container {
     display: flex;
     align-items: center;
-}
-
-/* Contenido del perfil */
-.profile-content {
-    padding: 8px 12px;
+    justify-content: center;
+    height: 100%; /* Asegurar alineación vertical */
 }
 
 /* Imagen de perfil */
@@ -47,12 +53,18 @@
     .navbar-custom {
         margin-left: 0px !important; /* Elimina el margen izquierdo en móviles */
         height: auto; /* Ajuste automático de altura */
+        justify-content: center !important; /* Centra los elementos */
     }
 
-    /* Centrar perfil en móviles */
-    .profile-container {
-        justify-content: center !important; /* Centra el perfil */
-    }
+    .profile-wrapper {
+        margin-left: auto; /* Empuja el perfil a la derecha */
+        border: none !important;
+        padding: 0 !important;
+      }
+      
+      .profile-container {
+        justify-content: flex-end !important;
+      }
 
     /* Ocultar el nombre en móviles pequeños */
     .profile-content span {

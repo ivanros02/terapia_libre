@@ -38,8 +38,8 @@ interface GoogleCalendarProps {
 }
 
 const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) => {
-  const { isSignedIn, signIn,  } = useGoogleAuth();
-  const [events, ] = useState<any[]>([]);
+  const { isSignedIn, signIn, } = useGoogleAuth();
+  const [events,] = useState<any[]>([]);
   const [selectedTurno, setSelectedTurno] = useState<Turno | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showMeetModal, setShowMeetModal] = useState(false);
@@ -356,21 +356,20 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
 
   return (
-    <div className="calendar-page d-flex justify-content-center align-items-start mt-5">
-      {isSignedIn ? (
-        <>
-          <Container fluid className="d-flex justify-content-center align-items-center py-3">
-            <Row className="w-100 justify-content-center">
-              <Col xs={12} md={10} lg={8} className="content-box">
-                <div className="d-flex flex-column align-items-center w-100">
-                  <h3 className="mb-3 text-center w-100">Agenda</h3>
-
-                  <div className="calendar-wrapper w-100">
+    <div className="calendar-page d-flex justify-content-center align-items-start w-100" style={{ marginTop: "-2rem" }}>
+  {isSignedIn ? (
+    <>
+      <Container fluid className="d-flex justify-content-center align-items-center py-3">
+        <Row className="w-100 justify-content-center">
+          <Col xs={12} md={10} lg={8} className="content-box">
+            <div className="d-flex flex-column align-items-center w-100">
+              <div className="calendar-wrapper">
+                <h3 className="text-center w-100">Agenda</h3>
                     <FullCalendar
                       plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                       initialView={calendarView}
                       locale="es"
-                      headerToolbar={headerConfig} // 🔹 Usa configuración dinámica
+                      headerToolbar={headerConfig}
                       buttonText={{
                         today: "Hoy",
                         month: "Mes",
@@ -379,6 +378,13 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
                       }}
                       events={formattedEvents}
                       eventClick={handleEventClick}
+                      height="parent" /* 🔹 Asegura que respete el contenedor */
+                      slotMinTime="07:00:00" /* 🔹 Define el inicio a las 7 AM */
+                      slotLabelFormat={{
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      }} /* 🔹 Formato de 12 horas con AM/PM */
                     />
                   </div>
                 </div>
