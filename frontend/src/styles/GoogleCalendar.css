@@ -88,17 +88,17 @@ h3 {
 .calendar-wrapper {
     width: 100% !important;
     height: calc(100vh - 190px) !important; /* 🔹 Ajustar altura restando menos espacio del encabezado */
-    max-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    max-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important; 
 }
 
 .calendar-wrapper .fc {
     width: 100% !important;
     height: 100% !important;
-    max-width: 100%;
-    max-height: 100%; /* 🔹 Ajustar al tamaño del contenedor */
-    flex-grow: 1;
+    max-width: 100% !important;
+    max-height: 100% !important; /* 🔹 Ajustar al tamaño del contenedor */
+    flex-grow: 1 !important;
 }
 
 /* En móviles, ajustar la altura */

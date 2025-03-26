@@ -11,6 +11,8 @@ import { useGoogleAuth } from "./useGoogleAuth";
 import { Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/GoogleCalendar.css"
+import { toast } from "react-toastify";
+
 declare global {
   interface Window {
     gapi: any;
@@ -306,17 +308,22 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
     );
 
     if (!meetWindow) {
-      alert("No se pudo abrir la videollamada. Habilita las ventanas emergentes.");
+      toast.error("🚫 No se pudo abrir la videollamada. Habilita las ventanas emergentes.", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       return;
     }
 
-    // 🔥 Monitoreamos cada 1 segundo si la ventana de Meet se cerró
     const checkPopupClosed = setInterval(() => {
       if (meetWindow.closed) {
         clearInterval(checkPopupClosed);
-        console.log("✅ La llamada de Meet ha finalizado.");
-
-        // 🔹 Ejecuta aquí la acción que necesites
+        
         registrarFinDeLlamada(turno);
       }
     }, 1000);
@@ -325,16 +332,31 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
   // 📌 Función para realizar acciones cuando finaliza la llamada
   const registrarFinDeLlamada = async (turno: Turno) => {
     try {
-      // 🔥 Llamar al backend para registrar el fin de la llamada
-      axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno })
-        .then(() => console.log("✅ Fin de llamada registrado en la base de datos"))
-        .catch((error) => console.error("❌ Error al registrar el fin de la llamada:", error));
+      await axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno });
+      console.log("✅ Fin de llamada registrado en la base de datos");
+
+      toast.success("✅ La videollamada ha finalizado correctamente.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } catch (error) {
       console.error("❌ Error al registrar el fin de la llamada:", error);
-    }
 
-    // 🔥 Opcional: Actualizar estado o mostrar mensaje al usuario
-    alert("La videollamada ha finalizado.");
+      toast.error("❌ Hubo un problema al finalizar la videollamada.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
   };
 
 
@@ -349,7 +371,15 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
     if (turno.meet_url) {
       abrirMeetEnPopup(turno.meet_url, turno);
     } else {
-      alert("La sesión aún no tiene una videollamada asociada.");
+      toast.warning("⚠️ La sesión aún no tiene una videollamada asociada.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 
@@ -357,14 +387,14 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
   return (
     <div className="calendar-page d-flex justify-content-center align-items-start w-100" style={{ marginTop: "-2rem" }}>
-  {isSignedIn ? (
-    <>
-      <Container fluid className="d-flex justify-content-center align-items-center py-3">
-        <Row className="w-100 justify-content-center">
-          <Col xs={12} md={10} lg={8} className="content-box">
-            <div className="d-flex flex-column align-items-center w-100">
-              <div className="calendar-wrapper">
-                <h3 className="text-center w-100">Agenda</h3>
+      {isSignedIn ? (
+        <>
+          <Container fluid className="d-flex justify-content-center align-items-center py-3">
+            <Row className="w-100 justify-content-center">
+              <Col xs={12} md={10} lg={8} className="content-box">
+                <div className="d-flex flex-column align-items-center w-100">
+                  <div className="calendar-wrapper">
+                    <h3 className="text-center w-100">Agenda</h3>
                     <FullCalendar
                       plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                       initialView={calendarView}

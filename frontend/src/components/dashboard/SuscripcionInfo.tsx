@@ -16,7 +16,7 @@ interface SuscripcionInfoProps {
 const SuscripcionInfo: React.FC<SuscripcionInfoProps> = ({ email }) => {
     const [suscripcion, setSuscripcion] = useState<Suscripcion | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [, setError] = useState<string | null>(null);
 
     const fetchSuscripcion = useCallback(async () => {
         try {

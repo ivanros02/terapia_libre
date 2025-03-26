@@ -75,7 +75,7 @@ function ProfesionalConfigComponent() {
     const handleCloseProfesional = () => setShowModalProfesional(false);
 
     return (
-        <div className="container" style={{ marginTop: "7rem" }}>
+        <div  style={{ marginTop: "7rem" }}>
             <DisponibilidadForm
                 show={showModalDisponibilidad}
                 handleClose={handleCloseDisponibilidad}

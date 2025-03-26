@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ⬅️ Para la redirección
 import CalendarAvailability from "./CalendarAvailability";
-import "../styles/CalendarAvailability.css";
+
 
 interface Professional {
     id_profesional: number;

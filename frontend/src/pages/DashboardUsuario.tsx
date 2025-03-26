@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
-import { FaCalendarAlt } from "react-icons/fa";
 import axios from "axios";
 import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
@@ -171,26 +170,37 @@ const DashboardUsuario = () => {
       {isMobile && (
         <>
           <div className="div8">
-            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
-              <FaCalendarAlt size={24} className="text-secondary mb-2" />
-              <span className="fw-bold text-secondary">AGENDAR NUEVO TURNO</span>
+            <Card
+              className="shadow-sm border-0 rounded-4 p-3 calendario-card d-flex align-items-center justify-content-center gap-2"
+              style={{ backgroundColor: "var(--naranja)", display: "flex", flexDirection: "row" }}
+            >
+              <img src="/sidebar/calendar.png" alt="Calendar" width="24" height="24" />
+              <span className="text-white">AGENDAR NUEVO TURNO</span>
             </Card>
           </div>
+
+
 
 
           <div className="div7" onClick={() => navigate('/dashboard/usuario/config_usuario')} style={{ cursor: "pointer" }}>
-            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
-              <FaCalendarAlt size={24} className="text-secondary mb-2" />
-              <span className="fw-bold text-secondary">CONFIGURACIÓN</span>
+            <Card
+              className="shadow-sm border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
+            >
+              <img src="/sidebar/config.png" alt="Home" width="24" height="24" className="mb-2" />
+              <span style={{ color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
           </div>
 
-          <div className="div9">
-            <Card className="shadow-sm border-0 rounded-4 text-center p-3 calendario-card">
-              <FaCalendarAlt size={24} className="text-secondary mb-2" />
-              <span className="fw-bold text-secondary">MI TERAPEUTA</span>
+
+          <div className="div9" onClick={() => navigate('/dashboard/usuario/config_usuario')} style={{ cursor: "pointer" }}>
+            <Card
+              className="shadow-sm border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
+            >
+              <img src="/sidebar/config.png" alt="Home" width="24" height="24" className="mb-2" />
+              <span style={{ color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
           </div>
+
 
         </>
       )}

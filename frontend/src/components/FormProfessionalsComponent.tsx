@@ -66,6 +66,7 @@ const FormProfessionalsComponent = () => {
 
         try {
             const response = await axios.post(`${url}/api/profesionales`, formData);
+            console.log("Respuesta del servidor:", response.data);
             toast.success(`Profesional registrado con éxito 🎉`, {
                 position: "top-center",
                 autoClose: 3000,

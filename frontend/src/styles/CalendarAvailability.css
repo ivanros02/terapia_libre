@@ -5,7 +5,7 @@
     width: 130% !important; /* 🔹 Aumenta el ancho del calendario */
     background: transparent !important;
     font-family: "Montserrat", sans-serif !important;
-    margin-top: 5rem;
+    
 }
 
 /* 📌 Ajustes para mejorar el estilo de los días */
@@ -58,19 +58,32 @@
 /* Contenedor flotante del calendario */
 .floating-calendar-container {
     background: white;
-    padding: 30px;
-    border-radius: 12px;
+    padding: 25px;
+    border-radius: 25px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     max-width: 90%;
-    width: 1060px !important; /* Ajustado para pantallas grandes */
+    width: 1050px; /* 🔹 Ajuste para mantener buena proporción */
+    height: auto; /* 🔹 Ajuste dinámico según contenido */
     text-align: center;
     position: relative;
     z-index: 1001;
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-height: 90vh; /* 🔹 Evita que sea más alto que la pantalla */
-    overflow-y: auto; /* 🔹 Permite scroll en móviles */
+    max-height: 90vh !important; /* 🔹 Evita que sea más alto que la pantalla */
+    overflow: auto;
+}
+
+
+/* 🟢 Botón "Cerrar" más arriba */
+.floating-calendar-container .btn-danger {
+    position: absolute; /* 🔹 Lo saca del flujo normal */
+    top: 10px; /* 🔹 Lo acerca a la parte superior */
+    right: 15px; /* 🔹 Lo mantiene alineado a la derecha */
+    padding: 8px 16px; /* 🔹 Ajusta el tamaño del botón */
+    font-size: 14px; /* 🔹 Reduce el tamaño del texto */
+    border-radius: 8px; /* 🔹 Bordes redondeados */
+    z-index: 10; /* 🔹 Asegura que se muestre sobre otros elementos */
 }
 
 
@@ -79,13 +92,22 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: flex-start;
+    align-items: stretch; /* 🔹 Asegura que ambos elementos sean del mismo tamaño */
     width: 100%;
-    max-width: 1050px; /* Ajustado para pantallas grandes */
-    padding: 30px;
+    max-width: 1000px;
+    padding: 20px;
     margin: 0 auto;
-    gap: 50px;
+    gap: 20px; /* 🔹 Reduce el espacio entre los elementos */
 }
+
+.calendar-wrappercalendar-wrapper-details {
+    flex: 1; /* 🔹 Permite que el calendario se ajuste automáticamente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 350px; /* 🔹 Ajustado para igualar los horarios */
+}
+
 
 
 /* Contenedor de horarios más ancho */
@@ -108,7 +130,6 @@
     padding: 16px 44px;
     font-size: 25px !important;
     border-radius: 10px;
-    margin-bottom: 12px;
     color: var(--verde); 
     border: 2px solid grey;
     font-weight: 600;
@@ -123,21 +144,6 @@
 }
 
 /* 🔹 RESPONSIVE para móviles y tablets */
-@media (max-width: 1024px) {
-    
-    .available-times {
-        margin-top: -10rem;
-    }
-
-    .calendar-container {
-        flex-direction: column; /* Cambiar a diseño en columna */
-        align-items: center;
-        max-width: 100% !important;
-        padding: 20px;
-        gap: 20px;
-    }
-    
-}
 
 /* 🔹 RESPONSIVE para móviles pequeños */
 @media (max-width: 600px) {
@@ -145,6 +151,7 @@
         width: 95%;
         max-width: 500px; /* Más pequeño en móviles */
         padding: 15px;
+        margin-top: 25vh;
     }
 
     .calendar-container {

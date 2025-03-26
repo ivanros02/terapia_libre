@@ -61,7 +61,7 @@ function DisponibilidadForm({ show, handleClose, disponibilidad, onSave, fetchDi
 
     return (
         <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
+            <Modal.Header closeButton >
                 <Modal.Title>{disponibilidad ? "Editar" : "Agregar"} Disponibilidad</Modal.Title>
             </Modal.Header>
             <Modal.Body>

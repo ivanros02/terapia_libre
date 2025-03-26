@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // 👈 Importamos useNavigate
-import { House, Calendar, MessageCircle, Settings, LogOut } from "lucide-react";
 import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/SideBar.css";
@@ -68,19 +67,19 @@ const Sidebar: React.FC = () => {
       <ul className="nav">
         <li className="nav-item">
           <button onClick={handleHomeClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
-            <House size={24} />
+            <img src="/sidebar/home.png" alt="Home" width="24" height="24" />
           </button>
         </li>
 
         <li className="nav-item">
           <Link to="/dashboard/calendario" className="nav-link text-white py-3">
-            <Calendar size={24} />
+            <img src="/sidebar/calendar.png" alt="Home" width="24" height="24" />
           </Link>
         </li>
 
         <li className="nav-item position-relative">
           <button onClick={handleMessagesClick} className="nav-link text-white py-3 bg-transparent border-0 w-100 position-relative">
-            <MessageCircle size={24} />
+            <img src="/sidebar/chat.png" alt="Home" width="24" height="24" />
             {hasNewMessages && (
               <span
                 className="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"
@@ -92,12 +91,12 @@ const Sidebar: React.FC = () => {
 
         <li className="nav-item">
           <button onClick={handleConfigClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
-            <Settings size={24} />
+            <img src="/sidebar/config.png" alt="Home" width="24" height="24" />
           </button>
         </li>
         <li className="nav-item">
           <button onClick={handleLogout} className="nav-link text-white py-3 bg-transparent border-0 w-100">
-            <LogOut size={24} />
+            <img src="/sidebar/out.png" alt="Home" width="24" height="24" />
           </button>
         </li>
       </ul>

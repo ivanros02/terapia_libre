@@ -105,7 +105,7 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
     return (
         <>
             <div className="calendar-container d-flex flex-column flex-md-row justify-content-center align-items-center w-100" style={{ maxWidth: "100%", padding: "20px", margin: "0 auto" }}>
-                <div className="calendar-wrapper">
+                <div className="calendar-wrapper-details">
                     <Calendar
                         onChange={(value) => handleDateChange(value as Date | Date[] | null)}
                         value={selectedDate}

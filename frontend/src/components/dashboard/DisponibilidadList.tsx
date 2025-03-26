@@ -53,8 +53,8 @@ function DisponibilidadList({ onEdit, onAdd, fetchDisponibilidades }: Disponibil
         <div className="container mt-4">
             {/* Contenedor flexible para el título y botón */}
             <div className="row align-items-center mb-3">
-                <div className="col-12 col-md-6">
-                    <h2 className="text-center text-md-start">Disponibilidades</h2>
+                <div className="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
+                    <h2 className="text-center text-md-start m-0">Disponibilidades</h2>
                 </div>
                 <div className="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
                     <Button

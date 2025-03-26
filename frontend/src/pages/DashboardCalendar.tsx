@@ -108,7 +108,7 @@ const DashboardCalendar = () => {
       {!isMobile && <div className="div1"><Sidebar /></div>} 
       <div className="div2">
         <SearchNavbar
-          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")} />
       </div>
       <div className="div6">

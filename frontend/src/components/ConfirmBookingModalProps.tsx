@@ -5,7 +5,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { useNavigate } from "react-router-dom";
 const url = import.meta.env.VITE_API_BASE_URL;
-
+const public_key_mp = import.meta.env.VITE_MP_PUBLIC_KEY;
 
 interface ConfirmBookingModalProps {
     show: boolean;
@@ -20,7 +20,7 @@ interface ConfirmBookingModalProps {
 
 const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide, selectedDateTime, id_profesional, id_usuario, precio, precioInternacional, profesionalName }) => {
     // ✅ Inicializa Mercado Pago solo una vez
-    initMercadoPago('APP_USR-9e2bda9f-ed96-4a5e-bcdd-aed83328c4a6', { locale: 'es-AR' });
+    initMercadoPago(public_key_mp, { locale: 'es-AR' });
 
     const [, setOrderID] = useState<string | null>(null);
     const [showPayPal, setShowPayPal] = useState(false);

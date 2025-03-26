@@ -3,8 +3,8 @@ import axios from "axios";
 import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
 import Messages from "../components/dashboard/Messages";
-import "../styles/DashboardCalendar.css";
 const url = import.meta.env.VITE_API_BASE_URL;
+import "../styles/DashboardProfesional.css"
 
 // Tipos de datos
 interface UserData {
@@ -16,7 +16,8 @@ const DashboardMensajes = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
   // Detectar si es profesional o usuario
   const esProfesional = localStorage.getItem("esProfesional") === "true";
 
@@ -52,6 +53,14 @@ const DashboardMensajes = () => {
     fetchUserData();
   }, [esProfesional]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (loading) {
     return <div>Cargando...</div>;
   }
@@ -63,14 +72,14 @@ const DashboardMensajes = () => {
   return (
 
     <div className="parent">
-      <div className="div1"><Sidebar /></div>
+      {!isMobile && <div className="div1"><Sidebar /></div>}
       <div className="div2">
         <SearchNavbar
-          profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={userData?.nombre || "Usuario"}
         />
       </div>
-      <div className="div6"><Messages /></div>
+      <div className="div6"><Messages/></div>
     </div>
 
 

@@ -17,7 +17,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [modalShow, setModalShow] = useState(false); // 🔹 Estado para el modal
-
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     // Detectar si es profesional o usuario
     const esProfesional = localStorage.getItem("esProfesional") === "true";
     const id = localStorage.getItem("id");
@@ -54,6 +54,14 @@ const Dashboard = () => {
         fetchUserData();
     }, [esProfesional]);
 
+    useEffect(() => {
+        const handleResize = () => {
+          setIsMobile(window.innerWidth <= 768);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+      }, []);
+
     if (loading) {
         return <div>Cargando...</div>;
     }
@@ -63,14 +71,14 @@ const Dashboard = () => {
     }
 
     return (
-        <div>
-            <SearchNavbar
-                profileImage="https://fcb-abj-pre.s3.amazonaws.com/img/jugadors/MESSI.jpg"
+        <div className="parent">
+             {!isMobile && <div className="div1"><Sidebar /></div>}
+            <div className="div2"><SearchNavbar
+                profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
                 profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
-            />
-            <Sidebar />
-
-            {/* Contenedor centrado */}
+            /></div>
+            
+            <div className="div6">{/* Contenedor centrado */}
             <Container className="d-flex flex-column justify-content-center align-items-center vh-100">
                 <Row className="w-100 text-center">
                     <Col>
@@ -94,7 +102,8 @@ const Dashboard = () => {
                 userId={id ? parseInt(id, 10) : 0}
                 show={modalShow}
                 onHide={() => setModalShow(false)}
-            />
+            /></div>
+            
         </div>
     );
 };

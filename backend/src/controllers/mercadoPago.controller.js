@@ -31,12 +31,12 @@ exports.crearOrdenMercadoPago = async (req, res) => {
                 },
             ],
             back_urls: {
-                success: "https://terapialibre.com.ar/dashboard/calendario",
+                success: "https://terapialibre.com.ar/dashboard/usuario",
                 failure: "https://terapialibre.com.ar",
                 pending: "https://terapialibre.com.ar",
             },
             auto_return: "approved",
-            notification_url: "https://de52-181-46-136-46.ngrok-free.app/api/mercadopago/webhook", // 🔹 URL DEL WEBHOOK
+            notification_url: "https://api.terapialibre.com.ar/api_terapia/api/mercadopago/webhook", // 🔹 URL DEL WEBHOOK
             external_reference: JSON.stringify({
                 id_profesional,
                 id_usuario,

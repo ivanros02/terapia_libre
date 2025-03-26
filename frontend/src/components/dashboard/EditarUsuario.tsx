@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const url = import.meta.env.VITE_API_BASE_URL;
 
@@ -60,10 +61,30 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
             await axios.put(`${url}/api/auth/usuario/${userId}`, formData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            alert("Datos actualizados correctamente.");
+
+            toast.success("✅ Datos actualizados correctamente.", {
+                position: "top-right",
+                autoClose: 3000, // Se cierra automáticamente en 3 segundos
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+
             onHide();
         } catch (error) {
             console.error("Error al actualizar usuario:", error);
+
+            toast.error("❌ Error al actualizar los datos. Intenta de nuevo.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
         } finally {
             setSaving(false);
         }
@@ -101,15 +122,6 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
                                 value={formData.correo_electronico}
                                 readOnly // 🔹 Ahora usa `readOnly` en lugar de `disabled`
                                 placeholder="correo@ejemplo.com"
-                            />
-                        </Form.Group>
-
-                        <Form.Group className="mb-3">
-                            <Form.Label>ID de Google</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={usuario.id_google || "No registrado con Google"}
-                                readOnly
                             />
                         </Form.Group>
 
