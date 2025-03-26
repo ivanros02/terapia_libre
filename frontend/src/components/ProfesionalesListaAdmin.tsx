@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Pagination } from "react-bootstrap";
+import { Table, Button } from "react-bootstrap";
 import axios from "axios";
 
 const url = import.meta.env.VITE_API_BASE_URL;
@@ -16,15 +16,8 @@ interface Profesional {
 
 const ProfesionalesListaAdmin = () => {
   const [profesionales, setProfesionales] = useState<Profesional[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const maxPagesToShow = 5; // 🔹 Cantidad de páginas a mostrar en la paginación
 
-  useEffect(() => {
-    fetchProfesionales(currentPage);
-  }, [currentPage]);
-
-  const fetchProfesionales = async (page: number) => {
+  const fetchProfesionales = async () => {
     try {
       const token = localStorage.getItem("adminToken");
       if (!token) {
@@ -32,8 +25,8 @@ const ProfesionalesListaAdmin = () => {
         return;
       }
 
-      const response = await axios.get(`${url}/api/admin/profesionales?page=${page}&limit=12`, {
-        headers: { Authorization: `Bearer ${token}` }, // 🔹 Enviar el token en los headers
+      const response = await axios.get(`${url}/api/admin/profesionales`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const profesionalesConEstadoBooleano = response.data.professionals.map((prof: any) => ({
@@ -42,13 +35,15 @@ const ProfesionalesListaAdmin = () => {
       }));
 
       setProfesionales(profesionalesConEstadoBooleano);
-      setTotalPages(response.data.totalPages);
     } catch (error) {
-
+      console.error("❌ Error al obtener profesionales:", error);
     }
   };
 
-
+  // 🔹 Llamar a fetchProfesionales cuando se monte el componente
+  useEffect(() => {
+    fetchProfesionales();
+  }, []);
 
   const toggleEstado = async (id: number, estado: boolean) => {
     try {
@@ -65,9 +60,6 @@ const ProfesionalesListaAdmin = () => {
     }
   };
 
-  // 🔹 Calcular las páginas a mostrar dinámicamente
-  const startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-  const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
   const getGoogleDriveImageUrl = (url: string) => {
     if (!url) return "/placeholder.jpg"; // 🔹 Si no hay URL, muestra un placeholder
@@ -136,35 +128,6 @@ const ProfesionalesListaAdmin = () => {
         </tbody>
       </Table>
 
-      {/* 🔹 Paginación Dinámica */}
-      <Pagination className="justify-content-center">
-        <Pagination.Prev
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        />
-
-        {startPage > 1 && <Pagination.Ellipsis disabled />}
-
-        {[...Array(endPage - startPage + 1)].map((_, index) => {
-          const pageNumber = startPage + index;
-          return (
-            <Pagination.Item
-              key={pageNumber}
-              active={pageNumber === currentPage}
-              onClick={() => setCurrentPage(pageNumber)}
-            >
-              {pageNumber}
-            </Pagination.Item>
-          );
-        })}
-
-        {endPage < totalPages && <Pagination.Ellipsis disabled />}
-
-        <Pagination.Next
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        />
-      </Pagination>
     </>
   );
 };
