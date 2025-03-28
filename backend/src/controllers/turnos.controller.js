@@ -267,17 +267,27 @@ exports.getProgress = async (req, res) => {
 
 exports.guardarGoogleEvent = async (req, res) => {
     try {
-        const { id_turno, google_event_id } = req.body;
+        console.log("📩 Request recibido en guardarGoogleEvent:", req.body);
 
-        if (!id_turno || !google_event_id) {
-            return res.status(400).json({ message: "id_turno y google_event_id son obligatorios" });
+        const { id_turno, google_event_id_paciente, google_event_id_profesional } = req.body;
+
+        if (!id_turno) {
+            console.warn("⚠️ id_turno es obligatorio");
+            return res.status(400).json({ message: "id_turno es obligatorio" });
         }
 
-        const actualizado = await Turno.guardarGoogleEvent(id_turno, google_event_id);
+        if (!google_event_id_paciente && !google_event_id_profesional) {
+            console.warn("⚠️ Se requiere al menos un Google Event ID");
+            return res.status(400).json({ message: "Se requiere al menos un Google Event ID" });
+        }
+
+        const actualizado = await Turno.guardarGoogleEvent(id_turno, google_event_id_paciente, google_event_id_profesional);
 
         if (actualizado) {
-            return res.status(200).json({ message: "Google Event ID guardado correctamente" });
+            console.log(`✅ Google Event ID guardado correctamente para el turno ${id_turno}`);
+            return res.status(200).json({ message: "Google Event ID(s) guardado(s) correctamente" });
         } else {
+            console.warn(`⚠️ No se encontró el turno ${id_turno} o ya estaba actualizado`);
             return res.status(404).json({ message: "No se encontró el turno o ya estaba actualizado" });
         }
     } catch (error) {
@@ -285,6 +295,8 @@ exports.guardarGoogleEvent = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
+
 
 exports.obtenerHistorialUsuario = async (req, res) => {
     try {

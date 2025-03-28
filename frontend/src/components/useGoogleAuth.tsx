@@ -2,44 +2,97 @@ import { useEffect, useState } from "react";
 import { gapi } from "gapi-script";
 
 const CLIENT_ID = "1005376109174-8j00pst6p2d1g0a5o330brpavnnbc731.apps.googleusercontent.com";
-export const SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.events.readonly";
+export const SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events";
 
 export const useGoogleAuth = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [googleAuth, setGoogleAuth] = useState<any>(null);
 
   useEffect(() => {
-    const initClient = () => {
-      gapi.load("client:auth2", () => {
-        gapi.client.init({
-          clientId: CLIENT_ID,
-          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-          scope: SCOPES,
-          ux_mode: "popup",
-        })
-
-          .then(() => {
-            const authInstance = gapi.auth2.getAuthInstance();
-            setGoogleAuth(authInstance);
-            setIsSignedIn(authInstance.isSignedIn.get());
-            authInstance.isSignedIn.listen(setIsSignedIn);
-          })
-          .catch((error: unknown) => {
-            if (error instanceof Error) {
-              console.error("Error loading Google API", error.message);
-            } else {
-              console.error("Unknown error loading Google API", error);
-            }
+    const initClient = async () => {
+      try {
+        await new Promise((resolve, reject) => {
+          gapi.load("client:auth2", () => {
+            gapi.client
+              .init({
+                clientId: CLIENT_ID,
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+                scope: SCOPES,
+                ux_mode: "popup",
+              })
+              .then(() => {
+                const authInstance = gapi.auth2.getAuthInstance();
+                setGoogleAuth(authInstance);
+                setIsSignedIn(authInstance.isSignedIn.get());
+                authInstance.isSignedIn.listen(setIsSignedIn);
+                console.log("✅ Google API inicializada correctamente.");
+                verificarPermisos(); // 🔹 Verifica permisos después de iniciar sesión
+                resolve(true);
+              })
+              .catch((error: unknown) => {
+                manejarError(error, "Error al inicializar Google API");
+                reject(error);
+              });
           });
-      });
+        });
+      } catch (error: unknown) {
+        manejarError(error, "Error en initClient");
+      }
     };
 
     initClient();
   }, []);
 
+  // 🔹 Función para manejar errores correctamente
+  const manejarError = (error: unknown, mensaje: string) => {
+    if (error instanceof Error) {
+      console.error(`❌ ${mensaje}:`, error.message);
+    } else {
+      console.error(`❌ ${mensaje}:`, error);
+    }
+  };
 
-  const signIn = () => googleAuth?.signIn();
-  const signOut = () => googleAuth?.signOut();
+  // 🔹 Función para verificar permisos del usuario
+  const verificarPermisos = () => {
+    if (!googleAuth) return;
+
+    const user = googleAuth.currentUser.get();
+    const grantedScopes = user.getGrantedScopes();
+    const email = user.getBasicProfile()?.getEmail();
+
+    console.log(`🔍 Usuario autenticado: ${email}`);
+    console.log("🔍 Scopes actuales concedidos por el usuario:", grantedScopes);
+
+    if (!grantedScopes.includes("https://www.googleapis.com/auth/calendar.events")) {
+      console.warn("⚠️ Permisos insuficientes. Se requiere reautenticación.");
+      signIn(); // 🔹 Si no tiene los permisos correctos, fuerza reautenticación
+    } else {
+      console.log("✅ Permisos correctos para Google Calendar.");
+    }
+  };
+
+  // 🔹 Función para forzar la autenticación con los permisos correctos
+  const signIn = async () => {
+    if (!googleAuth) return;
+
+    try {
+      console.log("🔍 Iniciando sesión con Google...");
+      await googleAuth.signIn({
+        scope: SCOPES,
+        prompt: "consent", // 🔹 Forzar a Google a pedir permisos nuevamente
+      });
+
+      verificarPermisos(); // 🔹 Verifica los permisos después de iniciar sesión
+    } catch (error: unknown) {
+      manejarError(error, "Error al autenticar usuario");
+    }
+  };
+
+  const signOut = () => {
+    googleAuth?.signOut();
+    setIsSignedIn(false);
+    console.log("👋 Usuario cerró sesión en Google.");
+  };
 
   return { isSignedIn, signIn, signOut };
 };

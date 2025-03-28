@@ -5,6 +5,7 @@ import { Form, Container, Row, Col, Card } from "react-bootstrap";
 import "../styles/LoginComponent.css";
 import GoogleLoginButton from "./GoogleLoginButton";
 const url = import.meta.env.VITE_API_BASE_URL;
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Login: React.FC = () => {
@@ -86,7 +87,10 @@ const Login: React.FC = () => {
 
                         <div className="d-flex justify-content-between align-items-center mb-4">
                             <Form.Check type="checkbox" label="Recordarme" />
-                            <a href="#" className="text-muted">¿Olvidaste tu contraseña?</a>
+                            {/* 🔹 Cambiamos <a> por <Link> */}
+                            <Link to="/forgot-password" className="text-muted">
+                                ¿Olvidaste tu contraseña?
+                            </Link>
                         </div>
 
                         <div className="d-flex justify-content-center">

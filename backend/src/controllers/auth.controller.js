@@ -1,10 +1,12 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/usuario.model");
 const Profesional = require("../models/profesional.model");
+const transporter = require("../config/nodemailer");
 
 const SECRET_KEY = process.env.JWT_SECRET || "secreto";
-
+const url = process.env.BACKEND_URL;
 exports.registrarUsuario = async (req, res) => {
   try {
     const { correo_electronico, contrasena, nombre, id_google = null } = req.body;
@@ -171,3 +173,65 @@ exports.editarUsuario = async (req, res) => {
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
+
+exports.requestPasswordReset = async (req, res) => {
+  const { correo_electronico } = req.body;
+
+  try {
+      const usuario = await Usuario.findByEmailResetPassword(correo_electronico);
+
+      if (!usuario) {
+          return res.status(404).json({ message: "No se encontró una cuenta con este correo." });
+      }
+
+      if (usuario.tipo === "usuario" && usuario.id_google) {
+          return res.status(400).json({ message: "Esta cuenta usa Google para autenticarse, no puede recuperar contraseña." });
+      }
+
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const tokenExpira = Date.now() + 3600000; // 1 hora
+
+      await Usuario.saveResetToken(usuario.id_usuario || usuario.id_profesional, usuario.tipo, resetToken, tokenExpira);
+
+      //en produccion va la url frontend
+      const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+
+      await transporter.sendMail({
+          from: "no-reply@tuapp.com",
+          to: correo_electronico,
+          subject: "Recuperación de contraseña",
+          html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+                 <a href="${resetURL}">${resetURL}</a>
+                 <p>Este enlace expirará en 1 hora.</p>`,
+      });
+
+      res.json({ message: "Se ha enviado un correo con instrucciones para recuperar tu contraseña." });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al procesar la solicitud." });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+      const usuario = await Usuario.findByToken(token);
+
+      if (!usuario) {
+          return res.status(400).json({ message: "Token inválido o expirado." });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await Usuario.updatePassword(usuario.id, usuario.tipo, hashedPassword);
+
+      res.json({ message: "Contraseña actualizada correctamente." });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al restablecer la contraseña." });
+  }
+};
+

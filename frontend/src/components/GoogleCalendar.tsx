@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Modal from "react-bootstrap/Modal";
+import { gapi } from "gapi-script";
 import Button from "react-bootstrap/Button";
 import axios from 'axios';
 const url = import.meta.env.VITE_API_BASE_URL;
@@ -29,7 +32,8 @@ interface Turno {
   email_paciente: string;  // 🔹 Correo del paciente
   nombre_profesional: string; // 🔹 Nombre del profesional
   email_profesional: string; // 🔹 Correo del profesional
-  google_event_id?: string | null; // 🔹 ID del evento en Google Calendar
+  google_event_id_profesional?: string | null; // 🔹 Este ya existía, lo dejamos por compatibilidad
+  google_event_id_paciente?: string | null; // 🔹_
 }
 
 
@@ -100,74 +104,166 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
   useEffect(() => {
     if (isSignedIn) {
-      subirEventosAGoogleCalendar();
+      verificarPermisos(); // Verificar permisos antes de subir eventos
     }
   }, [isSignedIn]);
 
+  // 🔹 Verificar que el usuario tiene los permisos correctos
+  const verificarPermisos = async () => {
+    if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+      console.error("❌ No estás autenticado en Google.");
+      return;
+    }
 
-  const subirEventosAGoogleCalendar = async () => {
+    const user = gapi.auth2.getAuthInstance().currentUser.get();
+    const grantedScopes = user.getGrantedScopes();
+
+    if (!grantedScopes.includes("https://www.googleapis.com/auth/calendar.events")) {
+      console.error("❌ Permisos insuficientes, reautenticando...");
+      await signInConPermisos();
+    } else {
+
+      await subirEventosAGoogleCalendar(usuarioRol);
+    }
+  };
+
+  // 🔹 Forzar reautenticación si los permisos son insuficientes
+  const signInConPermisos = async () => {
+    try {
+
+      await gapi.auth2.getAuthInstance().signIn({
+        scope: "https://www.googleapis.com/auth/calendar.events",
+        prompt: "consent",
+      });
+      await verificarPermisos();
+    } catch (error) {
+      console.error("❌ Error al reautenticar usuario:", error);
+    }
+  };
+
+  const formatearFechaLegible = (fechaISO: string, hora: string) => {
+    try {
+      const fecha = parseISO(fechaISO);
+      return format(fecha, "EEEE dd 'de' MMMM 'de' yyyy", { locale: es }) + ` a las ${hora}`;
+    } catch (error) {
+      console.warn("⚠️ Error al formatear la fecha legible:", error);
+      return `${fechaISO} a las ${hora}`;
+    }
+  };
+
+  const subirEventosAGoogleCalendar = async (usuarioRol: "profesional" | "usuario") => {
     if (!isSignedIn) return;
 
     try {
+
       for (const turno of turnos) {
-        if (turno.google_event_id) {
-          continue; // 🔹 Evita subir eventos duplicados
-        }
+        // 🔹 Verificar si el evento ya existe en el Google Calendar del usuario actual
+        if (usuarioRol === "profesional" && turno.google_event_id_profesional) continue;
+        if (usuarioRol === "usuario" && turno.google_event_id_paciente) continue;
+
+
 
         const fechaHoraInicio = formatearFechaHora(turno.fecha_turno, turno.hora_turno);
-        if (!fechaHoraInicio) continue;
-
-        const horaFin = String(parseInt(turno.hora_turno.slice(0, 2)) + 1).padStart(2, "0") + ":00:00";
-        const fechaHoraFin = formatearFechaHora(turno.fecha_turno, horaFin);
-        if (!fechaHoraFin) continue;
-
-        // 🔹 Validar emails
-        const emailPaciente = esEmailValido(turno.email_paciente) ? turno.email_paciente : null;
-        const emailProfesional = esEmailValido(turno.email_profesional) ? turno.email_profesional : null;
-
-        const attendees = [];
-        if (emailPaciente) attendees.push({ email: emailPaciente });
-        if (emailProfesional) attendees.push({ email: emailProfesional });
-
-        if (attendees.length === 0) {
+        if (!fechaHoraInicio) {
+          console.warn(`⚠️ Fecha inicio inválida para el turno ${turno.id_turno}`);
           continue;
         }
 
+        const horaFin = String(parseInt(turno.hora_turno.slice(0, 2)) + 1).padStart(2, "0") + ":00:00";
+        const fechaHoraFin = formatearFechaHora(turno.fecha_turno, horaFin);
+        if (!fechaHoraFin) {
+          console.warn(`⚠️ Fecha fin inválida para el turno ${turno.id_turno}`);
+          continue;
+        }
+
+        // 🔹 Validar emails antes de asignarlos
+        const emailPaciente = esEmailValido(turno.email_paciente) ? turno.email_paciente : null;
+        const emailProfesional = esEmailValido(turno.email_profesional) ? turno.email_profesional : null;
+
+        // 🔹 Verificar si hay al menos un email válido antes de continuar
+        if (!emailPaciente && !emailProfesional) {
+          console.warn(`⚠️ Ambos emails inválidos o faltantes en turno ID ${turno.id_turno}`, turno);
+          continue;
+        }
+
+        // 🔹 Definir el email según el tipo de usuario y usar solo emails válidos
+        let emailUsuario: string | null;
+        let campoGoogleEvent: "google_event_id_profesional" | "google_event_id_paciente";
+
+        if (usuarioRol === "profesional") {
+          emailUsuario = emailProfesional;
+          campoGoogleEvent = "google_event_id_profesional";
+        } else {
+          emailUsuario = emailPaciente;
+          campoGoogleEvent = "google_event_id_paciente";
+        }
+
+        // 🔹 Si el usuario es un paciente pero no tiene email, no subimos el evento para él.
+        if (usuarioRol === "usuario" && !emailUsuario) {
+          console.warn(`⚠️ Paciente sin email en turno ID ${turno.id_turno}, solo se creará evento para el profesional.`);
+          continue;
+        }
+
+
+
         try {
+          const fechaFormateada = formatearFechaLegible(turno.fecha_turno, turno.hora_turno);
+
+          let descripcionEvento = "";
+          let attendees: { email: string }[] = [];
+
+          // 🔹 Personalizar descripción y asistentes en base al usuarioRol
+          if (usuarioRol === "profesional") {
+            descripcionEvento = `Sesión con el paciente ${turno.nombre_paciente || "Desconocido"} el ${fechaFormateada}`;
+            if (esEmailValido(turno.email_paciente)) {
+              attendees.push({ email: turno.email_paciente });
+            }
+          } else { // usuarioRol === "usuario"
+            descripcionEvento = `Sesión con el profesional ${turno.nombre_profesional || "Desconocido"} el ${fechaFormateada}`;
+            if (esEmailValido(turno.email_profesional)) {
+              attendees.push({ email: turno.email_profesional });
+            }
+          }
+
           const response = await window.gapi.client.calendar.events.insert({
             calendarId: "primary",
-            conferenceDataVersion: 1,
             resource: {
-              summary: `Sesión de Terapia - ${turno.nombre_paciente || turno.nombre_profesional}`,
-              description: `Videollamada con ${turno.nombre_profesional || "Profesional"} el ${turno.fecha_turno} a las ${turno.hora_turno}`,
+              summary: "Sesión de Terapia Libre",
+              description: descripcionEvento,
               start: { dateTime: fechaHoraInicio, timeZone: "America/Argentina/Buenos_Aires" },
               end: { dateTime: fechaHoraFin, timeZone: "America/Argentina/Buenos_Aires" },
-              attendees,
-              conferenceData: {
-                createRequest: {
-                  requestId: `meet-${turno.id_turno}`,
-                  conferenceSolutionKey: { type: "hangoutsMeet" }
-                }
-              }
+              attendees: attendees.length > 0 ? attendees : undefined, // Solo agregar attendees si hay correos válidos
             }
           });
+
+
+          if (!response.result || !response.result.id) {
+            console.error(`❌ No se recibió un Google Event ID para ${usuarioRol} en el turno ${turno.id_turno}`);
+            continue;
+          }
 
           const googleEventId = response.result.id; // 🔹 Obtener el ID del evento en Google Calendar
 
           // 🔹 Guardar el Google Event ID en la base de datos
           await axios.post(`${url}/api/turnos/guardar-google-event`, {
             id_turno: turno.id_turno,
-            google_event_id: googleEventId
-          });
+            [campoGoogleEvent]: googleEventId // 🔹 Guarda en el campo correcto según el rol
+        });
+        
 
-        } catch (error) {
-          console.error(`❌ Error al subir evento para ${turno.nombre_paciente}:`, error);
+        } catch (error: any) {
+          console.error(`❌ Error al subir evento para ${usuarioRol} (${emailUsuario}):`, error.response?.data || error);
         }
+
+        // 🔹 Notificación de éxito después de subir eventos
+        toast.success("Los eventos fueron sincronizados con tu Google Calendar");
+
       }
     } catch (error) {
-      console.error("❌ Error al subir eventos:", error);
+      console.error("❌ Error general al subir eventos:", error);
     }
   };
+
 
 
   const formattedEvents = [
@@ -276,8 +372,6 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
       const meetUrl = response.result?.conferenceData?.entryPoints?.[0]?.uri;
       if (meetUrl) {
-        console.log("✅ Meet creado:", meetUrl);
-
         // Guardar la URL en la base de datos sin subir a Google Calendar
         await axios.post(`${url}/google-meet/guardar-meet`, {
           id_turno: turno.id_turno,
@@ -323,7 +417,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
     const checkPopupClosed = setInterval(() => {
       if (meetWindow.closed) {
         clearInterval(checkPopupClosed);
-        
+
         registrarFinDeLlamada(turno);
       }
     }, 1000);
@@ -333,7 +427,6 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
   const registrarFinDeLlamada = async (turno: Turno) => {
     try {
       await axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno });
-      console.log("✅ Fin de llamada registrado en la base de datos");
 
       toast.success("✅ La videollamada ha finalizado correctamente.", {
         position: "top-right",

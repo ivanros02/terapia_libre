@@ -19,9 +19,10 @@ class Turno {
 
     static async obtenerTurnosPorProfesional(id_profesional) {
         const [rows] = await pool.execute(
-            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente
+            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente,profesionales.correo_electronico AS email_profesional
             FROM turnos 
             LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
+            LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
             WHERE id_profesional = ? 
             ORDER BY fecha_turno, hora_turno`,
             [id_profesional]
@@ -37,7 +38,7 @@ class Turno {
             WHERE t.id_profesional = ?
             AND CONCAT(t.fecha_turno, ' ', t.hora_turno) >= NOW()  -- 🔹 Solo turnos futuros
             ORDER BY t.fecha_turno ASC, t.hora_turno ASC
-            LIMIT 5`,  
+            LIMIT 5`,
             [id_profesional]
         );
         return rows;
@@ -51,13 +52,13 @@ class Turno {
             WHERE t.id_usuario = ?
             AND CONCAT(t.fecha_turno, ' ', t.hora_turno) >= NOW()  -- 🔹 Solo turnos futuros
             ORDER BY t.fecha_turno ASC, t.hora_turno ASC
-            LIMIT 5`,  
+            LIMIT 5`,
             [id_usuario]
         );
         return rows;
     }
-    
-    
+
+
 
     static async cancelarTurno(id_turno, motivo) {
         const [result] = await pool.execute(
@@ -70,10 +71,11 @@ class Turno {
     static async obtenerTurnosPorUsuario(id_usuario) {
         try {
             const [rows] = await pool.execute(
-                `SELECT turnos.*, profesionales.nombre AS nombre_profesional, profesionales.correo_electronico AS email_profesional
+                `SELECT turnos.*, profesionales.nombre AS nombre_profesional, profesionales.correo_electronico AS email_profesional,usuarios.correo_electronico AS email_paciente
                 FROM turnos 
                 LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
-                WHERE id_usuario = ? 
+                LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
+                WHERE turnos.id_usuario = ?
                 ORDER BY fecha_turno, hora_turno`,
                 [id_usuario]
             );
@@ -152,18 +154,32 @@ class Turno {
         return total > 0 ? Math.round((completados / total) * 100) : 0;
     }
 
-    static async guardarGoogleEvent(id_turno, google_event_id) {
+    static async guardarGoogleEvent(id_turno, google_event_id_paciente = null, google_event_id_profesional = null) {
         try {
-            const [result] = await pool.execute(
-                `UPDATE turnos SET google_event_id = ? WHERE id_turno = ?`,
-                [google_event_id, id_turno]
-            );
+            let query = `UPDATE turnos SET `;
+            const params = [];
+
+            if (google_event_id_paciente) {
+                query += `google_event_id_paciente = ?, `;
+                params.push(google_event_id_paciente);
+            }
+            if (google_event_id_profesional) {
+                query += `google_event_id_profesional = ?, `;
+                params.push(google_event_id_profesional);
+            }
+
+            query = query.slice(0, -2); // 🔹 Eliminar la última coma sobrante
+            query += ` WHERE id_turno = ?`;
+            params.push(id_turno);
+
+            const [result] = await pool.execute(query, params);
             return result.affectedRows > 0; // Retorna `true` si la actualización fue exitosa
         } catch (error) {
             console.error("❌ Error al guardar Google Event ID:", error);
             throw new Error("Error al guardar Google Event ID en la base de datos.");
         }
     }
+
 
     static async obtenerHistorialUsuario(id_usuario) {
         const [rows] = await pool.execute(

@@ -17,6 +17,9 @@ import DashboardProfesionalConfig from "./pages/DashboardProfesionalConfig";
 import DashboardUsuarioConfig from "./pages/DashboardUsuarioConfig";
 import AdminProfesionales from "./pages/AdminProfesionales";
 import AdminLogin from "./components/AdminLogin";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 import "./index.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from "react-toastify";
@@ -26,7 +29,7 @@ const App: React.FC = () => {
   return (
 
     <HelmetProvider>
-       <ToastContainer position="top-center" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
       {/* ✅ Agregamos el PayPalScriptProvider aquí */}
       <PayPalScriptProvider options={{ clientId: "ASuvwaL7zuIKfyr5_OppnnQGrKqyvWDPkSn2BSHYTSR8wHbxOQPZE1JzVQ2Oj8ECpJSJ2XF-0ADkTk4l" }}>
         <SocketProvider> {/* ✅ Aquí envolvemos todo con el SocketProvider */}
@@ -46,6 +49,8 @@ const App: React.FC = () => {
               <Route path="/dashboard/usuario/config_usuario" element={<DashboardUsuarioConfig />} />
               <Route path="/admin" element={<AdminProfesionales />} />
               <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
             </Routes>
           </Router>
         </SocketProvider>

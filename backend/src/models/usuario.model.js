@@ -73,6 +73,64 @@ class Usuario {
     return result.affectedRows > 0;
   }
 
+  // Buscar usuario o profesional por correo
+  static async findByEmailResetPassword(correo) {
+    try {
+      const [usuario] = await pool.query("SELECT id_usuario, id_google FROM usuarios WHERE correo_electronico = ?", [correo]);
+      if (usuario.length) return { ...usuario[0], tipo: "usuario" };
+
+      const [profesional] = await pool.query("SELECT id_profesional FROM profesionales WHERE correo_electronico = ?", [correo]);
+      if (profesional.length) return { ...profesional[0], tipo: "profesional" };
+
+      return null;
+    } catch (error) {
+      console.error("Error en findByEmail:", error);
+      throw error;
+    }
+  }
+
+  // Guardar token de recuperación
+  static async saveResetToken(id, tipo, token, expiracion) {
+    try {
+      const tabla = tipo === "usuario" ? "usuarios" : "profesionales";
+      const campo = tipo === "usuario" ? "id_usuario" : "id_profesional";
+
+      await pool.query(`UPDATE ${tabla} SET reset_token = ?, reset_token_expira = ? WHERE ${campo} = ?`, [token, expiracion, id]);
+    } catch (error) {
+      console.error("Error en saveResetToken:", error);
+      throw error;
+    }
+  }
+
+  // Buscar usuario o profesional por token
+  static async findByToken(token) {
+    try {
+      const [usuario] = await pool.query("SELECT id_usuario FROM usuarios WHERE reset_token = ? AND reset_token_expira > ?", [token, Date.now()]);
+      if (usuario.length) return { id: usuario[0].id_usuario, tipo: "usuario" };
+
+      const [profesional] = await pool.query("SELECT id_profesional FROM profesionales WHERE reset_token = ? AND reset_token_expira > ?", [token, Date.now()]);
+      if (profesional.length) return { id: profesional[0].id_profesional, tipo: "profesional" };
+
+      return null;
+    } catch (error) {
+      console.error("Error en findByToken:", error);
+      throw error;
+    }
+  }
+
+  // Actualizar contraseña
+  static async updatePassword(id, tipo, hashedPassword) {
+    try {
+      const tabla = tipo === "usuario" ? "usuarios" : "profesionales";
+      const campo = tipo === "usuario" ? "id_usuario" : "id_profesional";
+
+      await pool.query(`UPDATE ${tabla} SET contrasena_hash = ?, reset_token = NULL, reset_token_expira = NULL WHERE ${campo} = ?`, [hashedPassword, id]);
+    } catch (error) {
+      console.error("Error en updatePassword:", error);
+      throw error;
+    }
+  }
 }
+
 
 module.exports = Usuario;

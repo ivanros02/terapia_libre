@@ -22,8 +22,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    // Crear la conexión de Socket.io usando la URL base
-    const newSocket = io(url);
+    // Crear la conexión de Socket.io usando la configuración correcta
+    const newSocket = io(url, {
+      path: "/api_terapia/socket.io", // 🔹 Asegurar que el path coincide con el backend
+      transports: ["websocket", "polling"], // 🔹 Habilitar ambos transportes
+      withCredentials: true // 🔹 Permitir cookies y credenciales si es necesario
+    });
+
     setSocket(newSocket);
 
     // Limpiar la conexión al desmontar el componente
