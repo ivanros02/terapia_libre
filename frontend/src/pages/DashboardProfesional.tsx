@@ -128,30 +128,31 @@ const DashboardProfesional = () => {
         <>
           <div className="div8" onClick={() => navigate('/dashboard/calendario')} style={{ cursor: "pointer" }}>
             <Card
-              className="shadow-sm border-0 rounded-4 p-3 calendario-card d-flex align-items-center justify-content-center gap-2"
-              style={{ backgroundColor: "var(--naranja)", display: "flex", flexDirection: "row" }}
+              className="shadow-lg border-0 rounded-4 p-3 calendario-card d-flex align-items-center justify-content-center gap-2"
+              style={{  display: "flex", flexDirection: "row" }}
             >
               <img src="/sidebar/calendar.png" alt="Calendar" width="24" height="24" />
-              <span className="fw-bold text-white">CALENDARIO</span>
+              <span style={{fontWeight:"bold", fontSize:"14px", color:"var(--verde)"}}>CALENDARIO</span>
             </Card>
           </div>
-
-
 
           <div className="div7" onClick={() => navigate('/dashboard/profesional/config_profesional')} style={{ cursor: "pointer" }}>
             <Card
-              className="shadow-sm border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
+              className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
+              style={{height:"90px",width:"183px"}}
             >
               <img src="/sidebar/config.png" alt="Home" width="24" height="24" className="mb-2" />
-              <span style={{ color: "var(--verde)" }}>CONFIGURACIÓN</span>
+              <span style={{fontWeight:"bold", fontSize:"14px", color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
           </div>
-          <div className="div9">
+
+          <div className="div9" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
             <Card
-              className="shadow-sm border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
+              className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
+              style={{height:"90px",width:"183px"}}
             >
-              <img src="/sidebar/config.png" alt="Home" width="24" height="24" className="mb-2" />
-              <span style={{ color: "var(--verde)" }}>CONFIGURACIÓN</span>
+              <img src="/sidebar/chat.png" alt="Home" width="24" height="24" className="mb-2" />
+              <span style={{fontWeight:"bold", fontSize:"14px", color: "var(--verde)" }}>Chats</span>
             </Card>
           </div>
 

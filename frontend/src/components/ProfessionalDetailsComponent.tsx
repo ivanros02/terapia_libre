@@ -46,8 +46,8 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
         } else if (url.includes("id=")) {
           fileId = url.split("id=")[1]?.split("&")[0]; // Extraer ID de formato "id="
         }
-    
-        return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "/placeholder.jpg";
+        
+        return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png";
       };
 
     return (

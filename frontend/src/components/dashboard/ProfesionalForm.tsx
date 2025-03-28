@@ -25,16 +25,13 @@ const url = import.meta.env.VITE_API_BASE_URL;
 interface ProfesionalFormProps {
     show: boolean;
     handleClose: () => void;
-    profesional: Profesional;
+    profesional: Profesional | null;
     onSave: () => void;
-    fetchProfesionalData: () => void;  // 🔹 Agregamos esta función
+    fetchProfesionalData: () => void;
 }
 
-
 function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesionalData }: ProfesionalFormProps) {
-
-    // 🔹 Inicialización segura del estado
-    const [formData, setFormData] = useState<Profesional & { especialidades: number[] }>({
+    const [formData, setFormData] = useState<Profesional>({
         id_profesional: 0,
         nombre: "",
         titulo_universitario: "",
@@ -48,50 +45,34 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
         valor: 0.0,
         valor_internacional: 0.0,
         creado_en: "",
-        especialidades: [] // Ahora almacenamos IDs de especialidades
+        especialidades: []
     });
 
-    const [especialidadesDisponibles, setEspecialidadesDisponibles] = useState<{ id_especialidad: number; nombre: string }[]>([]);
+    const [, setEspecialidadesDisponibles] = useState<{ id_especialidad: number; nombre: string }[]>([]);
+    const [selectedEspecialidades, setSelectedEspecialidades] = useState<number[]>([]);
 
+    // 🔹 Cargar especialidades disponibles al montar el componente
     useEffect(() => {
         const fetchEspecialidades = async () => {
             try {
                 const response = await axios.get<{ id_especialidad: number; nombre: string }[]>(`${url}/api/especialidades`);
                 setEspecialidadesDisponibles(response.data);
-                console.log("Especialidades disponibles:", response.data);
+                console.log("✅ Especialidades disponibles:", response.data);
             } catch (error) {
-                console.error("Error al cargar especialidades", error);
+                console.error("❌ Error al cargar especialidades", error);
             }
         };
 
         fetchEspecialidades();
     }, []);
 
-
-    // 🔹 Actualiza `formData` cuando cambia `profesional`
-    const [selectedEspecialidades, setSelectedEspecialidades] = useState<number[]>([]);
-
-    // 🔹 Cargar especialidades cuando cambia el profesional seleccionado
+    // 🔹 Cargar datos del profesional cuando el modal se abre
     useEffect(() => {
-        if (profesional && show && especialidadesDisponibles.length > 0) {
-            console.log("Cargando especialidades del profesional:", profesional.especialidades);
-            console.log("Especialidades disponibles:", especialidadesDisponibles);
+        if (profesional && show) {
+            console.log("✅ Cargando datos del profesional:", profesional);
 
-            // Verificar que `profesional.especialidades` sea un array válido
-            if (!Array.isArray(profesional.especialidades) || profesional.especialidades.length === 0) {
-                console.warn("⚠️ `profesional.especialidades` está vacío o no es un array:", profesional.especialidades);
-                return;
-            }
-
-            // 🔹 Convertir nombres en IDs si `profesional.especialidades` contiene nombres
-            const especialidadesIDs = profesional.especialidades
-                .map((id: number) => {
-                    const match = especialidadesDisponibles.find(esp => esp.id_especialidad === id);
-                    return match ? match.id_especialidad : null;
-                })
-                .filter(id => id !== null) as number[]; // 🔹 Filtrar valores null y asegurarse que sean números
-
-            console.log("Especialidades convertidas a IDs:", especialidadesIDs);
+            // Si no hay especialidades, inicializarlo con un array vacío
+            const especialidadesIDs = profesional.especialidades?.length ? profesional.especialidades : [];
 
             setFormData({
                 ...profesional,
@@ -100,24 +81,13 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
 
             setSelectedEspecialidades(especialidadesIDs);
         }
-    }, [profesional, especialidadesDisponibles, show]);
+    }, [profesional, show]);
 
-
-
-
-
-
-
-
-
-
-
-
-    // 🔹 Manejo seguro de los cambios en los inputs
+    // 🔹 Manejo de cambios en el formulario
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        setFormData((prev) => ({
+        setFormData(prev => ({
             ...prev,
-            [e.target.name]: e.target.value || ""
+            [e.target.name]: e.target.value
         }));
     };
 
@@ -125,27 +95,20 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.put(`${url}/api/profesionales/${profesional.id_profesional}`, {
+            console.log("✅ Enviando actualización:", formData);
+
+            await axios.put(`${url}/api/profesionales/${profesional?.id_profesional}`, {
                 ...formData,
-                especialidades: selectedEspecialidades.map(Number) // 🔹 Asegurar que sean números
+                especialidades: selectedEspecialidades.map(Number)
             });
+
             onSave();
             fetchProfesionalData();
             handleClose();
         } catch (error) {
-            console.error("Error al actualizar datos del profesional", error);
+            console.error("❌ Error al actualizar datos del profesional", error);
         }
     };
-
-
-
-
-
-
-
-
-
-
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -186,14 +149,26 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                     <Form.Group className="mb-3">
                         <Form.Label>Especialidades</Form.Label>
                         <EspecialidadSelectEditable
-                            selectedEspecialidades={selectedEspecialidades} // 🔹 Se pasa el estado con las especialidades del profesional
+                            selectedEspecialidades={selectedEspecialidades}
                             onChange={(selected) => {
-                                setSelectedEspecialidades(selected); // 🔹 Mantiene el estado sincronizado
+                                setSelectedEspecialidades(selected);
                                 setFormData(prev => ({ ...prev, especialidades: selected }));
                             }}
                         />
                     </Form.Group>
-                    <Button type="submit" style={{backgroundColor:"var(--naranja)",borderColor:"var(--naranja)",paddingLeft:"20px",paddingRight:"20px",color:"white"}} variant="success">Guardar</Button>
+                    <Button
+                        type="submit"
+                        style={{
+                            backgroundColor: "var(--naranja)",
+                            borderColor: "var(--naranja)",
+                            paddingLeft: "20px",
+                            paddingRight: "20px",
+                            color: "white"
+                        }}
+                        variant="success"
+                    >
+                        Guardar
+                    </Button>
                 </Form>
             </Modal.Body>
         </Modal>

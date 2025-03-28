@@ -1,0 +1,9 @@
+.h2-custom{
+    color: var(--naranja) !important; 
+    font-family: var(--fuente-secundaria);
+    font-size: 36px;
+}
+
+.p-custom{
+    font-size: 16px;
+}

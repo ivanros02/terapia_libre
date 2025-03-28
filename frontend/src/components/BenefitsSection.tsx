@@ -1,6 +1,6 @@
 import React from "react";
 import CustomButton from "./CustomButton";
-
+import "../styles/BenefitsSection.css";
 const benefits = [
     { image: "/benefs/facil_acceso.png", text: <><strong>Facilidad de acceso:</strong> Permite encontrar profesionales fácilmente desde la comodidad de tu hogar, sin necesidad de desplazarte básicamente a una consulta.</> },
     { image: "/benefs/facilidad_compra.png", text: <><strong>Facilidad para comparar:</strong> Muchas plataformas permiten el contacto directo con el profesional antes de programar una cita, lo que te brinda la oportunidad de plantear tus dudas y conocer mejor al profesional.</> },
@@ -13,7 +13,7 @@ const benefits = [
 const BenefitsSection: React.FC = () => {
     return (
         <section className="container py-5">
-            <h2 className="text-center mb-5" style={{ color: "var(--naranja)" }}>Beneficios</h2>
+            <h2 className="text-center mb-5 h2-custom-benef">Beneficios</h2>
             <div className="row">
                 {benefits.map((benefit, index) => (
                     <div key={index} className="col-md-6 d-flex align-items-center mb-4">

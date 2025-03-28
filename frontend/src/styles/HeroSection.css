@@ -12,14 +12,18 @@
 }
 
 .hero-section h1 {
+    font-family: var(--fuente-secundaria) !important;
+    font-size: 80px !important;
     margin-bottom: 0 !important;
     /* Elimina el espacio debajo del h1 */
     padding-bottom: 0 !important;
     /* Por si hay relleno extra */
     margin-top: 15rem !important;
+
 }
 
 .hero-section p {
     margin-top: -5px !important;
     /* Acerca aún más el p al h1 */
+    font-size: 24px !important;
 }

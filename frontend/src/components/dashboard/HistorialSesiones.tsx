@@ -28,7 +28,7 @@ const HistorialSesiones: React.FC<HistorialProps> = ({ sesiones, terapeuta, onCa
             <Row className="align-items-start">
                 {/* Historial de Sesiones */}
                 <Col xs={12} md={6} className="mb-4 ">
-                    <h5 className="fw-bold">Historial de sesiones</h5>
+                    <h5 className="fw-bold" style={{ fontSize: "24.58px" }}>Historial de sesiones</h5>
                     <ListGroup variant="flush" className="rounded-4 historial-sesiones">
 
                         {sesiones.map((sesion, index) => (
@@ -48,7 +48,7 @@ const HistorialSesiones: React.FC<HistorialProps> = ({ sesiones, terapeuta, onCa
                     {/* Contenedor de título y Card alineados */}
                     <div className="w-100 d-flex flex-column justify-content-start">
                         <div className="d-flex justify-content-between w-100 align-items-center">
-                            <h5 className="fw-bold mb-0">Mi terapeuta</h5>
+                            <h5 className="fw-bold mb-0" style={{ fontSize: "24.58px" }}>Mi terapeuta</h5>
                             {onCambiarTerapeuta && (
                                 <a href="#" className="text-primary fw-semibold" onClick={onCambiarTerapeuta}>
                                     Cambiar
@@ -60,7 +60,7 @@ const HistorialSesiones: React.FC<HistorialProps> = ({ sesiones, terapeuta, onCa
                         <Card className="p-3 shadow-sm rounded-4 border border-light historial-terapeuta-card mt-2">
                             <div className="d-flex align-items-center mb-3">
                                 <div className="circle-container">
-                                    <div className="circle-inner">
+                                    <div className="circle-inner" style={{ fontSize: "18.43px" }}>
                                         {terapeuta.nombre
                                             .split(" ")
                                             .map(word => word.charAt(0).toUpperCase())
@@ -77,14 +77,23 @@ const HistorialSesiones: React.FC<HistorialProps> = ({ sesiones, terapeuta, onCa
 
                             <hr className="my-3" />
 
-                            <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Última consulta</p>
-                            <p className="text-muted mb-2" style={{ fontSize: "0.8rem" }}>{terapeuta.ultimaConsulta}</p>
+                            <div className="d-flex align-items-center">
+                                <p className="mb-1 fw-bold me-2 " style={{ fontSize: "12.29px" }}>Última consulta:</p>
+                                <p className="text-muted mb-2 ms-1" style={{ fontSize: "12.29px" }}>{terapeuta.ultimaConsulta}</p>
+                            </div>
 
-                            <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Valor de la sesión</p>
-                            <p className="text-muted mb-2" style={{ fontSize: "0.8rem" }}>${terapeuta.valorSesion}</p>
+                            <div className="d-flex align-items-center">
+                                <p className="mb-1 fw-bold" style={{ fontSize: "12.29px" }}>Valor de la sesión:</p>
+                                <p className="text-muted mb-2 ms-1" style={{ fontSize: "12.29px" }}>${terapeuta.valorSesion}</p>
+                            </div>
 
-                            <p className="mb-1 fw-bold" style={{ fontSize: "0.85rem" }}>Descripción:</p>
-                            <p className="text-muted mb-0" style={{ fontSize: "0.8rem" }}>{terapeuta.descripcion}</p>
+                            <div className="d-flex align-items-center">
+                                <p className="mb-1 fw-bold" style={{ fontSize: "12.29px" }}>Descripción:</p>
+                                <p className="text-muted mb-0 ms-1" style={{ fontSize: "12.29px" }}>{terapeuta.descripcion}</p>
+                            </div>
+
+
+
                         </Card>
                     </div>
                 </Col>

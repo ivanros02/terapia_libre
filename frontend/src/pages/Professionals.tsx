@@ -3,6 +3,7 @@ import Head from "../layouts/Header"; // Usa el mismo Head si es necesario
 import Footer from "../layouts/Footer";
 import ProfessionalList from "../components/ProfessionalList";
 import FilterBar from "../components/FilterBar";
+import "../styles/Professionals.css";
 
 const Professionals: React.FC = () => {
     const menuLinks = [
@@ -34,7 +35,7 @@ const Professionals: React.FC = () => {
                     paddingTop: "16rem" // Ajusta según la altura del navbar
                 }}
             >
-                <h1 style={{ color: "var(--verde)" }}>PROFESIONALES</h1>
+                <h1 className="h1-custom-profs">PROFESIONALES</h1>
                 {/* Filtros */}
                 <FilterBar
                     selectedEspecialidad={selectedEspecialidad}

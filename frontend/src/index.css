@@ -1,24 +1,30 @@
 :root {
-    --verde: #4C655C;
+    --verde: #567C6F;
     --naranja: #F1974C;
     --crema: #d8d3bc;
     --verde-rgb: 86, 124, 111; /* Definir la variable en formato RGB */
+    --fuente-monserrat: 'Montserrat', sans-serif; /* Definir la fuente como variable */
+    --fuente-secundaria: 'Things', sans-serif; /* Nueva fuente "Things" */
 }
 
+/* ✅ Fuente "Things" Regular */
 @font-face {
-    font-family: 'Montserrat' !important;
-    src: url('./fonts/Montserrat-Regular.woff2') format('woff2'),
-         url('./fonts/Montserrat-Regular.woff') format('woff') !important;
-    font-weight: normal !important;
-    font-style: normal !important;
+    font-family: 'Things';
+    src: url('./fuente/things-serif-font/things.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
 }
 
+body {
+    font-family: var(--fuente-monserrat) !important;
+}
+
+/* ✅ Fuente "Things" Italic */
 @font-face {
-    font-family: 'Montserrat' !important;
-    src: url('./fonts/Montserrat-Bold.woff2') format('woff2'),
-         url('./fonts/Montserrat-Bold.woff') format('woff');
-    font-weight: bold !important;
-    font-style: normal !important;
+    font-family: 'Things';
+    src: url('./fuente/things-serif-font/things-italic.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
 }
 
 

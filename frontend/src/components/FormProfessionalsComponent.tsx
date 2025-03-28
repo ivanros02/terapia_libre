@@ -6,6 +6,7 @@ import React, { useState } from "react";
 const url = import.meta.env.VITE_API_BASE_URL;
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TermsAndConditions from "./TermsAndConditions";
 
 const FormProfessionalsComponent = () => {
 
@@ -359,13 +360,7 @@ const FormProfessionalsComponent = () => {
                     <Modal.Title>Términos y Condiciones</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada, nunc sit amet posuere
-                        ullamcorper, urna erat fermentum ligula, vel lacinia libero lectus in magna.
-                    </p>
-                    <p>
-                        Al hacer clic en "Aceptar", confirma que ha leído y acepta nuestros términos y condiciones.
-                    </p>
+                    <TermsAndConditions /> {/* 🔹 Aquí se renderiza el contenido modularizado */}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowTermsModal(false)}>

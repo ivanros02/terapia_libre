@@ -26,12 +26,12 @@ const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatie
                 <Row>
                     {/* Lista de Pacientes */}
                     <Col md={5} className="border-end">
-                        <h5 className="fw-bold mb-0">Lista de pacientes</h5>
+                        <h5 className="fw-bold mb-0" style={{fontSize:"24.58px"}}>Lista de pacientes</h5>
                         <ListGroup variant="flush">
                             {patients.map((patient, index) => (
                                 <ListGroup.Item key={index} className="d-flex align-items-center border-0">
                                     <div className="circle-container">
-                                        <div className="circle-inner">
+                                        <div className="circle-inner" style={{fontSize:"18.43px"}}>
                                             {patient.name
                                                 .split(" ")
                                                 .map(word => word.charAt(0).toUpperCase())
@@ -50,7 +50,7 @@ const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatie
                     {/* Historia Clínica */}
                     <Col md={7} className="p-2" style={{ marginTop: "-1.5vh" }}>
                         <div className="d-flex justify-content-between align-items-center mb-2">
-                            <h5 className="fw-bold mb-0">Historia clínica</h5>
+                            <h5 className="fw-bold mb-0" style={{fontSize:"24.58px"}}>Historia clínica</h5>
                             <a href="#" className="text-primary fw-semibold" style={{ fontSize: "0.9rem" }}>Ver todas</a>
                         </div>
 

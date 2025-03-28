@@ -50,7 +50,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
             <Card className="shadow-sm p-3 rounded-4">
                 {/* 🔹 Solo se muestra en pantallas medianas en adelante */}
                 <div className="d-none d-md-block">
-                    <h1>Calendario</h1>
+                    <h1 style={{fontSize:"20.48px"}}>Calendario</h1>
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <Button variant="light" size="sm" onClick={() => cambiarMes(-1)}>
                             <FaChevronLeft />
@@ -105,7 +105,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
 
                 {/* 🔹 Siempre visible, pero con visibilidad adaptada a móvil */}
                 <div className="d-block">
-                    <h6 className="text-muted mb-2">Próximos Turnos</h6>
+                    <h6 className=" mb-2 fw-bold" style={{fontSize:"20.48px", color:"black"}}>Próximos Turnos</h6>
                     <div className="d-flex flex-column">
                         {proximosTurnos.length > 0 ? (
                             proximosTurnos.map((turno, index) => (
@@ -117,7 +117,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
                                         {turno.paciente ? turno.paciente.charAt(0).toUpperCase() : "?"}
                                     </div>
                                     <div className="ms-2">
-                                        <span className="fw-bold">{turno.paciente}</span>
+                                        <span className="fw-bold" style={{fontSize:"16.39px"}}>{turno.paciente}</span>
                                         <br />
                                         <span className="text-muted small">
                                             {moment(turno.fecha).format("DD/MM/YYYY")}

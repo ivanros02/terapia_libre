@@ -3,7 +3,7 @@
 .card-responsive {
     background: #567C6F;
     max-width: 100%; /* 🔹 Aumentar el ancho */
-    min-height: 306px; /* 🔹 Aumentar la altura mínima */
+    min-height: 300px; /* 🔹 Aumentar la altura mínima */
     padding: 2rem; /* 🔹 Más espacio interno */
 }
 
@@ -11,6 +11,10 @@
 .position-relative.w-100 {
     width: 100%;
     max-width: 100%;
+}
+
+.titulo-card{
+    font-size: 48px !important;
 }
 
 

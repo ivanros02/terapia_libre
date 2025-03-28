@@ -1,6 +1,8 @@
 import React from "react";
 import CardItem from "./CardItem";
 import CustomButton from "./CustomButton";
+import "../styles/NeedTherapy.css";
+
 const NeedTherapy: React.FC = () => {
     return (
         <section
@@ -31,10 +33,10 @@ const NeedTherapy: React.FC = () => {
                 <div className="row align-items-center">
                     {/* Texto a la izquierda */}
                     <div className="col-lg-5 text-white text-lg-start text-center mb-4 mb-lg-0">
-                        <h2 className="display-5" style={{ color: "var(--verde)" }}>
+                        <h2 className="h2-custom-need">
                             ¿Necesito <br /> terapia?
                         </h2>
-                        <p className="fs-5 text-dark">
+                        <p style={{fontSize:"16px",color:"black"}}>
                             EN QUÉ SITUACIONES DEBERÍAS ACUDIR A <br />
                             NUESTROS PROFESIONALES DE SALUD MENTAL
                         </p>

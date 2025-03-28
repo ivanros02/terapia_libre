@@ -1,7 +1,12 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Card, Container } from "react-bootstrap";
+import { Card, Container, Modal } from "react-bootstrap";
+import axios from "axios";
 import imagen from "/quienes_somos.png"; // Asegúrate de importar la imagen correctamente
 import "../../styles/DashboardCard.css";
+import { useEffect, useState } from "react";
+import CalendarAvailability from "../CalendarAvailability";
+const url = import.meta.env.VITE_API_BASE_URL;
+
 interface DashboardCardProps {
     name: string;
     patientName: string;
@@ -9,12 +14,67 @@ interface DashboardCardProps {
     newPatients: number;
 }
 
+interface TurnoHoy {
+    fecha_turno: Date;
+    id_profesional: number;
+}
+
 const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appointmentTime, newPatients }) => {
     const esProfesional = localStorage.getItem("esProfesional") === "true";
+    const [showModal, setShowModal] = useState(false);
+    const [turnoHoy, setTurnoHoy] = useState<TurnoHoy | null>(null);
+    const handleShowModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+    const [, setLoading] = useState(true);
+
+    const [, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const id = localStorage.getItem("id");
+                if (!id) {
+                    throw new Error("No se encontró el ID del usuario.");
+                }
+
+                // 🔹 Obtener todos los turnos del usuario
+                const { data: turnos } = await axios.get<TurnoHoy[]>(`${url}/api/turnos/usuario/${id}`);
+
+                if (turnos.length > 0) {
+                    // 🔹 Encontrar el turno con la fecha más alta
+                    const turnoMasReciente = turnos.reduce((max, turno) =>
+                        new Date(turno.fecha_turno) > new Date(max.fecha_turno) ? turno : max,
+                        turnos[0] // 🔹 Usar el primer turno como valor inicial
+                    );
+
+                    console.log("✅ Turno con fecha más alta:", turnoMasReciente);
+
+                    setTurnoHoy(turnoMasReciente);
+                } else {
+                    setTurnoHoy(null);
+                }
+
+            } catch (error: any) {
+                console.error("❌ Error al cargar turnos:", error);
+                setError(error.response?.data?.message || "Error al cargar los datos");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
+
+
+
+
+    console.log("📌 ID Profesional enviado:", turnoHoy?.id_profesional ?? 0);
+
+
     return (
         <Container fluid>
             {/* 🔹 Se oculta en móvil */}
-            <h1 className="d-none d-md-block">
+            <h1 className="d-none d-md-block titulo-card" >
                 Buen día, <span style={{ color: "var(--naranja)" }}>{name}!</span>
             </h1>
 
@@ -45,6 +105,18 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
                         </Card>
                     )}
 
+                    {/* Nueva Card para No Profesionales */}
+                    {!esProfesional && (
+                        <Card
+                            className="p-3 rounded-4 border-0 text-white text-center card-interna"
+                            style={{ backgroundColor: "var(--naranja)", cursor: "pointer" }}
+                            onClick={handleShowModal}
+                        >
+                            <h5 className="fw-bold"> Agendar nuevo turno</h5>
+
+                        </Card>
+                    )}
+
                     {/* Imagen decorativa RESPONSIVA */}
                     <img
                         src={imagen}
@@ -52,6 +124,18 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
                         className="imagen-decorativa"
                     />
                 </Card>
+
+                {/* Modal con CalendarAvailability */}
+                <Modal show={showModal} onHide={handleCloseModal} size="lg">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Agendar Turno</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <CalendarAvailability id_profesional={turnoHoy?.id_profesional ?? 0} showModal={showModal} />
+                    </Modal.Body>
+                </Modal>
+
+
             </div>
         </Container>
     );

@@ -92,8 +92,8 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
     } else if (url.includes("id=")) {
       fileId = url.split("id=")[1]?.split("&")[0]; // Extraer ID de formato "id="
     }
-
-    return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "/placeholder.jpg";
+    console.log(fileId)
+    return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png";
   };
 
   return (
@@ -104,7 +104,7 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
             <ProfessionalCard
               id={prof.id_profesional}
               name={prof.nombre}
-              image={getGoogleDriveImageUrl(prof.foto_perfil_url) || "default-profile.jpg"}
+              image={getGoogleDriveImageUrl(prof.foto_perfil_url)}
               specialties={prof.especialidades ? prof.especialidades.split(", ") : []}  // 🔹 Evita el error
               availability={prof.disponibilidad || "No especificado"}
               price={`$${prof.valor || 0}`}

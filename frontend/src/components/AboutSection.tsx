@@ -1,4 +1,5 @@
 import React from "react";
+import "../styles/AboutSection.css"
 
 const AboutSection: React.FC = () => {
     return (
@@ -17,10 +18,10 @@ const AboutSection: React.FC = () => {
 
                 {/* Texto */}
                 <div className="col-lg-7">
-                    <h2 className="text-start mb-2" style={{ color: "var(--naranja)" }}>
+                    <h2 className="text-start mb-2 h2-custom">
                         Quiénes Somos
                     </h2>
-                    <p className="fs-5 text-dark">
+                    <p className="p-custom">
                         En nuestra plataforma web, nos encargamos de <strong>conectar</strong>{" "}
                         a los usuarios que requieren{" "}
                         <strong>atención terapéutica</strong> con{" "}

@@ -1,0 +1,5 @@
+.h2-custom-need{
+    font-size: 48px !important;
+    color:var(--verde);
+    font-family: var(--fuente-secundaria);
+}

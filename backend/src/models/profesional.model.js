@@ -25,12 +25,12 @@ class Profesional {
     }
 
     const [existingMatriculaNacional] = await pool.execute(
-      `SELECT matricula_nacional FROM profesionales WHERE matricula_provincial = ?`,
+      `SELECT matricula_nacional FROM profesionales WHERE matricula_nacional = ?`,
       [matricula_nacional]
     );
 
     if (existingMatriculaNacional.length > 0) {
-      throw new Error("La matrícula provincial ya está registrada. Verifica los datos.");
+      throw new Error("La matrícula nacional ya está registrada. Verifica los datos.");
     }
 
     // Si el correo no existe, proceder con la inserción

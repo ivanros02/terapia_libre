@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "react-bootstrap";
-
+import "../../styles/DisponibilidadList.css"
 const url = import.meta.env.VITE_API_BASE_URL;
 
 interface Disponibilidad {
@@ -54,7 +54,7 @@ function DisponibilidadList({ onEdit, onAdd, fetchDisponibilidades }: Disponibil
             {/* Contenedor flexible para el título y botón */}
             <div className="row align-items-center mb-3">
                 <div className="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
-                    <h2 className="text-center text-md-start m-0">Disponibilidades</h2>
+                    <h2 className="text-center text-md-start m-0 titulo-config">Disponibilidades</h2>
                 </div>
                 <div className="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
                     <Button

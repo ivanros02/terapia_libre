@@ -10,11 +10,12 @@ const CustomButton: React.FC<ButtonProps> = ({ text, href }) => {
   return (
     <Link
       to={href} 
-      className="btn btn-lg fw-bold px-5 py-1 fs-6"
+      className="btn btn-lg fw-bold px-5 py-1"
       style={{
         backgroundColor: "var(--verde)",
         color: "white",
         borderRadius: "30px",
+        fontSize:"16px"
       }}
     >
       {text}

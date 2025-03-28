@@ -102,12 +102,12 @@ class Turno {
 
     static async obtenerProximoTurnoPaciente(id_usuario) {
         const [turnos] = await pool.execute(
-            `SELECT t.id_turno, p.nombre AS nombre_profesional, t.fecha_turno, t.hora_turno, t.meet_url
+            `SELECT t.id_turno, p.nombre AS nombre_profesional, t.fecha_turno, t.hora_turno, t.meet_url,t.id_profesional
             FROM turnos t
             JOIN profesionales p ON t.id_profesional = p.id_profesional
             WHERE t.id_usuario = ? 
-                AND CONCAT(t.fecha_turno, ' ', t.hora_turno) >= NOW()
-                AND t.estado IN ('Pendiente', 'Confirmado')
+                AND DATE(t.fecha_turno) = CURDATE()
+                AND t.estado IN ('Pendiente')
             ORDER BY t.fecha_turno ASC, t.hora_turno ASC
             LIMIT 1`,
             [id_usuario]

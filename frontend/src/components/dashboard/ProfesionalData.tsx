@@ -1,4 +1,5 @@
 import { Button } from "react-bootstrap";
+import "../../styles/DisponibilidadList.css"
 
 interface Profesional {
     id_profesional: number;
@@ -26,7 +27,7 @@ interface ProfesionalDataProps {
 function ProfesionalData({ profesional, onEdit }: ProfesionalDataProps) {
     return (
         <div className="container mt-4" style={{marginBottom:"80px"}}>
-            <h2>Datos del profesional</h2>
+            <h2 className="titulo-config">Datos del profesional</h2>
 
             {profesional ? (
                 <div className="card p-4 shadow-sm rounded bg-light">
