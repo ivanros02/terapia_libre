@@ -70,8 +70,7 @@ class Disponibilidad {
             `SELECT DATE_FORMAT(fecha_turno, '%Y-%m-%d') AS fecha_turno, 
                     TIME_FORMAT(hora_turno, '%H:%i:%s') AS hora_turno
              FROM turnos 
-             WHERE id_profesional = ? 
-             AND estado IN ('Pendiente', 'Confirmado')`,
+             WHERE id_profesional = ?`,
             [id_profesional]
         );
 

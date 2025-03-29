@@ -4,6 +4,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js"; // ✅ Importar PayPal
 import { SocketProvider } from "./context/SocketContext"; // ✅ Importar el SocketProvider
 import Home from "./pages/Home";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy"
 import Professionals from "./pages/Professionals";
 import Login from "./pages/Login";
 import FormProfessionals from "./pages/FormProfessionals";
@@ -31,11 +33,13 @@ const App: React.FC = () => {
     <HelmetProvider>
       <ToastContainer position="top-center" autoClose={3000} />
       {/* ✅ Agregamos el PayPalScriptProvider aquí */}
-      <PayPalScriptProvider options={{ clientId: "ASuvwaL7zuIKfyr5_OppnnQGrKqyvWDPkSn2BSHYTSR8wHbxOQPZE1JzVQ2Oj8ECpJSJ2XF-0ADkTk4l" }}>
+      <PayPalScriptProvider options={{ clientId: "AYt15XdVwmjaDOGe9TqYp8WvqPowxW3WR43dAmAgdJyZosI29FCPEdUklGJyBnZJCS2w1xvGxCsQd6qI" }}>
         <SocketProvider> {/* ✅ Aquí envolvemos todo con el SocketProvider */}
           <Router>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/terminos-y-condiciones" element={<Terms />} />
+              <Route path="/privacidad" element={<Privacy />} />
               <Route path="/professionals" element={<Professionals />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

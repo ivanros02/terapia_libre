@@ -7,7 +7,14 @@ import { Link } from "react-router-dom"; // 👈 Importamos Link
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate(); // 👈 Hook para redirigir
-  const socket = useSocket();
+  let socket;
+  try {
+    socket = useSocket();
+  } catch (error) {
+    console.warn("⚠️ Sidebar cargado antes de que el SocketProvider esté listo.");
+    socket = null;
+  }
+
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const userId = localStorage.getItem("id");
   const esProfesional = localStorage.getItem("esProfesional") === "true";

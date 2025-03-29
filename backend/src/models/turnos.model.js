@@ -23,7 +23,7 @@ class Turno {
             FROM turnos 
             LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
             LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
-            WHERE id_profesional = ? 
+            WHERE turnos.id_profesional = ? 
             ORDER BY fecha_turno, hora_turno`,
             [id_profesional]
         );
