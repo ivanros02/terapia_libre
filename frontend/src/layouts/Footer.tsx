@@ -22,7 +22,7 @@ const Footer = () => {
                             </div>
 
                             {/* Descripción debajo */}
-                            <p className="text-light mt-2" style={{ maxWidth: "70%", lineHeight: "1.6", fontSize:"16px" }}>
+                            <p className="text-light mt-2" style={{ maxWidth: "70%", lineHeight: "1.6", fontSize: "16px" }}>
                                 Es una plataforma innovadora que te ofrece la libertad
                                 de elegir al profesional de salud mental ideal para ti.
                                 Con una amplia variedad de expertos, facilitamos la
@@ -72,6 +72,16 @@ const Footer = () => {
                                 Acceder como administrador
                             </a>
                         </div>
+                    </div>
+
+                    {/* Línea Divisoria */}
+                    <hr className="border-light my-4" />
+
+                    {/* Sección Derechos Reservados */}
+                    <div className="text-center text-light mt-3" style={{ fontSize: "14px" }}>
+                        © {new Date().getFullYear()} Terapia Libre. Todos los derechos reservados.
+                        <a href="/terminos-y-condiciones" className="text-light fw-semibold mx-2">Términos y condiciones</a> |
+                        <a href="/privacidad" className="text-light fw-semibold mx-2">Políticas de privacidad</a>
                     </div>
                 </div>
             </div>

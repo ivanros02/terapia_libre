@@ -195,7 +195,7 @@ class Turno {
 
     static async obtenerTerapeutaUsuario(id_usuario) {
         const [rows] = await pool.execute(
-            `SELECT p.nombre, p.correo_electronico, t.fecha_turno AS ultimaConsulta, p.valor, p.valor_internacional
+            `SELECT p.nombre, p.correo_electronico, t.fecha_turno AS ultimaConsulta, p.valor, p.valor_internacional, p.id_profesional
              FROM turnos t
              JOIN profesionales p ON t.id_profesional = p.id_profesional
              WHERE t.id_usuario = ?

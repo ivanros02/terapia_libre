@@ -5,7 +5,7 @@ import NeedTherapy from "../components/NeedTherapy";
 import BenefitsSection from "../components/BenefitsSection";
 import Footer from "../layouts/Footer";
 import Head from "../layouts/Header";
-
+import LegalPopup from "../layouts/LegalPopup";
 const Home: React.FC = () => {
   const needTherapyRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +30,7 @@ const Home: React.FC = () => {
       </div>
       <BenefitsSection />
       <Footer />
+      <LegalPopup/>
     </>
   );
 };

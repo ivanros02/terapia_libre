@@ -57,8 +57,10 @@
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         grid-template-rows: repeat(5, 1fr) !important;
-        gap: 8px    !important;
+        gap: 8px !important;
         overflow: scroll !important;
+
+        height: 70vh !important;
     }
 
     .div2 {
@@ -66,7 +68,7 @@
     }
 
     .div3 {
-        grid-column: span 2 / span 2 !important; 
+        grid-column: span 2 / span 2 !important;
         grid-row-start: 2 !important;
     }
 
@@ -92,5 +94,4 @@
         grid-column-start: 1 !important;
         grid-row-start: 3 !important;
     }
-
 }

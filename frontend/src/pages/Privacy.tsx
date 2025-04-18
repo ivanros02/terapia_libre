@@ -4,7 +4,6 @@ import Head from "../layouts/Header";
 const Privacy: React.FC = () => {
 
     const menuLinks = [
-        { name: "¿Necesito terapia?", href: "#necesito-terapia" },
         { name: "Buscar profesional", href: "/professionals" },
     ];
 

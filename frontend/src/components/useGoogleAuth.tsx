@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { gapi } from "gapi-script";
 
-const CLIENT_ID = "1005376109174-8j00pst6p2d1g0a5o330brpavnnbc731.apps.googleusercontent.com";
+const CLIENT_ID = "1046358666022-7p6r5abv40lu5b3c7inq67vvr2upjfuk.apps.googleusercontent.com";
 export const SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events";
 
 export const useGoogleAuth = () => {

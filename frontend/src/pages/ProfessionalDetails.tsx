@@ -4,6 +4,7 @@ import axios from "axios";
 import ProfessionalDetailsComponent from "../components/ProfessionalDetailsComponent"; // Importar el nuevo componente
 import Footer from "../layouts/Footer";
 import Head from "../layouts/Header";
+import LegalPopup from "../layouts/LegalPopup";
 
 const url = import.meta.env.VITE_API_BASE_URL;
 
@@ -55,6 +56,7 @@ const ProfessionalDetails: React.FC = () => {
             </main>
 
             <Footer />
+            <LegalPopup/>
         </div>
     );
 };

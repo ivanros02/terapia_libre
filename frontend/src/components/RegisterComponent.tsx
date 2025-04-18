@@ -55,8 +55,8 @@ const RegisterComponent: React.FC = () => {
           {/* Formulario */}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Nombre</Form.Label>
-              <Form.Control type="text" name="nombre" placeholder="Ingresá tu nombre" onChange={handleChange} required />
+              <Form.Label>Nombre y Apellido</Form.Label>
+              <Form.Control type="text" name="nombre" placeholder="Ingresá tu nombre y apellido" onChange={handleChange} required />
             </Form.Group>
 
             <Form.Group className="mb-3">

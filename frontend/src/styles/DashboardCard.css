@@ -2,9 +2,12 @@
 /* 🔹 Ajuste para hacer la tarjeta más ancha */
 .card-responsive {
     background: #567C6F;
-    max-width: 100%; /* 🔹 Aumentar el ancho */
-    min-height: 300px; /* 🔹 Aumentar la altura mínima */
-    padding: 2rem; /* 🔹 Más espacio interno */
+    max-width: 100%;
+    /* 🔹 Aumentar el ancho */
+    min-height: 300px;
+    /* 🔹 Aumentar la altura mínima */
+    padding: 2rem;
+    /* 🔹 Más espacio interno */
 }
 
 /* 🔹 Ajuste para hacer que el contenedor se expanda */
@@ -13,7 +16,7 @@
     max-width: 100%;
 }
 
-.titulo-card{
+.titulo-card {
     font-size: 48px !important;
 }
 
@@ -22,12 +25,15 @@
 .card-interna {
     background-color: transparent;
     max-width: 40%;
-    border: 1px solid #ccc !important; /* 👈 Borde gris */
+    border: 1px solid #ccc !important;
+    /* 👈 Borde gris */
 }
 
 .extra-padding-margin {
-    padding: 4rem !important;  /* 🔹 Aumenta el padding cuando no hay la tarjeta pequeña */
-    width: calc(100% - 6rem); /* 🔹 Mantiene proporción sin exceder el contenedor */
+    padding: 4rem !important;
+    /* 🔹 Aumenta el padding cuando no hay la tarjeta pequeña */
+    width: calc(100% - 6rem);
+    /* 🔹 Mantiene proporción sin exceder el contenedor */
 }
 
 
@@ -65,40 +71,52 @@
 /* 🔥 Responsividad en móviles */
 @media (max-width: 768px) {
     .card-responsive {
-        max-width: 100%;
-        padding: 0.5rem; /* 🔹 Reducimos padding */
-        min-height: 175px; /* 🔹 Limitar altura mínima */
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0.8rem 1rem !important;
+        min-height: 140px !important;
+        width: 100% !important;
+        /* antes estaba en 95% */
+        max-width: 100% !important;
     }
 
-    /* 🔹 Ajustamos la tarjeta interna para que sea más pequeña */
     .card-interna {
-        max-width: 50%; /* 🔹 Reduce el tamaño al 50% del ancho */
-        padding: 0.5rem; /* 🔹 Reduce padding */
-        text-align: left; /* 🔹 Mantiene alineación del texto */
+        max-width: 65% !important;
+        padding: 0 !important;
+        border: none !important;
     }
 
     .card-interna h5 {
-        font-size: 0.9rem; /* 🔹 Reduce el tamaño del título */
+        font-size: 0.85rem !important;
+        white-space: nowrap !important;
+        /* 🔹 Fuerza que "Tu próxima sesión" esté en una línea */
     }
 
     .card-interna p {
-        font-size: 0.75rem; /* 🔹 Reduce tamaño de texto */
+        font-size: 0.7rem !important;
+        margin-bottom: 0.2rem !important;
     }
 
-    /* 🔹 Ajustamos la imagen para que sea más pequeña */
     .imagen-decorativa {
-        width: 155px !important; /* 🔹 Reduce el tamaño */
-        margin-top: 2rem;
+        position: static !important;
+        width: 120px !important;
+        height: auto;
+        margin: 0 !important;
     }
 }
+
 
 
 /* 🔥 Responsividad en notebooks (pantallas medianas de 1280px a 1440px) */
 @media (max-width: 1440px) {
     .imagen-decorativa {
-        width: 300px; /* 🔹 Reduce ligeramente el tamaño */
-        top: -30px;  /* 🔹 Ajusta la posición */
-        right: -10px; /* 🔹 Evita que se desplace demasiado */
+        width: 300px;
+        /* 🔹 Reduce ligeramente el tamaño */
+        top: -30px;
+        /* 🔹 Ajusta la posición */
+        right: -10px;
+        /* 🔹 Evita que se desplace demasiado */
     }
 }
-

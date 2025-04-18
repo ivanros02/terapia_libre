@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Modal } from "react-bootstrap";
 import axios from "axios";
 import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
@@ -7,7 +7,7 @@ import DashboardCard from "../components/dashboard/DashboardCard";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
 import HistorialSesiones from "../components/dashboard/HistorialSesiones";
 import { useNavigate } from "react-router-dom";
-
+import CalendarAvailability from "../components/CalendarAvailability";
 import "../styles/DashboardProfesional.css"
 const url = import.meta.env.VITE_API_BASE_URL;
 
@@ -15,6 +15,7 @@ interface TurnoHoy {
   nombre_profesional: string;
   hora_turno: string;
   meet_url: string;
+  id_profesional: number;
 }
 
 interface Turno {
@@ -22,6 +23,15 @@ interface Turno {
   paciente: string;
 }
 
+type Terapeuta = {
+  id_profesional : number;
+  nombre: string;
+  correo_electronico: string;
+  ultimaConsulta: string;
+  valorSesion: string;
+  especialidad: string;
+  descripcion: string;
+};
 
 
 const DashboardUsuario = () => {
@@ -32,9 +42,13 @@ const DashboardUsuario = () => {
   const [, setError] = useState<string | null>(null);
   const [eventos, setEventos] = useState<string[]>([]);
   const [sesiones, setSesiones] = useState([]);
-  const [terapeuta, setTerapeuta] = useState(null);
+  const [terapeuta, setTerapeuta] = useState<Terapeuta | null>(null);
   const userId = localStorage.getItem("id"); // 🔹 Obtener el ID almacenado en localStorage
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+  const [showModal, setShowModal] = useState(false);
+
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
@@ -52,21 +66,35 @@ const DashboardUsuario = () => {
 
         const terapeutaResponse = await axios.get(`${url}/api/turnos/usuario/${userId}/terapeuta`);
         const terapeutaData = terapeutaResponse.data;
-
+        
         // 🔹 Transformar `ultimaConsulta` a un formato legible
+        if (!terapeutaData) {
+          setTerapeuta({
+            id_profesional: 0,
+            nombre: "No disponible",
+            correo_electronico: "No disponible",
+            ultimaConsulta: "No disponible",
+            valorSesion: "No disponible",
+            especialidad: "No disponible",
+            descripcion: "No disponible"
+          });
+          return;
+        }
+
         const ultimaConsultaFormateada = terapeutaData.ultimaConsulta
           ? new Date(terapeutaData.ultimaConsulta).toLocaleDateString("es-ES", {
             weekday: "long",
             day: "numeric",
             month: "long",
           })
-          : "No disponible"; // Si no hay datos, mostrar "No disponible"
+          : "No disponible";
 
         setTerapeuta({
           ...terapeutaData,
-          ultimaConsulta: ultimaConsultaFormateada, // 🔹 Asignar la fecha formateada
+          ultimaConsulta: ultimaConsultaFormateada,
           valorSesion: terapeutaData.valor + "/ USD" + terapeutaData.valor_internacional
         });
+
 
       } catch (error) {
         console.error("Error al obtener datos:", error);
@@ -108,7 +136,7 @@ const DashboardUsuario = () => {
         // 🔹 Obtener el próximo turno más cercano
         const turnoResponse = await axios.get(`${url}/api/turnos/${id}/turnos-hoy-paciente`);
         const turnoMasCercano = turnoResponse.data || null; // ✅ Manejar el caso `null`
-
+      
         setTurnoHoy(turnoMasCercano);
 
         // 🔹 Obtener turnos del profesional
@@ -147,7 +175,7 @@ const DashboardUsuario = () => {
   }, []);
 
   if (loading) return <div>Cargando...</div>;
-
+  
   return (
     <div className="parent">
       {!isMobile && <div className="div1"><Sidebar /></div>}
@@ -175,7 +203,7 @@ const DashboardUsuario = () => {
               style={{ backgroundColor: "var(--naranja)", display: "flex", flexDirection: "row" }}
             >
               <img src="/sidebar/calendar.png" alt="Calendar" width="24" height="24" />
-              <span className="text-white">AGENDAR NUEVO TURNO</span>
+              <span className="text-white" onClick={handleShowModal}>AGENDAR NUEVO TURNO</span>
             </Card>
           </div>
 
@@ -210,9 +238,21 @@ const DashboardUsuario = () => {
           <HistorialSesiones sesiones={sesiones} terapeuta={terapeuta} onCambiarTerapeuta={() => alert("Cambiar terapeuta")} />
         )}
       </div>
+
       {!isMobile && <div className="div5 calendarioAncho">
         <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />
       </div>}
+
+
+      {/* Modal con CalendarAvailability */}
+      <Modal show={showModal} onHide={handleCloseModal} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Agendar Turno</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <CalendarAvailability id_profesional={terapeuta?.id_profesional ?? 0} showModal={showModal} />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

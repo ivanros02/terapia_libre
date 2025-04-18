@@ -129,8 +129,7 @@ const DashboardProfesional = () => {
           <div className="div8" onClick={() => navigate('/dashboard/calendario')} style={{ cursor: "pointer" }}>
             <Card
               className="shadow-lg border-0 rounded-4 p-3 calendario-card d-flex align-items-center justify-content-center gap-2"
-              style={{  display: "flex", flexDirection: "row" }}
-            >
+              style={{  display: "flex", flexDirection: "row",width: "99%", maxWidth: "99%" }}>
               <img src="/sidebar/calendar.png" alt="Calendar" width="24" height="24" />
               <span style={{fontWeight:"bold", fontSize:"14px", color:"var(--verde)"}}>CALENDARIO</span>
             </Card>

@@ -4,7 +4,7 @@ import Footer from "../layouts/Footer";
 import ProfessionalList from "../components/ProfessionalList";
 import FilterBar from "../components/FilterBar";
 import "../styles/Professionals.css";
-
+import LegalPopup from "../layouts/LegalPopup";
 const Professionals: React.FC = () => {
     const menuLinks = [
         { name: "¿Necesito terapia?", href: "/necesito-terapia" },
@@ -52,6 +52,7 @@ const Professionals: React.FC = () => {
                 />
             </main >
             <Footer />
+            <LegalPopup/>
         </>
     );
 };
