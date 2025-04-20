@@ -180,15 +180,15 @@ class Profesional {
 
     // Obtener especialidades asociadas
     const [especialidades] = await pool.execute(
-      `SELECT e.nombre 
+      `SELECT e.id_especialidad, e.nombre
        FROM especialidades e
        JOIN profesional_especialidad pe ON e.id_especialidad = pe.id_especialidad
        WHERE pe.id_profesional = ?`,
       [id_profesional]
     );
 
-    // Agregar especialidades como un array de strings al objeto profesional
-    profesional.especialidades = especialidades.map(e => e.nombre);
+    // Nuevo formato: array de objetos
+    profesional.especialidades = especialidades; // [{ id_especialidad: 1, nombre: 'Psicología' }, ...]
 
     return profesional; // Ahora incluye todos los datos y especialidades
   }

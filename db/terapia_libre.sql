@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-03-2025 a las 17:15:17
+-- Tiempo de generación: 20-04-2025 a las 01:33:17
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -55,14 +55,6 @@ CREATE TABLE `chats` (
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `chats`
---
-
-INSERT INTO `chats` (`id_chat`, `id_profesional`, `id_usuario`, `creado_en`) VALUES
-(1, 1001, 5, '2025-03-11 21:14:36'),
-(9, 1001, 6, '2025-03-14 13:50:45');
-
 -- --------------------------------------------------------
 
 --
@@ -85,7 +77,8 @@ CREATE TABLE `disponibilidad` (
 INSERT INTO `disponibilidad` (`id_disponibilidad`, `id_profesional`, `dia_semana`, `hora_inicio`, `hora_fin`, `creado_en`) VALUES
 (10, 1, 'Lunes', '08:00:00', '17:00:00', '2025-03-13 14:37:18'),
 (11, 1, 'Lunes', '17:00:00', '19:00:00', '2025-03-17 13:51:48'),
-(12, 1001, 'Lunes', '08:00:00', '21:00:00', '2025-03-20 14:27:01');
+(12, 1001, 'Lunes', '08:00:00', '21:00:00', '2025-03-20 14:27:01'),
+(18, 1007, 'Lunes', '08:00:00', '17:00:00', '2025-04-19 15:35:56');
 
 -- --------------------------------------------------------
 
@@ -120,23 +113,6 @@ CREATE TABLE `mensajes` (
   `fecha_envio` timestamp NOT NULL DEFAULT current_timestamp(),
   `leido` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `mensajes`
---
-
-INSERT INTO `mensajes` (`id_mensaje`, `id_chat`, `id_remitente`, `mensaje`, `fecha_envio`, `leido`) VALUES
-(146, 1, 1001, 'Hola soy el profesional', '2025-03-14 13:59:51', 0),
-(147, 1, 5, 'Hola soy el paciente', '2025-03-14 13:59:58', 0),
-(148, 1, 5, 'Hola!', '2025-03-18 18:50:28', 0),
-(149, 1, 1001, 'Hola ivan!', '2025-03-20 23:53:16', 0),
-(150, 1, 1001, 'Holaa', '2025-03-20 23:56:27', 0),
-(151, 1, 1001, 'hh', '2025-03-20 23:56:48', 0),
-(152, 1, 1001, 'hola ivan', '2025-03-21 00:07:35', 0),
-(153, 1, 5, 'hola!', '2025-03-21 00:07:42', 0),
-(154, 1, 1001, 'hola', '2025-03-21 00:28:03', 0),
-(155, 1, 1001, 'hola', '2025-03-21 00:41:26', 0),
-(156, 1, 1001, 'holi', '2025-03-21 00:41:45', 0);
 
 -- --------------------------------------------------------
 
@@ -174,7 +150,6 @@ CREATE TABLE `pagos` (
 --
 
 INSERT INTO `pagos` (`id_pago`, `id_turno`, `monto`, `metodo_pago`, `estado`, `id_transaccion`, `fecha_pago`) VALUES
-(4, 7, 877.60, 'PayPal', 'Pagado', '1PK161811M774822V', '2025-03-17 22:05:25'),
 (6, 9, 1698.37, 'MercadoPago', 'Pagado', '105599854718', '2025-03-18 18:25:20'),
 (7, 10, 1698.37, 'PayPal', 'Pagado', '0WA90743X9421030Y', '2025-03-18 20:59:54'),
 (8, 11, 1.00, 'PayPal', 'Pagado', '2RS788138M403245L', '2025-03-21 02:26:37');
@@ -1221,7 +1196,8 @@ INSERT INTO `profesionales` (`id_profesional`, `nombre`, `titulo_universitario`,
 (1001, 'Wally', 'Lic. test', '555', '123', 'aaa', '1139114579', '48 horas', 'infowss@gmail.com', '$2b$10$2NxPsb/89n9SMRoiQ0zHR.2RKYkiJUI4CyE4RBzB76/7KQ3hMnut6', 'https://drive.usercontent.google.com/download?id=12WufJvs-7S_bvSQMedGnrAYoqCGs2XlC&export=view&authuser=0', 1.00, 5.00, '2025-03-13 20:16:23', 1, NULL, NULL),
 (1002, 'test ', 'Lic. test', '333', '222', 'assdasdasdasd', '1139114579', '24 horas', 'testprofesional@gmail.com', '$2b$10$IFMCt0oc8kVSLqrdRkOoSeM0mxB09AQtCOZ2EWjOYeogiHIUsxaV2', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2tYdAJt1rd9BQN2tnZxTANSDYTaxgix75Kg&s', 123.00, 345.00, '2025-03-17 13:07:05', 1, NULL, NULL),
 (1004, 'Ivan Agustin Rosendo', 'Lic. test', '666', '555', 'asdasdasd', '1139114579', '24 horas', 'aaa@gmail.com', '$2b$10$HgOqAG/q1urRhr3x7Ypax.e8RSj6g57eLlmp/uTm7qvF0G4j5zcCq', 'https://drive.usercontent.google.com/download?id=12WufJvs-7S_bvSQMedGnrAYoqCGs2XlC&export=view&authuser=0', 123.00, 345.00, '2025-03-21 00:54:28', 1, NULL, NULL),
-(1006, 'test drive', 'Lic. test', '435', '666', 'a', '123', '24 horas', 'testdrive@gmail.com', '$2b$10$aGAAwOMccR5V4ayw3bOz3eY.4mlxW8ZPvS3UWw2P7N0/HyIlVvDo.', 'https://drive.google.com/file/d/12WufJvs-7S_bvSQMedGnrAYoqCGs2XlC/view?usp=drive_link', 12.00, 11.00, '2025-03-25 12:23:32', 0, NULL, NULL);
+(1006, 'test drive', 'Lic. test', '435', '666', 'a', '123', '24 horas', 'testdrive@gmail.com', '$2b$10$aGAAwOMccR5V4ayw3bOz3eY.4mlxW8ZPvS3UWw2P7N0/HyIlVvDo.', 'https://drive.google.com/file/d/12WufJvs-7S_bvSQMedGnrAYoqCGs2XlC/view?usp=drive_link', 12.00, 11.00, '2025-03-25 15:23:32', 0, NULL, NULL),
+(1007, 'Ivan', 'Lic. test', '678', '567', 'aaa', '1139114579', '24 horas', 'ivanrosendo1102@gmail.com', '$2b$10$rWRCunZY7FBjfbAOMDDkHON0jslVRIUkbUW9QXWlb0tD7l.o3is0K', 'aaa', 12.00, 20.00, '2025-03-29 14:35:06', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2746,7 +2722,10 @@ INSERT INTO `profesional_especialidad` (`id_profesional`, `id_especialidad`) VAL
 (1000, 3),
 (1002, 3),
 (1004, 2),
-(1006, 2);
+(1006, 2),
+(1006, 3),
+(1007, 2),
+(1007, 3);
 
 -- --------------------------------------------------------
 
@@ -2774,10 +2753,9 @@ CREATE TABLE `turnos` (
 --
 
 INSERT INTO `turnos` (`id_turno`, `id_profesional`, `id_usuario`, `fecha_turno`, `hora_turno`, `estado`, `motivo_cancelacion`, `creado_en`, `meet_url`, `meet_creado_en`, `google_event_id_paciente`, `google_event_id_profesional`) VALUES
-(7, 1001, 7, '2025-04-30', '08:00:00', 'Pendiente', NULL, '2025-03-17 22:05:25', NULL, NULL, '8mcbksv9tqeu4qm3agoio74ho8', NULL),
 (9, 1001, 5, '2025-03-27', '08:00:00', 'Pendiente', NULL, '2025-03-18 18:25:20', NULL, NULL, NULL, NULL),
 (10, 193, 5, '2025-04-07', '10:00:00', 'Pendiente', NULL, '2025-03-18 20:59:54', NULL, NULL, NULL, NULL),
-(11, 1001, 5, '2025-04-01', '08:00:00', 'Pendiente', NULL, '2025-03-21 02:26:37', NULL, NULL, NULL, NULL);
+(11, 1001, 8, '2025-04-01', '08:00:00', 'Pendiente', NULL, '2025-03-21 02:26:37', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2803,7 +2781,7 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`id_usuario`, `correo_electronico`, `contrasena_hash`, `created_at`, `nombre`, `id_google`, `reset_token`, `reset_token_expira`) VALUES
 (5, 'test123@gmail.com', '$2b$10$Mvoubjt0/E79M9P2XUetiuS0lAVLAJFnpPCwnfTMzBgk0nL0i9K4K', '2025-03-11 20:11:29', 'Ivan', NULL, NULL, NULL),
 (6, 'chat@gmail.com', '$2b$10$EO7ODv1Nxr5FpTD.s.9AiOR.Y4wFcTaNWD/ZxxdkY.xHVFrN6vL4i', '2025-03-12 19:20:46', 'prueba test chat', NULL, NULL, NULL),
-(7, 'paginaswebs2002@gmail.com', NULL, '2025-03-17 19:19:17', 'paginas webs', '115174563388842750337', NULL, NULL);
+(8, 'paginaswebs2002@gmail.com', NULL, '2025-03-31 17:06:26', 'paginas webs', '115174563388842750337', NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -2907,13 +2885,13 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT de la tabla `chats`
 --
 ALTER TABLE `chats`
-  MODIFY `id_chat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_chat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `disponibilidad`
 --
 ALTER TABLE `disponibilidad`
-  MODIFY `id_disponibilidad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_disponibilidad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `especialidades`
@@ -2925,7 +2903,7 @@ ALTER TABLE `especialidades`
 -- AUTO_INCREMENT de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=157;
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=159;
 
 --
 -- AUTO_INCREMENT de la tabla `notificaciones`
@@ -2937,25 +2915,25 @@ ALTER TABLE `notificaciones`
 -- AUTO_INCREMENT de la tabla `pagos`
 --
 ALTER TABLE `pagos`
-  MODIFY `id_pago` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_pago` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `profesionales`
 --
 ALTER TABLE `profesionales`
-  MODIFY `id_profesional` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1007;
+  MODIFY `id_profesional` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1008;
 
 --
 -- AUTO_INCREMENT de la tabla `turnos`
 --
 ALTER TABLE `turnos`
-  MODIFY `id_turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_turno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Restricciones para tablas volcadas

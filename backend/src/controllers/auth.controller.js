@@ -197,7 +197,7 @@ exports.requestPasswordReset = async (req, res) => {
       const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
 
       await transporter.sendMail({
-          from: "no-reply@tuapp.com",
+          from: "ivanrosendo1102@gmail.com",
           to: correo_electronico,
           subject: "Recuperación de contraseña",
           html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>

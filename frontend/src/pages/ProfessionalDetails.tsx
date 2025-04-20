@@ -12,7 +12,10 @@ interface Professional {
     id_profesional: number;
     nombre: string;
     foto_perfil_url: string;
-    especialidades: string[];
+    especialidades: {
+        id_especialidad: number;
+        nombre: string;
+    }[];
     disponibilidad: string;
     valor: number;
     descripcion: string;

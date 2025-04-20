@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 const url = import.meta.env.VITE_API_BASE_URL;
 
@@ -43,21 +44,27 @@ function DisponibilidadForm({ show, handleClose, disponibilidad, onSave, fetchDi
             alert("No se encontró el ID del profesional.");
             return;
         }
+
         const dataToSend = { ...formData, id_profesional: Number(idProfesional) };
 
         try {
             if (disponibilidad) {
                 await axios.put(`${url}/disponibilidad`, dataToSend);
+                toast.success("✅ Disponibilidad actualizada correctamente");
             } else {
                 await axios.post(`${url}/disponibilidad`, dataToSend);
+                toast.success("✅ Disponibilidad agregada correctamente");
             }
+
             fetchDisponibilidades();
             onSave();
             handleClose();
         } catch (error) {
             console.error("Error al guardar disponibilidad", error);
+            toast.error("❌ Error al guardar disponibilidad");
         }
     };
+
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -82,7 +89,7 @@ function DisponibilidadForm({ show, handleClose, disponibilidad, onSave, fetchDi
                         <label className="form-label">Hora fin:</label>
                         <input type="time" name="hora_fin" value={formData.hora_fin} onChange={handleChange} className="form-control" />
                     </div>
-                    <Button type="submit" style={{backgroundColor:"var(--naranja)",borderColor:"var(--naranja)",paddingLeft:"20px",paddingRight:"20px",color:"white"}} variant="success">Guardar</Button>
+                    <Button type="submit" style={{ backgroundColor: "var(--naranja)", borderColor: "var(--naranja)", paddingLeft: "20px", paddingRight: "20px", color: "white" }} variant="success">Guardar</Button>
                 </form>
             </Modal.Body>
         </Modal>

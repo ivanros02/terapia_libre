@@ -1,50 +1,56 @@
-import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // Asegúrate de instalarlo con `npm install jwt-decode`
 import { useNavigate } from "react-router-dom";
+
 const url = import.meta.env.VITE_API_BASE_URL;
 
 const LoginGoogle = () => {
   const navigate = useNavigate();
 
-  const handleSuccess = async (response: CredentialResponse) => {
-    if (!response.credential) {
-      console.error("No se recibió credencial de Google");
-      return;
-    }
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        // Obtener los datos del usuario desde Google usando el access_token
+        const { access_token } = tokenResponse;
+        const profile = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        });
 
-    const { email, name, sub }: any = jwtDecode(response.credential);
+        const { email, name, sub } = profile.data;
 
-    try {
-      const res = await axios.post(`${url}/api/auth/google-login`, {
-        id_google: sub,
-        correo_electronico: email,
-        nombre: name,
-      });
+        const res = await axios.post(`${url}/api/auth/google-login`, {
+          id_google: sub,
+          correo_electronico: email,
+          nombre: name,
+        });
 
-      // Guardar el token y el ID en el localStorage
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("id", res.data.id);
+        // Guardar el token de tu backend
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("id", res.data.id);
 
-      // Redirigir a la URL previa si existe
-      const prevPath = localStorage.getItem("prevPath") || null;
-      if (prevPath) {
-        localStorage.removeItem("prevPath"); // Limpiar la variable
+        // ✅ Guardar el access_token de Google para luego revocar
+        localStorage.setItem("google_token", access_token);
+        localStorage.setItem("isGoogleLogin", "true");
+
+        // Redirigir
+        const prevPath = localStorage.getItem("prevPath") || "/dashboard/usuario";
+        localStorage.removeItem("prevPath");
         navigate(prevPath);
-      } else {
-        navigate("/dashboard/usuario");
+      } catch (error) {
+        console.error("Error en login con Google:", error);
       }
-    } catch (error) {
-      console.error("Error en login con Google:", error);
-    }
-  };
-
+    },
+    onError: () => console.log("Login de Google falló"),
+    scope: "openid email profile", // asegurate que estos scopes estén
+    flow: "implicit", // o "auth-code" si querés intercambiar tokens (más seguro)
+  });
 
   return (
-    <GoogleLogin
-      onSuccess={handleSuccess}
-      onError={() => console.log("Error en login con Google")}
-    />
+    <button className="btn btn-outline-dark" onClick={() => login()}>
+      Iniciar sesión con Google
+    </button>
   );
 };
 

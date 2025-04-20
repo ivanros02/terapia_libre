@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Button, Form } from "react-bootstrap";
 import EspecialidadSelectEditable from "./EspecialidadSelectEditable";
+import { toast } from 'react-toastify';
 
 interface Profesional {
     id_profesional: number;
@@ -17,7 +18,10 @@ interface Profesional {
     valor: number;
     valor_internacional: number;
     creado_en: string;
-    especialidades: number[];
+    especialidades: {
+        id_especialidad: number;
+        nombre: string;
+    }[];
 }
 
 const url = import.meta.env.VITE_API_BASE_URL;
@@ -49,6 +53,7 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
     });
 
     const [, setEspecialidadesDisponibles] = useState<{ id_especialidad: number; nombre: string }[]>([]);
+
     const [selectedEspecialidades, setSelectedEspecialidades] = useState<number[]>([]);
 
     // 🔹 Cargar especialidades disponibles al montar el componente
@@ -69,19 +74,17 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
     // 🔹 Cargar datos del profesional cuando el modal se abre
     useEffect(() => {
         if (profesional && show) {
-            console.log("✅ Cargando datos del profesional:", profesional);
+            const especialidadesIDs = profesional.especialidades.map(e => e.id_especialidad);
 
-            // Si no hay especialidades, inicializarlo con un array vacío
-            const especialidadesIDs = profesional.especialidades?.length ? profesional.especialidades : [];
-
-            setFormData({
-                ...profesional,
-                especialidades: especialidadesIDs
-            });
-
+            setFormData(profesional); // ✅
             setSelectedEspecialidades(especialidadesIDs);
+
         }
     }, [profesional, show]);
+
+
+
+
 
     // 🔹 Manejo de cambios en el formulario
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -95,20 +98,22 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            console.log("✅ Enviando actualización:", formData);
-
             await axios.put(`${url}/api/profesionales/${profesional?.id_profesional}`, {
                 ...formData,
                 especialidades: selectedEspecialidades.map(Number)
             });
+
+            toast.success("✅ Profesional actualizado correctamente");
 
             onSave();
             fetchProfesionalData();
             handleClose();
         } catch (error) {
             console.error("❌ Error al actualizar datos del profesional", error);
+            toast.error("❌ Error al actualizar profesional");
         }
     };
+
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -128,6 +133,35 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                     <Form.Group className="mb-3">
                         <Form.Label>Matrícula Nacional</Form.Label>
                         <Form.Control type="text" name="matricula_nacional" value={formData.matricula_nacional} onChange={handleChange} />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Matrícula Provincial</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="matricula_provincial"
+                            value={formData.matricula_provincial ?? ""}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Valor</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="valor"
+                            value={formData.valor}
+                            onChange={handleChange}
+                            step="0.01"
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Valor Internacional</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="valor_internacional"
+                            value={formData.valor_internacional}
+                            onChange={handleChange}
+                            step="0.01"
+                        />
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Descripción</Form.Label>
@@ -152,7 +186,6 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                             selectedEspecialidades={selectedEspecialidades}
                             onChange={(selected) => {
                                 setSelectedEspecialidades(selected);
-                                setFormData(prev => ({ ...prev, especialidades: selected }));
                             }}
                         />
                     </Form.Group>

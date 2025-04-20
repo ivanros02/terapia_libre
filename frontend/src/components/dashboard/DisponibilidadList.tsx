@@ -3,6 +3,7 @@ import axios from "axios";
 import { Button } from "react-bootstrap";
 import "../../styles/DisponibilidadList.css"
 const url = import.meta.env.VITE_API_BASE_URL;
+import { toast } from "react-toastify";
 
 interface Disponibilidad {
     id_disponibilidad: number;
@@ -43,11 +44,16 @@ function DisponibilidadList({ onEdit, onAdd, fetchDisponibilidades }: Disponibil
             await axios.delete(`${url}/disponibilidad`, {
                 data: { id_disponibilidad: id, id_profesional: idProfesional }
             });
+
+            toast.success("✅ Disponibilidad eliminada correctamente");
+
             await obtenerDisponibilidades();
         } catch (error) {
             console.error("Error al eliminar disponibilidad", error);
+            toast.error("❌ Error al eliminar la disponibilidad");
         }
     };
+
 
     return (
         <div className="container mt-4">

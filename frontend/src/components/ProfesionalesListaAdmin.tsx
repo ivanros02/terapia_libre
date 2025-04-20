@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import axios from "axios";
-
+import ProfesionalForm from "../components/dashboard/ProfesionalForm";
 const url = import.meta.env.VITE_API_BASE_URL;
+import { BsPencilSquare } from "react-icons/bs";
 
 interface Profesional {
   id_profesional: number;
@@ -14,8 +15,41 @@ interface Profesional {
   foto_perfil_url: string; // 🔹 Agregamos la URL de la imagen
 }
 
+interface ProfesionalCompleto {
+  id_profesional: number;
+  nombre: string;
+  titulo_universitario: string;
+  matricula_nacional: string;
+  matricula_provincial?: string | null;
+  descripcion?: string | null;
+  telefono?: string | null;
+  disponibilidad: "24 horas" | "48 horas" | "72 horas" | "96 horas";
+  correo_electronico: string;
+  foto_perfil_url?: string | null;
+  valor: number;
+  valor_internacional: number;
+  creado_en: string;
+  especialidades: {
+    id_especialidad: number;
+    nombre: string;
+  }[];
+}
+
+
 const ProfesionalesListaAdmin = () => {
   const [profesionales, setProfesionales] = useState<Profesional[]>([]);
+  const [editingProfesional, setEditingProfesional] = useState<ProfesionalCompleto | null>(null);
+  const [showModalEditar, setShowModalEditar] = useState(false);
+
+  const handleEditarProfesional = async (id: number) => {
+    try {
+      const response = await axios.get(`${url}/api/profesionales/${id}`);
+      setEditingProfesional(response.data); // contiene especialidades, valores, etc.
+      setShowModalEditar(true);
+    } catch (error) {
+      console.error("❌ Error al cargar datos del profesional", error);
+    }
+  };
 
   const fetchProfesionales = async () => {
     try {
@@ -117,6 +151,14 @@ const ProfesionalesListaAdmin = () => {
                   >
                     {prof.estado ? "Desactivar" : "Activar"}
                   </Button>
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    title="Editar profesional"
+                    onClick={() => handleEditarProfesional(prof.id_profesional)}
+                  >
+                    <BsPencilSquare />
+                  </Button>
                 </td>
               </tr>
             ))
@@ -127,6 +169,20 @@ const ProfesionalesListaAdmin = () => {
           )}
         </tbody>
       </Table>
+
+      {editingProfesional && (
+        <ProfesionalForm
+          show={showModalEditar}
+          handleClose={() => setShowModalEditar(false)}
+          profesional={editingProfesional}
+          onSave={() => {
+            fetchProfesionales(); // actualiza la tabla
+            setShowModalEditar(false);
+          }}
+          fetchProfesionalData={fetchProfesionales} // o podés dejarlo vacío si no lo usás
+        />
+      )}
+
 
     </>
   );

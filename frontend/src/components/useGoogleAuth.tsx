@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { gapi } from "gapi-script";
+const client_id = import.meta.env.VITE_GOOGLE_CLIENT;
 
-const CLIENT_ID = "1046358666022-7p6r5abv40lu5b3c7inq67vvr2upjfuk.apps.googleusercontent.com";
+const CLIENT_ID = client_id;
 export const SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events";
 
 export const useGoogleAuth = () => {

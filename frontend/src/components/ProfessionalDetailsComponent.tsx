@@ -7,7 +7,10 @@ interface Professional {
     id_profesional: number;
     nombre: string;
     foto_perfil_url: string;
-    especialidades: string[];
+    especialidades: {
+        id_especialidad: number;
+        nombre: string;
+    }[];
     disponibilidad: string;
     valor: number;
     descripcion: string;
@@ -23,32 +26,32 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
 
     const handleOpenCalendar = () => {
         const token = localStorage.getItem("token");
-    
+
         if (!token) {
             // Guardamos la URL actual antes de redirigir al login
             localStorage.setItem("prevPath", location.pathname);
             navigate("/login");
             return;
         }
-    
+
         // Si hay token, abrir el calendario
         setShowCalendar(true);
     };
-    
+
     const getGoogleDriveImageUrl = (url: string) => {
         if (!url) return "/placeholder.jpg"; // 🔹 Si no hay URL, muestra un placeholder
-    
+
         let fileId = "";
-    
+
         // Detectar diferentes formatos de URL de Google Drive
         if (url.includes("/d/")) {
-          fileId = url.split("/d/")[1]?.split("/")[0]; // Extraer ID de formato "/d/"
+            fileId = url.split("/d/")[1]?.split("/")[0]; // Extraer ID de formato "/d/"
         } else if (url.includes("id=")) {
-          fileId = url.split("id=")[1]?.split("&")[0]; // Extraer ID de formato "id="
+            fileId = url.split("id=")[1]?.split("&")[0]; // Extraer ID de formato "id="
         }
-        
+
         return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png";
-      };
+    };
 
     return (
         <div className="container mt-5">
@@ -72,7 +75,9 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
                         <h2 className="fw-bold">
                             {professional.nombre} <span className="fw-normal text-light"> ${professional.valor}.-</span>
                         </h2>
-                        <p className="fw-semibold">{professional.especialidades.join(" • ")}</p>
+                        <p className="fw-semibold">
+                            {professional.especialidades.map(e => e.nombre).join(" • ")}
+                        </p>
                         <p className="text-light">{professional.descripcion}</p>
 
                         {/* Botón para abrir el calendario flotante */}

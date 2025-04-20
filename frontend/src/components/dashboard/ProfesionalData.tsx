@@ -15,7 +15,10 @@ interface Profesional {
     valor: number;
     valor_internacional: number;
     creado_en: string;
-    especialidades: number[];
+    especialidades: {
+        id_especialidad: number;
+        nombre: string;
+    }[];
 }
 
 interface ProfesionalDataProps {
@@ -26,7 +29,7 @@ interface ProfesionalDataProps {
 
 function ProfesionalData({ profesional, onEdit }: ProfesionalDataProps) {
     return (
-        <div className="container mt-4" style={{marginBottom:"80px"}}>
+        <div className="container mt-4" style={{ marginBottom: "80px" }}>
             <h2 className="titulo-config">Datos del profesional</h2>
 
             {profesional ? (
@@ -43,7 +46,7 @@ function ProfesionalData({ profesional, onEdit }: ProfesionalDataProps) {
 
                     {/* Botón alineado a la derecha */}
                     <div className="d-flex justify-content-end mt-1 ">
-                        <Button variant="warning" style={{backgroundColor:"var(--naranja)",borderColor:"var(--naranja)",paddingLeft:"20px",paddingRight:"20px",color:"white"}} className=" px-4 py-2" onClick={() => onEdit(profesional)}>
+                        <Button variant="warning" style={{ backgroundColor: "var(--naranja)", borderColor: "var(--naranja)", paddingLeft: "20px", paddingRight: "20px", color: "white" }} className=" px-4 py-2" onClick={() => onEdit(profesional)}>
                             Editar
                         </Button>
                     </div>

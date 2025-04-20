@@ -4,6 +4,17 @@ import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/SideBar.css";
 import { Link } from "react-router-dom"; // 👈 Importamos Link
+declare global {
+  interface Window {
+    google?: {
+      accounts?: {
+        id?: {
+          disableAutoSelect?: () => void;
+        };
+      };
+    };
+  }
+}
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate(); // 👈 Hook para redirigir
@@ -21,13 +32,34 @@ const Sidebar: React.FC = () => {
   const homeRoute = esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
   const configRoute = esProfesional ? "/dashboard/profesional/config_profesional" : "/dashboard/usuario/config_usuario";
 
+
   // Función para cerrar sesión
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // Eliminar token
-    localStorage.removeItem("id"); // Eliminar ID del usuario
-    localStorage.removeItem("esProfesional"); // Eliminar rol
-    navigate("/login"); // Redirigir a la página de login
+  const handleLogout = async () => {
+    const isGoogle = localStorage.getItem("isGoogleLogin") === "true";
+    const googleToken = localStorage.getItem("google_token");
+
+    if (isGoogle && googleToken) {
+      try {
+        await fetch(`https://oauth2.googleapis.com/revoke?token=${googleToken}`, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/x-www-form-urlencoded",
+          },
+        });
+      } catch (error) {
+        console.warn("Error al revocar token de Google:", error);
+      }
+    }
+
+    // Limpiar todo
+    localStorage.clear();
+    navigate("/login");
   };
+
+
+
+
+
 
   // Función para navegar correctamente a Home
   const handleHomeClick = () => {

@@ -21,7 +21,10 @@ interface Profesional {
     valor: number;
     valor_internacional: number;
     creado_en: string;
-    especialidades: number[];
+    especialidades: {
+        id_especialidad: number;
+        nombre: string;
+    }[];
 }
 
 interface Disponibilidad {
@@ -75,7 +78,7 @@ function ProfesionalConfigComponent() {
     const handleCloseProfesional = () => setShowModalProfesional(false);
 
     return (
-        <div  style={{ marginTop: "7rem" }}>
+        <div style={{ marginTop: "7rem" }}>
             <DisponibilidadForm
                 show={showModalDisponibilidad}
                 handleClose={handleCloseDisponibilidad}
