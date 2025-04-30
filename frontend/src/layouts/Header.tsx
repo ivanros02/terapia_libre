@@ -73,7 +73,7 @@ const Head: React.FC<HeadProps> = ({ description, keywords, links = [], onScroll
           {/* Logo (más grande en escritorio, más a la izquierda en móviles) */}
           <a className="navbar-brand d-flex align-items-center logo-container" href="/">
             <img src="/logo.png" alt="Logo" className="logo-img" />
-            <span className="brand-text fw-bold fs-5">Terapia Libre</span>
+            <span className="brand-text">Terapia Libre</span>
           </a>
 
           {/* Sección Atención Inmediata (Pantallas grandes: Original, Móviles: Ajustado) */}

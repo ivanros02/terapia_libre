@@ -12,7 +12,17 @@ class Usuario {
       throw new Error("El correo ya está registrado.");
     }
 
-    // 2️⃣ Si el correo no existe, insertar el nuevo usuario
+    // 2️⃣ Verificar si el correo ya existe en la tabla profesionales
+    const [existingProfesionales] = await pool.execute(
+      `SELECT id_profesional FROM profesionales WHERE correo_electronico = ?`,
+      [correo_electronico]
+    );
+
+    if (existingProfesionales.length > 0) {
+      throw new Error("El correo ya está registrado como profesional.");
+    }
+
+    // 3️⃣ Insertar el nuevo usuario
     const [result] = await pool.execute(
       `INSERT INTO usuarios (correo_electronico, contrasena_hash, nombre, id_google) VALUES (?, ?, ?, ?)`,
       [correo_electronico, contrasena_hash, nombre, id_google]
@@ -30,13 +40,26 @@ class Usuario {
     return rows[0]; // Retorna el usuario si existe
   }
 
-  static async findByGoogleId(id_google) {
+  static async findByGoogleId(id_google, correo_electronico = null) {
+    // 🔒 Validar si el correo existe en profesionales
+    if (correo_electronico) {
+      const [profesionales] = await pool.execute(
+        `SELECT 1 FROM profesionales WHERE correo_electronico = ? LIMIT 1`,
+        [correo_electronico]
+      );
+      if (profesionales.length > 0) {
+        throw new Error("PROFESIONAL_REGISTRADO");
+      }
+    }
+
+    // 🔍 Buscar usuario con Google ID
     const [rows] = await pool.execute(
       `SELECT * FROM usuarios WHERE id_google = ?`,
       [id_google]
     );
-    return rows[0]; // Retorna el usuario si existe
+    return rows[0];
   }
+
 
   static async findById(id_profesional) {
     const [rows] = await pool.execute(

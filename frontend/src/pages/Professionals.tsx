@@ -32,7 +32,7 @@ const Professionals: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     overflow: "hidden",
-                    paddingTop: "16rem" // Ajusta según la altura del navbar
+                    paddingTop: "10rem" // Ajusta según la altura del navbar
                 }}
             >
                 <h1 className="h1-custom-profs">PROFESIONALES</h1>

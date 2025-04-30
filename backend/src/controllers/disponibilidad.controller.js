@@ -11,7 +11,14 @@ exports.crearDisponibilidad = async (req, res) => {
         res.status(201).json({ message: "Disponibilidad creada", id });
     } catch (error) {
         console.error("Error al crear disponibilidad:", error);
-        res.status(500).json({ message: "Error interno" });
+
+        // 🔎 Si querés detectar errores de clave única o formato:
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({ message: "La disponibilidad ya fue registrada para ese día y horario." });
+        }
+
+        // 🧱 Fallback seguro
+        res.status(400).json({ message: "No se pudo crear la disponibilidad. Intentá nuevamente." });
     }
 };
 
@@ -26,7 +33,7 @@ exports.obtenerDisponibilidades = async (req, res) => {
         res.json(horarios);
     } catch (error) {
         console.error("Error al obtener disponibilidades:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudieron obtener las disponibilidades. Intentá nuevamente." });
     }
 };
 
@@ -63,13 +70,9 @@ exports.obtenerDisponibilidadesHoras = async (req, res) => {
         res.json(disponibilidadPorFecha);
     } catch (error) {
         console.error("❌ Error al obtener disponibilidades:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudieron obtener las disponibilidades. Intentá nuevamente." });
     }
 };
-
-
-
-
 
 exports.actualizarDisponibilidad = async (req, res) => {
     try {
@@ -86,7 +89,7 @@ exports.actualizarDisponibilidad = async (req, res) => {
         }
     } catch (error) {
         console.error("Error al actualizar disponibilidad:", error);
-        res.status(500).json({ message: "Error interno" });
+        return res.status(400).json({ message: "No se pudo actualizar la disponibilidad. Intentá nuevamente." });
     }
 };
 
@@ -105,6 +108,6 @@ exports.eliminarDisponibilidad = async (req, res) => {
         }
     } catch (error) {
         console.error("Error al eliminar disponibilidad:", error);
-        res.status(500).json({ message: "Error interno" });
+        return res.status(400).json({ message: "No se pudo eliminar la disponibilidad. Intentá nuevamente." });
     }
 };

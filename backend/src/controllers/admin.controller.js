@@ -28,7 +28,9 @@ exports.loginAdmin = async (req, res) => {
 
     } catch (error) {
         console.error("Error en loginAdmin:", error);
-        res.status(500).json({ message: "Error en el servidor." });
+        res.status(400).json({
+            message: "Ocurrió un error inesperado. Verificá los datos o intentá más tarde.",
+        });
     }
 };
 
@@ -40,7 +42,9 @@ exports.getProfesionalesAdmin = async (req, res) => {
         res.json({ professionals: profesionales });
     } catch (error) {
         console.error("Error al obtener profesionales para admin:", error);
-        res.status(500).json({ message: error.message });
+        res.status(400).json({
+            message: "No se pudieron obtener los profesionales."
+        });
     }
 };
 

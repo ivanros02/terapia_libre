@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Card, Container } from "react-bootstrap";
 import imagen from "/quienes_somos.png"; // Asegúrate de importar la imagen correctamente
 import "../../styles/DashboardCard.css";
+import { Link } from "react-router-dom";
 
 interface DashboardCardProps {
     name: string;
@@ -13,7 +14,7 @@ interface DashboardCardProps {
 
 const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appointmentTime, newPatients }) => {
     const esProfesional = localStorage.getItem("esProfesional") === "true";
-   
+
     return (
         <Container fluid>
             {/* 🔹 Se oculta en móvil */}
@@ -35,6 +36,9 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
                             <p className="text-white mb-0" style={{ fontSize: "0.9rem" }}>
                                 Hoy - {appointmentTime}
                             </p>
+                            <Link to="/dashboard/calendario" style={{ color: "#7ED9BA", textDecoration: "none" }}>
+                                Ingresar a la sesión
+                            </Link>
                         </div>
                     </Card>
 
@@ -47,7 +51,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
                             </div>
                         </Card>
                     )}
-                    
+
 
                     {/* Imagen decorativa RESPONSIVA */}
                     <img

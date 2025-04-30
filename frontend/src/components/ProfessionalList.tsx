@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ProfessionalCard from "./ProfessionalCard";
 import "../styles/Paginacion.css";
+import LoadingSpinner from "./LoadingSpinner"; // Asegúrate de tener un componente de carga
 const url = import.meta.env.VITE_API_BASE_URL;
 
 interface Professional {
@@ -28,9 +29,12 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
   const [filteredProfessionals, setFilteredProfessionals] = useState<Professional[]>([]);
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     const fetchProfessionals = async () => {
+      setLoading(true); // ⏳ Empieza la carga
       try {
         const response = await axios.get(`${url}/api/profesionales`, {
           params: {
@@ -45,6 +49,8 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
         setTotalPages(response.data.totalPages);
       } catch (error) {
         console.error("Error al obtener profesionales:", error);
+      } finally {
+        setLoading(false); // ✅ Termina la carga
       }
     };
 
@@ -92,25 +98,31 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
     } else if (url.includes("id=")) {
       fileId = url.split("id=")[1]?.split("&")[0]; // Extraer ID de formato "id="
     }
-    console.log(fileId)
+
     return fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s220` : "https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png";
   };
 
   return (
     <div className="container mt-4 p-3">
       <div className="row g-4">
-        {filteredProfessionals.map((prof) => (
-          <div key={prof.id_profesional} className="col-12 col-md-6 col-lg-3">
-            <ProfessionalCard
-              id={prof.id_profesional}
-              name={prof.nombre}
-              image={getGoogleDriveImageUrl(prof.foto_perfil_url)}
-              specialties={prof.especialidades ? prof.especialidades.split(", ") : []}  // 🔹 Evita el error
-              availability={prof.disponibilidad || "No especificado"}
-              price={`$${prof.valor || 0}`}
-            />
+        {loading ? (
+          <div className="d-flex justify-content-center my-4">
+            <LoadingSpinner />
           </div>
-        ))}
+        ) : (
+          filteredProfessionals.map((prof) => (
+            <div key={prof.id_profesional} className="col-6 col-md-6 col-lg-3">
+              <ProfessionalCard
+                id={prof.id_profesional}
+                name={prof.nombre}
+                image={getGoogleDriveImageUrl(prof.foto_perfil_url)}
+                specialties={prof.especialidades ? prof.especialidades.split(", ") : []}
+                availability={prof.disponibilidad || "No especificado"}
+                price={`${prof.valor || 0}`}
+              />
+            </div>
+          ))
+        )}
 
       </div>
 

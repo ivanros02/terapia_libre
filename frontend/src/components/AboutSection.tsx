@@ -3,7 +3,7 @@ import "../styles/AboutSection.css"
 
 const AboutSection: React.FC = () => {
     return (
-        <section className="container py-2">
+        <section className="container py-2 about-section">
             <div className="row align-items-center">
                 {/* Imagen */}
                 <div className="col-lg-5 d-flex justify-content-center">

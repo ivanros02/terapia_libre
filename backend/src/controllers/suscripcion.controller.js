@@ -24,7 +24,7 @@ exports.obtenerSuscripcion = async (req, res) => {
 
         // 🔹 FILTRAR solo las suscripciones activas
         const suscripcion = suscripciones.find(sub =>
-            (sub.status === "authorized" || sub.status === "active") && 
+            (sub.status === "authorized" || sub.status === "active") &&
             sub.payer_first_name.toLowerCase().includes("monica") // 🔹 Filtra por nombre ya que el email no aparece
         );
 
@@ -42,11 +42,7 @@ exports.obtenerSuscripcion = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("❌ Error al obtener suscripción en Mercado Pago:", error.response?.data || error.message);
-        res.status(500).json({ message: "Error al obtener la suscripción." });
+        console.error("❌ Error al obtener suscripción:", error.response?.data || error.message);
+        res.status(400).json({ message: "No se pudo obtener la suscripción. Intentá nuevamente." });
     }
 };
-
-
-
-

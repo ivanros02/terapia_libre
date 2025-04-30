@@ -25,33 +25,33 @@ class Disponibilidad {
         const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         const hoy = new Date();
         const fechas = [];
-    
+
         // 🔹 Normalizar el nombre del día
         const diaSemanaNormalizado = diaSemana?.trim()?.toLowerCase();
         console.log("🔍 Verificando día de la semana recibido:", diaSemanaNormalizado);
-    
+
         const diasSemanaNormalizados = diasSemana.map(d => d.toLowerCase());
-    
+
         if (!diasSemanaNormalizados.includes(diaSemanaNormalizado)) {
             console.error(`❌ Error: El día recibido "${diaSemana}" no es válido`);
             return [];
         }
-    
+
         for (let i = 0; i < semanas * 7; i++) { // Extiende a 6 meses
             const fecha = new Date();
             fecha.setDate(hoy.getDate() + i);
-    
+
             const nombreDia = diasSemana[fecha.getDay()].toLowerCase();
-    
+
             if (nombreDia === diaSemanaNormalizado) {
                 fechas.push(fecha.toISOString().split("T")[0]); // Formato YYYY-MM-DD
             }
         }
-    
+
         console.log("✅ Fechas generadas correctamente:", fechas);
         return fechas;
     }
-    
+
 
 
 
@@ -108,6 +108,12 @@ class Disponibilidad {
                     let horaFin = `${String(horas + 1).padStart(2, "0")}:00:00`;
 
                     const claveTurno = `${fecha}-${horaActual}`;
+
+                    const fechaHoraTurno = new Date(`${fecha}T${horaActual}`);
+                    if (fechaHoraTurno <= new Date()) {
+                        horaActual = horaFin;
+                        continue; // ⛔️ saltar horarios pasados
+                    }
 
                     if (!turnosSet.has(claveTurno)) {
                         if (!horariosDisponibles[fecha]) {

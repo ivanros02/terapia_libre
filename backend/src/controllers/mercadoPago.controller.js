@@ -31,7 +31,7 @@ exports.crearOrdenMercadoPago = async (req, res) => {
                 },
             ],
             back_urls: {
-                success: "https://terapialibre.com.ar/dashboard/usuario",
+                success: "https://terapialibre.com.ar/retorno-pago",
                 failure: "https://terapialibre.com.ar",
                 pending: "https://terapialibre.com.ar",
             },
@@ -43,7 +43,7 @@ exports.crearOrdenMercadoPago = async (req, res) => {
                 fecha_turno,
                 hora_turno
             }),
-             // 🔹 Guardamos los datos aquí
+            // 🔹 Guardamos los datos aquí
         };
 
         // ✅ Crear la preferencia en Mercado Pago
@@ -58,7 +58,7 @@ exports.crearOrdenMercadoPago = async (req, res) => {
 
     } catch (error) {
         console.error("❌ Error creando la orden en Mercado Pago:", error);
-        res.status(500).json({ message: "Error interno en Mercado Pago", error: error.message });
+        res.status(400).json({ message: "No se pudo generar la orden de pago. Intentá nuevamente." });
     }
 };
 
@@ -84,6 +84,7 @@ exports.capturarPagoMercadoPago = async (req, res) => {
         if (paymentResponse.status === "approved") {
             // ✅ 1️⃣ Guardar el turno en la base de datos
             const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
+            await Turno.notificarTurnoConfirmado(id_turno);
 
             // ✅ 2️⃣ Guardar el pago en la base de datos
             await Pago.registrarPago(id_turno, precio, "MercadoPago", "Pagado", payment_id);
@@ -98,11 +99,10 @@ exports.capturarPagoMercadoPago = async (req, res) => {
         res.status(400).json({ message: "Pago no aprobado", status: paymentResponse.status });
 
     } catch (error) {
-        console.error("❌ Error al capturar el pago de Mercado Pago:", error);
-        res.status(500).json({ message: "Error interno en Mercado Pago", error: error.message });
+        console.error("❌ Error procesando el webhook de Mercado Pago:", error);
+        res.sendStatus(400);
     }
 };
-
 
 
 /* ======================= */
@@ -143,6 +143,7 @@ exports.webhookMercadoPago = async (req, res) => {
 
                 // ✅ Guardar turno en la base de datos
                 const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
+                await Turno.notificarTurnoConfirmado(id_turno);
 
                 // ✅ Guardar pago en la base de datos
                 await Pago.registrarPago(id_turno, transaction_amount, "MercadoPago", "Pagado", data.id);
@@ -154,7 +155,7 @@ exports.webhookMercadoPago = async (req, res) => {
         res.sendStatus(200);
     } catch (error) {
         console.error("❌ Error procesando el webhook de Mercado Pago:", error);
-        res.sendStatus(500);
+        res.sendStatus(200);
     }
 };
 

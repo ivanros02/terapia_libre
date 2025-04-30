@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/ProfessionalCard.css"; // Asegúrate de que la ruta sea correcta
 
 type ProfessionalCardProps = {
     id: number; // Agregamos el id del profesional
@@ -17,10 +18,12 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ id, name, image, sp
         navigate(`/profesional/${id}`); // Redirige a la página de detalles con el ID
     };
 
+    console.log(price)
+    const formattedPrice = parseFloat(price).toLocaleString("es-AR");
+
+
     return (
-        <div className="card border-0  rounded-5 overflow-hidden position-relative" style={{
-            width: "100%",
-            height: "290px",
+        <div className="card border-0 professional-card overflow-hidden position-relative" style={{
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.9)" // Sombra más notoria
         }}
             onClick={handleClick} // Añadimos el evento onClick
@@ -29,21 +32,26 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ id, name, image, sp
             <img src={image} alt={name} className="position-absolute w-100 h-100 object-cover" />
 
             {/* Contenido con fondo opaco más gris */}
-            <div className="position-absolute bottom-0 w-100 p-1 text-white" style={{
-                background: "rgba(var(--verde-rgb), 0.7)"
-            }}>
-                <h5 className="fw-bold mb-0">{name}</h5>
+            <div
+                className="card-footer-custom"
+            >
+                <h5 className="card-footer-title mb-0 text-truncate">{name}</h5>
 
                 {/* Especialidades */}
-                <p className="mb-0 text-truncate" style={{ maxHeight: "40px", overflow: "hidden" }}>
-                    {specialties.join(" • ")}
+                <p className="mb-0 text-truncate card-footer-specialties" >
+                    {specialties.join(" - ")}
                 </p>
 
                 {/* Disponibilidad */}
-                <p className=" mb-0">Disponibilidad en {availability}</p>
+                <p className="mb-0 card-footer-availability d-none d-sm-block">
+                    Disponibilidad en {availability}
+                </p>
 
                 {/* Precio ahora está aquí */}
-                <p className=" fs-5 mb-0">{price}.-</p>
+                <p className="mb-0 card-footer-price">
+                    {formattedPrice}.-
+                </p>
+
             </div>
         </div>
     );

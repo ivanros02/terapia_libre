@@ -8,6 +8,7 @@ import PatientHistory from "../components/dashboard/PatientHistory";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
 import "../styles/DashboardProfesional.css"
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos
@@ -42,6 +43,8 @@ const DashboardProfesional = () => {
   const [, setError] = useState<string | null>(null);
   const [eventos, setEventos] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [nuevosPacientes, setNuevosPacientes] = useState(0);
+
   const navigate = useNavigate();
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -51,6 +54,12 @@ const DashboardProfesional = () => {
           throw new Error("No se encontró el ID del profesional.");
         }
 
+        // 🔹 Obtener pacientes nuevos
+        const nuevosPacientesResponse = await axios.get(`${url}/api/turnos/${id}/nuevos-pacientes?cantidad=5`);
+        const nuevosPacientes = nuevosPacientesResponse.data;
+        setNuevosPacientes(nuevosPacientes);
+
+
         // 🔹 Obtener datos del profesional
         const profesionalResponse = await axios.get(`${url}/api/profesionales/${id}`);
         setProfesionalData(profesionalResponse.data);
@@ -58,14 +67,13 @@ const DashboardProfesional = () => {
         // 🔹 Obtener el próximo turno más cercano
         const turnoResponse = await axios.get(`${url}/api/turnos/${id}/turno-hoy`);
         const turnoMasCercano = turnoResponse.data || null; // ✅ Manejar el caso `null`
-
         setTurnoHoy(turnoMasCercano);
+
+
 
         // 🔹 Obtener turnos del profesional
         const turnosResponse = await axios.get(`${url}/api/turnos/profesionalDashboard/${id}`);
         const turnos = Array.isArray(turnosResponse.data) ? turnosResponse.data : [];
-
-
 
         // 🔹 Extraer próximos turnos (máximo 5)
         const proximosTurnos = turnos.map((turno: any) => ({
@@ -74,10 +82,15 @@ const DashboardProfesional = () => {
         }));
 
         // 🔹 Extraer próximos turnos (máximo 5)
-        const listaPacientes = turnos.slice(0, 5).map((turno: any) => ({
-          name: turno.nombre_paciente,  // 🔹 Nombre del paciente
-          frequency: "Semanal",         // 🔹 Se establece "Semanal" fijo
-        }));
+        const listaPacientes = Array.from(
+          new Map(
+            turnos.map((turno: any) => [turno.nombre_paciente, {
+              name: turno.nombre_paciente,
+              frequency: "Semanal",
+            }])
+          ).values()
+        ).slice(0, 5);
+
 
 
 
@@ -106,7 +119,7 @@ const DashboardProfesional = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (loading) return <div>Cargando...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="parent">
@@ -119,39 +132,39 @@ const DashboardProfesional = () => {
         name={profesionalData?.nombre || "Profesional"}
         patientName={turnoHoy?.nombre_paciente || "Sin paciente hoy"}
         appointmentTime={turnoHoy ? `${turnoHoy.hora_turno}` : "Sin turnos"}
-        newPatients={3}
+        newPatients={nuevosPacientes} // 🆕 dinámico
       /></div>
       {!isMobile && <div className="div4"><PatientHistory patients={listaPacientes} selectedPatient={null} /></div>}
 
       {/* 🔹 Estas tarjetas SOLO aparecen en móviles */}
       {isMobile && (
         <>
-          <div className="div8" onClick={() => navigate('/dashboard/calendario')} style={{ cursor: "pointer" }}>
+          <div className="calendar-div-movil" onClick={() => navigate('/dashboard/calendario')} style={{ cursor: "pointer" }}>
             <Card
-              className="shadow-lg border-0 rounded-4 p-3 calendario-card d-flex align-items-center justify-content-center gap-2"
-              style={{  display: "flex", flexDirection: "row",width: "99%", maxWidth: "99%" }}>
+              className="shadow-lg border-0 rounded-4 p-3 d-flex align-items-center justify-content-center gap-2"
+            >
               <img src="/sidebar/calendar.png" alt="Calendar" width="24" height="24" />
-              <span style={{fontWeight:"bold", fontSize:"14px", color:"var(--verde)"}}>CALENDARIO</span>
+              <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>CALENDARIO</span>
             </Card>
           </div>
 
           <div className="div7" onClick={() => navigate('/dashboard/profesional/config_profesional')} style={{ cursor: "pointer" }}>
             <Card
-              className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
-              style={{height:"90px",width:"183px"}}
+              className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center"
+              
             >
               <img src="/sidebar/config.png" alt="Home" width="24" height="24" className="mb-2" />
-              <span style={{fontWeight:"bold", fontSize:"14px", color: "var(--verde)" }}>CONFIGURACIÓN</span>
+              <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
           </div>
 
           <div className="div9" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
             <Card
-              className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
-              style={{height:"90px",width:"183px"}}
+              className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center"
+              
             >
               <img src="/sidebar/chat.png" alt="Home" width="24" height="24" className="mb-2" />
-              <span style={{fontWeight:"bold", fontSize:"14px", color: "var(--verde)" }}>Chats</span>
+              <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>Chats</span>
             </Card>
           </div>
 

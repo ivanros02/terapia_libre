@@ -19,9 +19,12 @@ import DashboardProfesionalConfig from "./pages/DashboardProfesionalConfig";
 import DashboardUsuarioConfig from "./pages/DashboardUsuarioConfig";
 import AdminProfesionales from "./pages/AdminProfesionales";
 import AdminLogin from "./components/AdminLogin";
+import WhatsAppButton from "./components/WhatsAppButton";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-
+import RutaProtegida from "./components/RutaProtegida";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import RetornoPago from "./pages/RetornoPago";
 import "./index.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from "react-toastify";
@@ -44,18 +47,20 @@ const App: React.FC = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/formProfessionals" element={<FormProfessionals />} />
-              <Route path="/dashboard/profesional" element={<DashboardProfesional />} />
-              <Route path="/dashboard/usuario" element={<DashboardUsuario />} />
-              <Route path="/dashboard/calendario" element={<DashboardCalendar />} />
-              <Route path="/messages" element={<DashboardMensajes />} />
+              <Route path="/dashboard/profesional" element={<RutaProtegida> <DashboardProfesional /> </RutaProtegida>} />
+              <Route path="/dashboard/usuario" element={<RutaProtegida> <DashboardUsuario /> </RutaProtegida>}/>
+              <Route path="/dashboard/calendario" element={<RutaProtegida> <DashboardCalendar /> </RutaProtegida>}/>
+              <Route path="/messages" element={<RutaProtegida> <DashboardMensajes /> </RutaProtegida>} />
               <Route path="/profesional/:id" element={<ProfessionalDetails />} />
-              <Route path="/dashboard/profesional/config_profesional" element={<DashboardProfesionalConfig />} />
-              <Route path="/dashboard/usuario/config_usuario" element={<DashboardUsuarioConfig />} />
+              <Route path="/dashboard/profesional/config_profesional" element={ <RutaProtegida> <DashboardProfesionalConfig /> </RutaProtegida>} />
+              <Route path="/dashboard/usuario/config_usuario" element={<RutaProtegida> <DashboardUsuarioConfig /> </RutaProtegida> } />
+              <Route path="/retorno-pago" element={<RetornoPago />} />
               <Route path="/admin" element={<AdminProfesionales />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
             </Routes>
+            <WhatsAppButton />
           </Router>
         </SocketProvider>
       </PayPalScriptProvider>

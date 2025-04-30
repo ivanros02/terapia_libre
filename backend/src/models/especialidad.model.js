@@ -10,7 +10,7 @@ class Especialidad {
   }
 
   static async getAll() {
-    const [rows] = await pool.execute(`SELECT * FROM especialidades`);
+    const [rows] = await pool.execute(`SELECT * FROM especialidades ORDER BY CHAR_LENGTH(nombre) ASC;`);
     return rows;
   }
 

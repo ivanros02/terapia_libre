@@ -55,14 +55,15 @@ exports.crearMeet = async (req, res) => {
 
         // Guardamos el enlace en la base de datos
         const guardado = await GoogleMeet.guardarMeetUrl(id_turno, meetUrl);
+
         if (!guardado) {
-            return res.status(500).json({ message: "Error al guardar el Meet en la base de datos" });
+            return res.status(422).json({ message: "No se pudo guardar la videollamada." });
         }
 
         res.json({ meet_url: meetUrl });
     } catch (error) {
         console.error("❌ Error al crear Meet:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudo crear la videollamada. Intentá nuevamente." });
     }
 };
 
@@ -82,7 +83,7 @@ exports.obtenerMeet = async (req, res) => {
         res.json({ meet_url: meetUrl });
     } catch (error) {
         console.error("❌ Error al obtener Meet:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudo obtener la videollamada." });
     }
 };
 
@@ -96,14 +97,16 @@ exports.guardarMeet = async (req, res) => {
         }
 
         const guardado = await GoogleMeet.guardarMeetUrl(id_turno, meet_url);
+
         if (!guardado) {
-            return res.status(500).json({ message: "Error al guardar el Meet en la base de datos" });
+            return res.status(422).json({ message: "No se pudo guardar la videollamada." });
         }
 
         res.json({ message: "Meet guardado correctamente" });
+
     } catch (error) {
         console.error("❌ Error al guardar Meet:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudo guardar la videollamada." });
     }
 };
 
@@ -118,15 +121,16 @@ exports.terminarMeet = async (req, res) => {
 
         // Actualizar la base de datos indicando que la videollamada ha finalizado
         const actualizado = await GoogleMeet.registrarFinDeLlamada(id_turno);
+
         if (!actualizado) {
-            return res.status(500).json({ message: "Error al registrar el fin de la llamada" });
+            return res.status(422).json({ message: "No se pudo registrar el fin de la videollamada." });
         }
 
         res.json({ message: "Fin de la videollamada registrado correctamente" });
+        
     } catch (error) {
-        console.error("❌ Error al registrar el fin de la videollamada:", error);
-        res.status(500).json({ message: "Error interno" });
+        console.error("❌ Error al registrar fin de videollamada:", error);
+        res.status(400).json({ message: "No se pudo finalizar la videollamada." });
     }
 };
-
 

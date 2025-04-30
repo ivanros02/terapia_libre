@@ -225,38 +225,49 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
             }
           }
 
-          const response = await window.gapi.client.calendar.events.insert({
-            calendarId: "primary",
-            resource: {
-              summary: "Sesión de Terapia Libre",
-              description: descripcionEvento,
-              start: { dateTime: fechaHoraInicio, timeZone: "America/Argentina/Buenos_Aires" },
-              end: { dateTime: fechaHoraFin, timeZone: "America/Argentina/Buenos_Aires" },
-              attendees: attendees.length > 0 ? attendees : undefined, // Solo agregar attendees si hay correos válidos
+          if (usuarioRol == "profesional") {
+            const response = await window.gapi.client.calendar.events.insert({
+              calendarId: "primary",
+              conferenceDataVersion: 1,
+              resource: {
+                summary: "Sesión de Terapia Libre",
+                description: descripcionEvento,
+                start: { dateTime: fechaHoraInicio, timeZone: "America/Argentina/Buenos_Aires" },
+                end: { dateTime: fechaHoraFin, timeZone: "America/Argentina/Buenos_Aires" },
+                attendees: attendees.length > 0 ? attendees : undefined,
+                conferenceData: { //crea la videollamada
+                  createRequest: {
+                    requestId: `turno-${turno.id_turno}`,
+                    conferenceSolutionKey: { type: "hangoutsMeet" }
+                  }
+                }
+              }
+            });
+
+            if (!response.result || !response.result.id) {
+              console.error(`❌ No se recibió un Google Event ID para ${usuarioRol} en el turno ${turno.id_turno}`);
+              continue;
             }
-          });
 
+            const googleEventId = response.result.id;
+            const meetUrl = response.result?.conferenceData?.entryPoints?.[0]?.uri;
+            console.log(meetUrl, 'url evento');
+            await axios.post(`${url}/api/turnos/guardar-google-event`, {
+              id_turno: turno.id_turno,
+              [campoGoogleEvent]: googleEventId,
+              meet_url: meetUrl,
+            });
 
-          if (!response.result || !response.result.id) {
-            console.error(`❌ No se recibió un Google Event ID para ${usuarioRol} en el turno ${turno.id_turno}`);
-            continue;
+            // 🔹 Notificación de éxito después de subir eventos
+            toast.success("Los eventos fueron sincronizados con tu Google Calendar");
+
           }
-
-          const googleEventId = response.result.id; // 🔹 Obtener el ID del evento en Google Calendar
-
-          // 🔹 Guardar el Google Event ID en la base de datos
-          await axios.post(`${url}/api/turnos/guardar-google-event`, {
-            id_turno: turno.id_turno,
-            [campoGoogleEvent]: googleEventId // 🔹 Guarda en el campo correcto según el rol
-        });
-        
 
         } catch (error: any) {
           console.error(`❌ Error al subir evento para ${usuarioRol} (${emailUsuario}):`, error.response?.data || error);
         }
 
-        // 🔹 Notificación de éxito después de subir eventos
-        toast.success("Los eventos fueron sincronizados con tu Google Calendar");
+
 
       }
     } catch (error) {
@@ -331,6 +342,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
   };
 
 
+  /*
   const crearVideollamadaMeet = async (turno: Turno) => {
     if (!window.gapi || !window.gapi.client) {
       console.error("Google API no está cargada.");
@@ -387,6 +399,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
       console.error("❌ Error al crear Meet:", error);
     }
   };
+  */
 
 
   const abrirMeetEnPopup = (url: string, turno: Turno) => {
@@ -454,17 +467,43 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
 
   const iniciarSesionVideo = async (turno: Turno) => {
-    const url = await crearVideollamadaMeet(turno);
-    if (url) {
-      abrirMeetEnPopup(url, turno);
+    try {
+      const response = await axios.get(`${url}/google-meet/${turno.id_turno}`);
+      const meetUrl = response.data.meet_url;
+
+      if (meetUrl) {
+        abrirMeetEnPopup(meetUrl, turno);
+      } else {
+        toast.warning("⚠️ Este turno no tiene una videollamada asociada.");
+      }
+    } catch (error) {
+      toast.error("❌ No se pudo obtener la videollamada.");
     }
   };
 
-  const unirseAVideo = (turno: Turno) => {
-    if (turno.meet_url) {
-      abrirMeetEnPopup(turno.meet_url, turno);
-    } else {
-      toast.warning("⚠️ La sesión aún no tiene una videollamada asociada.", {
+
+
+  const unirseAVideo = async (turno: Turno) => {
+    try {
+      const response = await axios.get(`${url}/google-meet/${turno.id_turno}`);
+      const meetUrl = response.data.meet_url;
+
+      if (meetUrl) {
+        abrirMeetEnPopup(meetUrl, turno);
+      } else {
+        toast.warning("⚠️ La sesión aún no tiene una videollamada asociada.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      console.error("❌ Error al consultar la videollamada:", error);
+      toast.error("❌ No se pudo obtener la videollamada.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -475,6 +514,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
       });
     }
   };
+
 
 
 

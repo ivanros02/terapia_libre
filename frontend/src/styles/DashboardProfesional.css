@@ -1,7 +1,8 @@
 .parent {
     display: grid;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh !important;
+    height: auto !important;
     grid-template-columns: 120px 2.5fr 2.5fr 3fr;
     /* 🔹 Sidebar con ancho fijo */
     grid-template-rows: 0.5fr 2.2fr 2.2fr;
@@ -59,7 +60,6 @@
         grid-template-rows: repeat(5, 1fr) !important;
         gap: 8px !important;
         overflow: scroll !important;
-
         height: 70vh !important;
     }
 
@@ -89,7 +89,7 @@
         grid-row-start: 4 !important;
     }
 
-    .div8 {
+    .calendar-div-movil {
         grid-column: span 2 / span 2 !important;
         grid-column-start: 1 !important;
         grid-row-start: 3 !important;

@@ -2,4 +2,5 @@
     color: var(--naranja) !important;
     font-size: 48px !important;
     font-family: var(--fuente-secundaria) !important;
+    font-weight: 400 !important;
 }

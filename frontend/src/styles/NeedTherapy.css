@@ -2,4 +2,5 @@
     font-size: 48px !important;
     color:var(--verde);
     font-family: var(--fuente-secundaria);
+    font-weight:400 !important ;
 }

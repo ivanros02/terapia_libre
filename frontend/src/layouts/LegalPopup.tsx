@@ -25,7 +25,7 @@ const LegalPopup: React.FC = () => {
         bottom: "0",
         left: "0",
         width: "100%",
-        backgroundColor: "rgba(var(--verde-rgb), 0.9)", // Verde semi-transparente
+        backgroundColor: "var(--degrade-verde-oscuro)", // Verde semi-transparente
         color: "white",
         textAlign: "center",
         padding: "15px",

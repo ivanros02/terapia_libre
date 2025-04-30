@@ -3,34 +3,24 @@ const pool = require("../config/db");
 class Profesional {
 
   static async create({ nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional }) {
-    // Verificar si el correo electrónico ya está registrado
+    // 1️⃣ Verificar si el correo ya existe en profesionales
     const [existingEmail] = await pool.execute(
       `SELECT correo_electronico FROM profesionales WHERE correo_electronico = ?`,
       [correo_electronico]
     );
 
-    // Si el correo ya existe, lanzar un error
     if (existingEmail.length > 0) {
-      throw new Error("El correo electrónico ya está registrado.");
+      throw new Error("El correo electrónico ya está registrado como profesional.");
     }
 
-    // 🔹 Verificar si la matrícula provincial ya existe
-    const [existingMatricula] = await pool.execute(
-      `SELECT matricula_provincial FROM profesionales WHERE matricula_provincial = ?`,
-      [matricula_provincial]
+    // 2️⃣ Verificar si el correo ya existe en usuarios
+    const [existingUserEmail] = await pool.execute(
+      `SELECT correo_electronico FROM usuarios WHERE correo_electronico = ?`,
+      [correo_electronico]
     );
 
-    if (existingMatricula.length > 0) {
-      throw new Error("La matrícula provincial ya está registrada. Verifica los datos.");
-    }
-
-    const [existingMatriculaNacional] = await pool.execute(
-      `SELECT matricula_nacional FROM profesionales WHERE matricula_nacional = ?`,
-      [matricula_nacional]
-    );
-
-    if (existingMatriculaNacional.length > 0) {
-      throw new Error("La matrícula nacional ya está registrada. Verifica los datos.");
+    if (existingUserEmail.length > 0) {
+      throw new Error("El correo electrónico ya está registrado como usuario.");
     }
 
     // Si el correo no existe, proceder con la inserción

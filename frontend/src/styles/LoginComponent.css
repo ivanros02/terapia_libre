@@ -22,3 +22,28 @@
     align-items: center;
     justify-content: center;
 }
+
+.login-title-card{
+    font-size: 40px;
+    font-family: var(--fuente-secundaria);
+}
+
+.title-login{
+    font-size:  24px;
+    font-family: var(--fuente-secundaria);
+}
+
+.title-login-movil{
+    font-size: 36px;
+    font-family: var(--fuente-secundaria);  
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        margin-top: 1rem !important;
+    }
+
+    .title-login{
+        font-size: 36px;
+    }
+}

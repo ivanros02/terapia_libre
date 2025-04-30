@@ -26,6 +26,7 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     const [showPayPal, setShowPayPal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [preferenceId, setPreferenceId] = useState(null);
+    const [loadingWallet, setLoadingWallet] = useState(false);
     const navigate = useNavigate();
 
     // 🔹 Crear orden de pago en PayPal
@@ -104,11 +105,18 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
 
 
     const handleBuy = async () => {
+        // 🔹 Guardar navegador de origen antes de salir
+        const browser = navigator.userAgent;
+        localStorage.setItem("navegador_origen", browser);
+
+        setLoadingWallet(true); // 🔹 Mostrar mensaje de carga
         const id = await create_preference();
         if (id) {
             setPreferenceId(id);
         }
+        setLoadingWallet(false); // 🔹 Ocultar loader cuando ya está listo
     };
+
 
 
 
@@ -116,7 +124,30 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
         <>
             <Modal show={show} onHide={onHide} centered>
                 <Modal.Body style={{ backgroundColor: "var(--verde)", color: "white" }} className="text-center rounded-top p-4">
-                    {selectedDateTime && <p className="fs-5 fw-bold">Turno: {selectedDateTime}</p>}
+                    {selectedDateTime && (
+                        <p className="fs-5 fw-bold">
+                            Turno: {
+                                (() => {
+                                    const [fecha, rango] = selectedDateTime.split(" - ");
+                                    const [anio, mes, dia] = fecha.split("-");
+                                    const fechaDate = new Date(Number(anio), Number(mes) - 1, Number(dia));
+
+                                    const fechaFormateada = fechaDate.toLocaleDateString("es-AR", {
+                                        weekday: "long",
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    });
+
+                                    const [inicio, fin] = rango.split(" a ");
+                                    const horaInicio = inicio.slice(0, 5);
+                                    const horaFin = fin.slice(0, 5);
+
+                                    return `${fechaFormateada} de ${horaInicio} a ${horaFin}`;
+                                })()
+                            }
+                        </p>
+                    )}
                     <div className="p-4 bg-white shadow rounded-4">
                         <p className="text-center" style={{ color: "var(--verde)" }}>Para confirmar debe abonar la sesión.</p>
                     </div>
@@ -126,22 +157,37 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
                     {!showPayPal ? (
                         <>
                             {/* 🔹 Botón de Mercado Pago Checkout Pro */}
-                            <Button
-                                style={{ backgroundColor: "white", color: "var(--verde)", border: "2px solid white", width: "80%" }}
-                                className="fw-bold px-4 py-2 d-flex flex-column align-items-center justify-content-center"
-                                onClick={handleBuy}
-                            >
-                                {/* 🔹 Contenedor centrado del Wallet */}
-                                {preferenceId && (
-                                    <div className="wallet-container" style={{ display:"flex", justifyContent:"center" }}>
-                                        <Wallet initialization={{ preferenceId: preferenceId }} />
-                                    </div>
-                                )}
+                            {!preferenceId && !loadingWallet && (
+                                <Button
+                                    style={{ backgroundColor: "white", color: "var(--verde)", border: "2px solid white", width: "80%" }}
+                                    className="fw-bold px-4 py-2 d-flex flex-column align-items-center justify-content-center"
+                                    onClick={handleBuy}
+                                >
+                                    {/* 🔹 Contenedor centrado del Wallet */}
+                                    {preferenceId && (
+                                        <div className="wallet-container" style={{ display: "flex", justifyContent: "center" }}>
+                                            <Wallet initialization={{ preferenceId: preferenceId }} />
+                                        </div>
+                                    )}
 
-                                {/* 🔹 Texto centrado correctamente */}
-                                <span className="text-center w-100 mt-2">Pagar con Mercado Pago</span>
-                            </Button>
+                                    {/* 🔹 Texto centrado correctamente */}
+                                    <span className="text-center w-100 mt-2">Pagar con Mercado Pago</span>
+                                </Button>
+                            )}
 
+                            {/* 🔹 Loader */}
+                            {loadingWallet && (
+                                <div className="text-white py-2">
+                                    Cargando botón de pago...
+                                </div>
+                            )}
+
+                            {/* 🔹 Wallet cuando está lista la preferencia */}
+                            {preferenceId && (
+                                <div className="wallet-container mb-2" style={{ display: "flex", justifyContent: "center", width: "80%" }}>
+                                    <Wallet initialization={{ preferenceId }} />
+                                </div>
+                            )}
 
 
                             {/* 🔹 Botón de PayPal */}

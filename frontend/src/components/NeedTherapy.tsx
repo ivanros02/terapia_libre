@@ -36,7 +36,7 @@ const NeedTherapy: React.FC = () => {
                         <h2 className="h2-custom-need">
                             ¿Necesito <br /> terapia?
                         </h2>
-                        <p style={{fontSize:"16px",color:"black"}}>
+                        <p style={{fontSize:"16px",color:"black", fontWeight:"500"}}>
                             EN QUÉ SITUACIONES DEBERÍAS ACUDIR A <br />
                             NUESTROS PROFESIONALES DE SALUD MENTAL
                         </p>

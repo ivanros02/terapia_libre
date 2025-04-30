@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const Profesional = require("../models/profesional.model");
-const nodemailer = require("nodemailer"); // Importar nodemailer
+const transporter = require("../config/nodemailer");
+const path = require("path");
 
 exports.getProfesionales = async (req, res) => {
     try {
@@ -26,7 +27,44 @@ exports.getProfesionales = async (req, res) => {
         });
     } catch (error) {
         console.error("Error al obtener profesionales:", error);
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ message: "No se pudieron obtener los profesionales. Intentá nuevamente." });
+    }
+};
+
+enviarBienvenida = async (nombreProfesional, correoDestino) => {
+    try {
+        await transporter.sendMail({
+            from: '"Terapia Libre" <terapialibre@terapialibre.com.ar>', // remitente
+            to: correoDestino, // destinatario
+            subject: "¡Bienvenido/a a Terapia Libre!",
+            html: `
+                <p>Hola ${nombreProfesional},</p>
+                <p>¡Gracias por registrarte en Terapia Libre!</p>
+                <p>Tu cuenta ya fue creada exitosamente y estás listo/a para comenzar a usar la plataforma.</p>
+                <p>📥 Usuario: el correo que proporcionaste al registrarte<br>
+                🔐 Contraseña: la que elegiste durante el proceso de registro<br>
+                👉 Iniciá sesión acá: <a href="https://terapialibre.com.ar/login">https://terapialibre.com.ar/login</a></p>
+                <p>Si necesitás ayuda para configurar tu perfil o tenés dudas, estamos para acompañarte en cada paso.</p>
+                <p>Te adjuntamos un archivo con el On Boarding paso a paso, que te va a servir de guía.</p>
+                <br>
+                <p>Ahora sí, ¡Bienvenido/a a una nueva forma de conectar con tus pacientes!</p>
+                <p>Equipo de Terapia Libre</p>
+                <img src="cid:logo_terapia" style="width:150px; margin-top:10px;">
+            `,
+            attachments: [
+                {
+                    filename: 'instructivo.pdf',
+                    path: path.join(__dirname, "../assets/instructivo.pdf"), // PDF en src/assets
+                },
+                {
+                    filename: 'logo.png',
+                    path: path.join(__dirname, "../assets/logo.png"), // Imagen en src/assets
+                    cid: 'logo_terapia' // ID para insertar la imagen en el mail
+                }
+            ]
+        });
+    } catch (error) {
+        console.error("❌ Error enviando correo:", error);
     }
 };
 
@@ -62,72 +100,34 @@ exports.createProfesional = async (req, res) => {
             await Profesional.assignEspecialidades(id_profesional, especialidades);
         }
 
-        /*
-        //  Configurar el transporter de Nodemailer
-        const transporter = nodemailer.createTransport({
-            host: 'localhost',
-            port: 25,
-            auth: {
-                user: 'terapialibre@terapialibre.com.ar',
-                pass: 'abundancia2024'
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
+        // 🔥 Solo UNA respuesta
+        res.status(201).json({ message: "Profesional registrado exitosamente", id_profesional });
 
-        //  Definir el contenido del correo
-        const mailOptions = {
-            from: 'terapialibre@terapialibre.com.ar',
-            to: correo_electronico,
-            subject: "¡Bienvenido a Terapia Libre!",
-            html: `
-                <h2>Hola, ${nombre}</h2>
-                <p>Gracias por registrarte como profesional en Terapia Libre.</p>
-                <p>Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión y gestionar tus consultas.</p>
-                <br>
-                <p>Si no realizaste este registro, por favor contáctanos.</p>
-                <br>
-                <p>Atentamente,</p>
-                <p><strong>El equipo de Terapia Libre</strong></p>
-            `,
-        };
-        */
-
-        // 🔹 Configurar el transporter de Nodemailer
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: "ivanrosendo1102@gmail.com", // Tu correo
-                pass: "djve kpbf xgwm qgtz", // Tu contraseña o App Password
-            },
-        });
-
-        // 🔹 Definir el contenido del correo
-        const mailOptions = {
-            from: `"Terapia Libre" <${process.env.EMAIL_USER}>`,
-            to: correo_electronico,
-            subject: "¡Bienvenido a Terapia Libre!",
-            html: `
-                <h2>Hola, ${nombre}</h2>
-                <p>Gracias por registrarte como profesional en Terapia Libre.</p>
-                <p>Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión y gestionar tus consultas.</p>
-                <br>
-                <p>Si no realizaste este registro, por favor contáctanos.</p>
-                <br>
-                <p>Atentamente,</p>
-                <p><strong>El equipo de Terapia Libre</strong></p>
-            `,
-        };
-
-        // 🔹 Enviar el correo
-        await transporter.sendMail(mailOptions);
-
-        res.status(201).json({ message: "Profesional registrado exitosamente y correo enviado", id_profesional });
+        // 🔥 Después el mail, SIN tocar res ni hacer nada más
+        enviarBienvenida(nombre, correo_electronico);
 
     } catch (error) {
-        console.error("Error en la inserción:", error);
-        res.status(500).json({ message: error.message });
+        console.error("Error en createProfesional:", error);
+
+        if (error.message === "El correo electrónico ya está registrado como profesional." ||
+            error.message === "El correo electrónico ya está registrado como usuario.") {
+            // 🔥 Si es un error de mail duplicado, respondemos 400
+            return res.status(400).json({ message: error.message });
+        }
+
+        //Detectar errores de clave duplicada
+        if (error.code === "ER_DUP_ENTRY") {
+            // 🔎 Opcional: mensaje personalizado según el campo duplicado
+            if (error.sqlMessage.includes("matricula_provincial")) {
+                return res.status(400).json({ message: "La matrícula provincial ya está registrada." });
+            } else if (error.sqlMessage.includes("matricula_nacional")) {
+                return res.status(400).json({ message: "La matrícula nacional ya está registrada." });
+            } else {
+                return res.status(400).json({ message: "Ya existe un registro con ese dato único." });
+            }
+        }
+        
+        res.status(400).json({ message: "No se pudo registrar al profesional. Intentá nuevamente." });
     }
 };
 
@@ -146,7 +146,7 @@ exports.getProfesionalData = async (req, res) => {
         res.json(profesional);
     } catch (error) {
         console.error("Error al obtener datos del profesional:", error);
-        res.status(500).json({ message: "Error al obtener datos del profesional" });
+        res.status(400).json({ message: "No se pudo obtener la información del profesional." });
     }
 };
 
@@ -184,6 +184,6 @@ exports.updateProfesional = async (req, res) => {
         res.json({ message: "Datos del profesional actualizados correctamente" });
     } catch (error) {
         console.error("Error al actualizar el profesional:", error);
-        res.status(500).json({ message: "Error interno del servidor" });
+        res.status(400).json({ message: "No se pudo actualizar el profesional. Intentá nuevamente." });
     }
 };

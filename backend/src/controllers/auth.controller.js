@@ -7,6 +7,8 @@ const transporter = require("../config/nodemailer");
 
 const SECRET_KEY = process.env.JWT_SECRET || "secreto";
 const url = process.env.BACKEND_URL;
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 exports.registrarUsuario = async (req, res) => {
   try {
     const { correo_electronico, contrasena, nombre, id_google = null } = req.body;
@@ -73,7 +75,7 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error("Error en el inicio de sesión:", error);
-    res.status(500).json({ message: "Error al iniciar sesión" });
+    res.status(400).json({ message: "No se pudo iniciar sesión. Intentá nuevamente." });
   }
 };
 
@@ -86,7 +88,8 @@ exports.loginConGoogle = async (req, res) => {
       return res.status(400).json({ message: "Datos incompletos para autenticación con Google" });
     }
 
-    let usuario = await Usuario.findByGoogleId(id_google);
+    let usuario = await Usuario.findByGoogleId(id_google, correo_electronico);
+
 
     if (!usuario) {
       // Si el usuario no existe, lo creamos
@@ -107,8 +110,15 @@ exports.loginConGoogle = async (req, res) => {
       id: usuario.id_usuario, // 🔹 Devuelve el ID del usuario
     });
   } catch (error) {
-    console.error("Error en login con Google:", error);
-    res.status(500).json({ message: "Error al iniciar sesión con Google" });
+    console.error("Error en loginConGoogle:", error);
+
+    if (error.message === "PROFESIONAL_REGISTRADO") {
+      return res.status(403).json({
+        message: "Este correo ya está registrado como profesional. Iniciá sesión con usuario y contraseña.",
+      });
+    }
+
+    res.status(400).json({ message: "No se pudo iniciar sesión con Google. Intentá nuevamente." });
   }
 };
 
@@ -133,7 +143,7 @@ exports.getUserData = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al obtener datos del usuario:", error);
-    res.status(500).json({ message: "Error al obtener datos del usuario" });
+    return res.status(400).json({ message: "No se pudieron obtener los datos del usuario. Intentá más tarde." });
   }
 };
 
@@ -164,13 +174,14 @@ exports.editarUsuario = async (req, res) => {
     const actualizado = await Usuario.editarUsuario(id, { nombre, correo_electronico, contrasena_hash });
 
     if (actualizado) {
-      res.json({ message: "Usuario actualizado correctamente" });
-    } else {
-      res.status(500).json({ message: "Error al actualizar usuario" });
+      return res.json({ message: "Usuario actualizado correctamente." });
     }
+
+    return res.status(422).json({ message: "No se pudo actualizar el usuario. Verificá los datos." });
+
   } catch (error) {
     console.error("Error al editar usuario:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    return res.status(400).json({ message: "No se pudo procesar la solicitud. Intentá más tarde." });
   }
 };
 
@@ -178,38 +189,48 @@ exports.requestPasswordReset = async (req, res) => {
   const { correo_electronico } = req.body;
 
   try {
-      const usuario = await Usuario.findByEmailResetPassword(correo_electronico);
+    const usuario = await Usuario.findByEmailResetPassword(correo_electronico);
 
-      if (!usuario) {
-          return res.status(404).json({ message: "No se encontró una cuenta con este correo." });
-      }
+    if (!usuario) {
+      return res.status(404).json({ message: "No se encontró una cuenta con este correo." });
+    }
 
-      if (usuario.tipo === "usuario" && usuario.id_google) {
-          return res.status(400).json({ message: "Esta cuenta usa Google para autenticarse, no puede recuperar contraseña." });
-      }
+    if (usuario.tipo === "usuario" && usuario.id_google) {
+      return res.status(400).json({ message: "Esta cuenta usa Google para autenticarse, no puede recuperar contraseña." });
+    }
 
-      const resetToken = crypto.randomBytes(32).toString("hex");
-      const tokenExpira = Date.now() + 3600000; // 1 hora
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpira = Date.now() + 3600000; // 1 hora
 
-      await Usuario.saveResetToken(usuario.id_usuario || usuario.id_profesional, usuario.tipo, resetToken, tokenExpira);
+    await Usuario.saveResetToken(usuario.id_usuario || usuario.id_profesional, usuario.tipo, resetToken, tokenExpira);
 
-      //en produccion va la url frontend
-      const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+    //en produccion va la url frontend
+    const resetURL = `${FRONTEND_URL}/reset-password/${resetToken}`;
 
-      await transporter.sendMail({
-          from: "ivanrosendo1102@gmail.com",
-          to: correo_electronico,
-          subject: "Recuperación de contraseña",
-          html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+    await transporter.sendMail({
+      from: "terapialibre@terapialibre.com.ar",
+      to: correo_electronico,
+      subject: "Recuperación de contraseña",
+      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
                  <a href="${resetURL}">${resetURL}</a>
                  <p>Este enlace expirará en 1 hora.</p>`,
-      });
+    });
 
-      res.json({ message: "Se ha enviado un correo con instrucciones para recuperar tu contraseña." });
+    res.json({
+      message: "Se ha enviado un correo con instrucciones para recuperar tu contraseña.",
+    });
 
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error al procesar la solicitud." });
+    console.error("Error en requestPasswordReset:", error);
+
+    // 🔎 Distinguir error de envío de correo
+    if (error.name === "Error" && error.message.includes("Invalid recipient")) {
+      return res.status(400).json({ message: "El correo electrónico no es válido." });
+    }
+
+    return res.status(400).json({
+      message: "No se pudo procesar la solicitud. Intentá nuevamente más tarde.",
+    });
   }
 };
 
@@ -217,21 +238,29 @@ exports.resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
-      const usuario = await Usuario.findByToken(token);
+    const usuario = await Usuario.findByToken(token);
 
-      if (!usuario) {
-          return res.status(400).json({ message: "Token inválido o expirado." });
-      }
+    if (!usuario) {
+      return res.status(400).json({ message: "Token inválido o expirado." });
+    }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-      await Usuario.updatePassword(usuario.id, usuario.tipo, hashedPassword);
+    await Usuario.updatePassword(usuario.id, usuario.tipo, hashedPassword);
 
-      res.json({ message: "Contraseña actualizada correctamente." });
+    res.json({ message: "Contraseña actualizada correctamente." });
 
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error al restablecer la contraseña." });
+    console.error("Error en resetPassword:", error);
+
+    // 🔎 Puedes detectar casos comunes si querés
+    if (error.message?.includes("updatePassword")) {
+      return res.status(422).json({ message: "No se pudo actualizar la contraseña." });
+    }
+
+    return res.status(400).json({
+      message: "No se pudo restablecer la contraseña. Intente nuevamente.",
+    });
   }
 };
 

@@ -5,7 +5,6 @@ import FormProfessionalsComponent from "../components/FormProfessionalsComponent
 
 const FormProfessionals: React.FC = () => {
     const menuLinks = [
-        { name: "¿Necesito terapia?", href: "/necesito-terapia" },
         { name: "Buscar profesional", href: "/professionals" },
     ];
 

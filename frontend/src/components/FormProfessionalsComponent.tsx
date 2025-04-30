@@ -2,7 +2,7 @@ import { Card, Form, Row, Col, Container, Modal, Button } from "react-bootstrap"
 import "../styles/FormProfessionalsComponent.css"; // Ajusta la ruta según corresponda
 import EspecialidadSelect from "./EspecialidadSelect";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 const url = import.meta.env.VITE_API_BASE_URL;
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,22 +13,33 @@ const FormProfessionalsComponent = () => {
     const [termsChecked, setTermsChecked] = useState(false);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const [formData, setFormData] = useState({
-        nombre: "",
-        telefono: "",
-        correo_electronico: "",
-        contrasena: "",
-        titulo_universitario: "",
-        matricula_nacional: "",
-        matricula_provincial: "",
-        descripcion: "",
-        disponibilidad: "",
-        valor: "",
-        valor_internacional: "",
-        especialidades: [] as number[],
-        foto_perfil_url: "", // Ahora solo almacenamos el nombre del archivo
+    const [formData, setFormData] = useState(() => {
+        const savedForm = localStorage.getItem("formProfesional");
+        return savedForm
+            ? JSON.parse(savedForm)
+            : {
+                nombre: "",
+                telefono: "",
+                correo_electronico: "",
+                contrasena: "",
+                titulo_universitario: "",
+                matricula_nacional: "",
+                matricula_provincial: "",
+                descripcion: "",
+                disponibilidad: "",
+                valor: "",
+                valor_internacional: "",
+                especialidades: [] as number[],
+                foto_perfil_url: "",
+            };
     });
+
+    useEffect(() => {
+        localStorage.setItem("formProfesional", JSON.stringify(formData));
+    }, [formData]);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         if (e.target.type === "file") {
@@ -40,7 +51,6 @@ const FormProfessionalsComponent = () => {
             setFormData({ ...formData, [e.target.name]: e.target.value });
         }
     };
-
 
     const handleEspecialidadChange = (selected: number[]) => {
         setFormData({ ...formData, especialidades: selected });
@@ -65,19 +75,24 @@ const FormProfessionalsComponent = () => {
             return;
         }
 
+        if (!navigator.onLine) {
+            toast.error("Estás desconectado de Internet.");
+            return;
+        }
+
         try {
-            const response = await axios.post(`${url}/api/profesionales`, formData);
-            console.log("Respuesta del servidor:", response.data);
-            toast.success(`Profesional registrado con éxito 🎉`, {
-                position: "top-center",
-                autoClose: 3000,
-            });
+            setLoading(true);
+            await axios.post(`${url}/api/profesionales`, formData);
+            toast.success("Profesional registrado con éxito 🎉");
+            localStorage.removeItem("formProfesional");
         } catch (error: any) {
-            console.error("Error al registrar profesional:", error);
-            toast.error(`Error: ${error.response?.data?.message || error.message}`, {
-                position: "top-center",
-                autoClose: 5000,
-            });
+            if (error.message === "Network Error") {
+                toast.error("No se pudo conectar al servidor. Verificá tu conexión a Internet.");
+            } else {
+                toast.error(error.response?.data?.message || "Error inesperado");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -89,8 +104,6 @@ const FormProfessionalsComponent = () => {
             "correo_electronico",
             "contrasena",
             "titulo_universitario",
-            "matricula_nacional",
-            "matricula_provincial",
             "descripcion",
             "disponibilidad",
             "valor",
@@ -107,8 +120,6 @@ const FormProfessionalsComponent = () => {
     };
 
 
-
-
     return (
         <Container fluid className="form-container">
             <div className="form-card">
@@ -121,7 +132,7 @@ const FormProfessionalsComponent = () => {
                     }}
                 >
                     <Card.Body>
-                        <Card.Title className="text-center mb-4" style={{ color: "var(--verde)" }}>
+                        <Card.Title className="text-center mb-4 form-title">
                             Registro de profesionales
                         </Card.Title>
                         <Form onSubmit={handleSubmit}>
@@ -290,6 +301,11 @@ const FormProfessionalsComponent = () => {
                                             placeholder="Ingrese valor nacional"
                                             value={formData.valor}
                                             onChange={handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === '.' || e.key === ',' || e.key === 'e' || e.key === '-' || e.key === '+') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -302,6 +318,11 @@ const FormProfessionalsComponent = () => {
                                             placeholder="Ingrese valor internacional"
                                             value={formData.valor_internacional}
                                             onChange={handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === '.' || e.key === ',' || e.key === 'e' || e.key === '-' || e.key === '+') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -332,22 +353,19 @@ const FormProfessionalsComponent = () => {
                             <div className="d-flex justify-content-center mt-4">
                                 <button
                                     type="submit"
-                                    style={{
-                                        backgroundColor: "var(--verde)",
-                                        color: "white",
-                                        borderRadius: "30px",
-                                        padding: "10px 30px",
-                                        fontSize: "16px",
-                                        fontWeight: "bold",
-                                        border: "none",
-                                        cursor: "pointer",
-                                    }}
+                                    disabled={loading}
+                                    className="boton-enviar"
                                 >
-                                    Enviar
+                                    {loading ? (
+                                        <div className="d-flex align-items-center gap-2">
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Enviando...
+                                        </div>
+                                    ) : (
+                                        "Enviar"
+                                    )}
                                 </button>
                             </div>
-
-
                         </Form>
                     </Card.Body>
                 </Card>
@@ -373,7 +391,7 @@ const FormProfessionalsComponent = () => {
                             setTermsChecked(true); // 🔹 Marcar automáticamente el checkbox
                             setShowTermsModal(false);
                         }}
-                    >
+                        style={{ backgroundColor: "var(--verde)", borderColor: "var(--verde)" }}>
                         Aceptar
                     </Button>
                 </Modal.Footer>

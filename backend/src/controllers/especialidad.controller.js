@@ -10,7 +10,7 @@ exports.createEspecialidad = async (req, res) => {
     res.status(201).json({ message: "Especialidad creada", id });
   } catch (error) {
     console.error("Error al crear especialidad:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "No se pudo crear la especialidad. Intentá nuevamente." });
   }
 };
 
@@ -20,7 +20,7 @@ exports.getAllEspecialidades = async (req, res) => {
     res.status(200).json(especialidades);
   } catch (error) {
     console.error("Error al obtener especialidades:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "No se pudieron obtener las especialidades." });
   }
 };
 
@@ -34,7 +34,7 @@ exports.getEspecialidadById = async (req, res) => {
     res.status(200).json(especialidad);
   } catch (error) {
     console.error("Error al obtener especialidad:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "No se pudo obtener la especialidad." });
   }
 };
 
@@ -52,7 +52,7 @@ exports.updateEspecialidad = async (req, res) => {
     res.status(200).json({ message: "Especialidad actualizada" });
   } catch (error) {
     console.error("Error al actualizar especialidad:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "No se pudo actualizar la especialidad. Intentá nuevamente." });
   }
 };
 
@@ -66,6 +66,6 @@ exports.deleteEspecialidad = async (req, res) => {
     res.status(200).json({ message: "Especialidad eliminada" });
   } catch (error) {
     console.error("Error al eliminar especialidad:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "No se pudo eliminar la especialidad. Intentá nuevamente." });
   }
 };

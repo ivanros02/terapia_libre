@@ -127,7 +127,7 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
                                 style={{ padding: "14px 20px", fontSize: "16px", borderRadius: "12px" }}
                                 onClick={() => handleSelectTime(time.hora_inicio, time.hora_fin)}
                             >
-                                {`${time.hora_inicio} - ${time.hora_fin}`}
+                                {`${time.hora_inicio.slice(0, 5)} a ${time.hora_fin.slice(0, 5)}`}
                             </button>
                         ))
                     ) : (

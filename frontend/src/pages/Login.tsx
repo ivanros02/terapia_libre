@@ -5,18 +5,26 @@ import LoginComponente from "../components/LoginComponent"; // Asegúrate de ten
 import LegalPopup from "../layouts/LegalPopup";
 const Login: React.FC = () => {
     const menuLinks = [
-        { name: "¿Necesito terapia?", href: "/necesito-terapia" },
         { name: "Buscar profesional", href: "/professionals" },
     ];
 
     return (
-        <>
+        <div
+            style={{
+                backgroundImage: "url('/papel.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                minHeight: "100vh" // 🔹 Asegura que cubra toda la altura de la pantalla
+            }}
+        >
             <Head links={menuLinks} />
             <LoginComponente />
             <Footer />
-            <LegalPopup/>
-        </>
+            <LegalPopup />
+        </div>
     );
+
 }
 
 export default Login;

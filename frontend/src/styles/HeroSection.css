@@ -1,14 +1,18 @@
 .hero-section {
-    background-image: linear-gradient(
-        to bottom, 
-        rgba(255, 255, 255, 0) 60%, /* Transparente en la parte superior */
-        rgba(255, 255, 255, 1) 100%  /* Blanco en la parte inferior */
-    ), url("/home.png"); /* Imagen de fondo */
+    background-image: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0) 60%,
+            /* Transparente en la parte superior */
+            rgba(255, 255, 255, 1) 100%
+            /* Blanco en la parte inferior */
+        ), url("/home.png");
+    /* Imagen de fondo */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     width: 100%;
-    min-height: 111vh; /* Ajusta según sea necesario */
+    min-height: 111vh;
+    /* Ajusta según sea necesario */
+    margin-bottom: -25rem !important;
 }
 
 .hero-section h1 {
@@ -26,4 +30,19 @@
     margin-top: -5px !important;
     /* Acerca aún más el p al h1 */
     font-size: 24px !important;
+    font-weight: 400 !important;
+}
+
+@media (max-width: 768px) {
+    .hero-section h1 {
+        margin-top: 10rem !important;
+        /* o menos, ajustalo a gusto */
+        font-size: 48px !important;
+        /* opcional: más chico en móvil */
+    }
+
+    .hero-section p {
+        font-size: 18px !important;
+        /* opcional: texto del subtítulo más chico */
+    }
 }

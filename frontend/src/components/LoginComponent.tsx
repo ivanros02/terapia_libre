@@ -59,19 +59,25 @@ const Login: React.FC = () => {
         <Container fluid className="login-container mt-5">
             <Row className="shadow-lg overflow-hidden p-3 align-items-center bg-white rounded" style={{ maxWidth: "900px", width: "100%" }}>
                 {/* Sección Izquierda */}
-                <Col md={5} className="d-none d-md-flex align-items-center justify-content-center rounded-personalizado h-100" style={{ background: "#567C6F" }}>
+                <Col md={5} className="d-none d-md-flex align-items-center justify-content-center rounded-personalizado h-100" style={{ background: "var(--verde)" }}>
                     <Card className="border-0 bg-transparent text-center">
                         <Card.Body className="d-flex flex-column align-items-center">
                             <img src="/footer_image.png" alt="Hola" className="img-fluid mb-3" style={{ maxWidth: "150px" }} />
-                            <h3>Hola! 👋</h3>
+                            <h3 className="login-title-card">Hola! 👋</h3>
                         </Card.Body>
                     </Card>
                 </Col>
 
                 {/* Sección Derecha */}
                 <Col md={6} className="p-5 h-100 d-flex flex-column justify-content-center" style={{ marginTop: "70px" }}>
-                    <h2>Iniciar sesión</h2>
-                    <p>Si no tenés una cuenta, ¡creá la tuya <a href="/register">acá!</a></p>
+                    <div className="d-md-none text-center mb-4" style={{ whiteSpace: "nowrap", marginLeft:"-2rem" }}>
+                        <h3 className="m-0 title-login-movil">
+                            Hola de nuevo! 👋
+                        </h3>
+                    </div>
+
+                    <h2 className="title-login">Iniciar sesión</h2>
+                    <p style={{fontSize:"15px"}}>Si no tenés una cuenta, ¡creá la tuya <a href="/register">acá!</a></p>
 
                     {/* Formulario */}
                     <Form onSubmit={handleSubmit}>

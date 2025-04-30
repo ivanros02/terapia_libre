@@ -48,18 +48,24 @@ const ProfessionalDetails: React.FC = () => {
     ];
 
     return (
-        <div className="d-flex flex-column min-vh-100">
+        <div className="d-flex flex-column min-vh-100" style={{/* 🔽 Fondo con imagen */
+            backgroundImage: "url('/papel.png')", /* Cambiá esto por la ruta real */
+            backgroundSize: "cover", /* Ajusta para cubrir todo el área */
+            backgroundPosition: "center", /* Centra la imagen */
+            backgroundRepeat: "no-repeat",/* Evita que se repita */
+        }}>
             <Head links={menuLinks} />
-
+            <h1 className="h1-custom-profs text-center" style={{ paddingTop: "10rem" }}>PROFESIONALES</h1>
             {/* Contenedor principal para centrar la card */}
-            <main className="flex-grow-1 d-flex justify-content-center align-items-center p-1" style={{ marginTop: "80px" }}>
+            <main className="flex-grow-1 d-flex justify-content-center align-items-center p-1" style={{ marginBottom: "100px" }}>
+
                 <div className="container">
                     <ProfessionalDetailsComponent professional={professional} />
                 </div>
             </main>
 
             <Footer />
-            <LegalPopup/>
+            <LegalPopup />
         </div>
     );
 };

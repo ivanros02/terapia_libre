@@ -2,7 +2,7 @@ import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
     return (
-        <footer className="py-4 border-top border-secondary" style={{ backgroundColor: "var(--verde)" }}>
+        <footer className="py-4 border-top border-secondary" style={{ backgroundColor: "var(--verde-oscuro)" }}>
             <div className="container">
                 <div className="row">
                     {/* Sección Izquierda */}

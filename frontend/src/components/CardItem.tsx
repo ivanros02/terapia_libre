@@ -54,7 +54,7 @@ const CardItem: React.FC<CardProps> = ({ image, title, card_text }) => {
             {!hovered && (
                 <div
                     className="position-absolute top-50 start-0 translate-middle-y w-100 text-center py-2"
-                    style={{ backgroundColor: "var(--verde)", opacity: 0.75, transition: "opacity 0.3s ease-in-out" }}
+                    style={{ backgroundColor: "var(--verde)", opacity: 0.75, transition: "opacity 0.3s ease-in-out",height:"71px" }}
                 >
                     <h5 className="text-white mb-0">{title}</h5>
                 </div>

@@ -34,7 +34,7 @@ exports.crearOrdenPayPal = async (req, res) => {
         res.json(response.data); // Enviar `orderID` al frontend
     } catch (error) {
         console.error("Error creando la orden de PayPal:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudo completar la operación. Verificá los datos e intentá nuevamente." });
     }
 };
 
@@ -63,6 +63,7 @@ exports.capturarPagoPayPal = async (req, res) => {
 
             // Guardar turno en la base de datos
             const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
+            await Turno.notificarTurnoConfirmado(id_turno);
 
             // Guardar pago en la base de datos
             await Pago.registrarPago(id_turno, precio, "PayPal", "Pagado", id_transaccion);
@@ -73,7 +74,7 @@ exports.capturarPagoPayPal = async (req, res) => {
         res.status(400).json({ message: "Pago no completado" });
     } catch (error) {
         console.error("Error al capturar el pago:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudo completar la operación. Verificá los datos e intentá nuevamente." });
     }
 };
 
@@ -95,7 +96,7 @@ exports.reservarTurno = async (req, res) => {
         res.status(201).json({ message: "Turno reservado con éxito", id_turno: turnoId });
     } catch (error) {
         console.error("Error al reservar turno:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudo completar la operación. Verificá los datos e intentá nuevamente." });
     }
 };
 
@@ -110,7 +111,7 @@ exports.obtenerTurnos = async (req, res) => {
         res.json(turnos);
     } catch (error) {
         console.error("Error al obtener turnos:", error);
-        res.status(500).json({ message: "Error interno" });
+        res.status(400).json({ message: "No se pudo completar la operación. Verificá los datos e intentá nuevamente." });
     }
 };
 
@@ -245,7 +246,7 @@ exports.getNuevosPacientes = async (req, res) => {
         if (!id) return res.status(400).json({ message: "ID del profesional es requerido" });
 
         const nuevosPacientes = await Turno.obtenerNuevosPacientes(id);
-        res.json({ nuevosPacientes });
+        res.json(nuevosPacientes);
     } catch (error) {
         console.error("Error al obtener nuevos pacientes:", error);
         res.status(500).json({ message: "Error interno del servidor" });
@@ -269,25 +270,21 @@ exports.guardarGoogleEvent = async (req, res) => {
     try {
         console.log("📩 Request recibido en guardarGoogleEvent:", req.body);
 
-        const { id_turno, google_event_id_paciente, google_event_id_profesional } = req.body;
+        const { id_turno, google_event_id_paciente, google_event_id_profesional, meet_url } = req.body;
 
         if (!id_turno) {
-            console.warn("⚠️ id_turno es obligatorio");
             return res.status(400).json({ message: "id_turno es obligatorio" });
         }
 
-        if (!google_event_id_paciente && !google_event_id_profesional) {
-            console.warn("⚠️ Se requiere al menos un Google Event ID");
-            return res.status(400).json({ message: "Se requiere al menos un Google Event ID" });
+        if (!google_event_id_paciente && !google_event_id_profesional && !meet_url) {
+            return res.status(400).json({ message: "Se requiere al menos un Google Event ID o meet_url" });
         }
 
-        const actualizado = await Turno.guardarGoogleEvent(id_turno, google_event_id_paciente, google_event_id_profesional);
+        const actualizado = await Turno.guardarGoogleEvent(id_turno, google_event_id_paciente, google_event_id_profesional, meet_url);
 
         if (actualizado) {
-            console.log(`✅ Google Event ID guardado correctamente para el turno ${id_turno}`);
-            return res.status(200).json({ message: "Google Event ID(s) guardado(s) correctamente" });
+            return res.status(200).json({ message: "Datos de Google Calendar guardados correctamente" });
         } else {
-            console.warn(`⚠️ No se encontró el turno ${id_turno} o ya estaba actualizado`);
             return res.status(404).json({ message: "No se encontró el turno o ya estaba actualizado" });
         }
     } catch (error) {
@@ -295,6 +292,7 @@ exports.guardarGoogleEvent = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
 
 
 

@@ -30,7 +30,7 @@ const getOrCreateChat = async (req, res) => {
     res.status(200).json({ chatId: chat.id_chat });
   } catch (error) {
     console.error("Error en getOrCreateChat:", error);
-    res.status(500).json({ message: "Error al obtener o crear el chat" });
+    res.status(400).json({ message: "Error al obtener o crear el chat" });
   }
 };
 
@@ -90,7 +90,7 @@ const sendMessage = async (req, res) => {
 
     if (!destinatario) {
       console.error("❌ Error: No se pudo determinar el destinatario.");
-      return res.status(500).json({ message: "No se pudo determinar el destinatario." });
+      return res.status(400).json({ message: "No se pudo determinar el destinatario." });
     }
 
     // 🔔 Enviar notificación SOLO si el mensaje no ha sido leído
@@ -107,7 +107,7 @@ const sendMessage = async (req, res) => {
     res.status(201).json({ messageId });
   } catch (error) {
     console.error("❌ Error al enviar el mensaje:", error);
-    res.status(500).json({ message: "Error al enviar el mensaje" });
+    res.status(400).json({ message: "Error al enviar el mensaje" });
   }
 };
 
@@ -127,7 +127,7 @@ const marcarMensajesComoLeidos = async (req, res) => {
     res.status(200).json({ message: "Mensajes marcados como leídos." });
   } catch (error) {
     console.error("❌ Error al marcar mensajes como leídos:", error);
-    res.status(500).json({ message: "Error al marcar mensajes como leídos." });
+    res.status(400).json({ message: "Error al marcar mensajes como leídos." });
   }
 };
 
@@ -146,7 +146,7 @@ const getMessages = async (req, res) => {
     const messages = await Message.findByChatId(id_chat);
     res.status(200).json(messages);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener los mensajes" });
+    res.status(400).json({ message: "Error al obtener los mensajes" });
   }
 };
 
@@ -187,7 +187,7 @@ const getChatId = async (req, res) => {
     res.status(200).json({ chatId: chat.id_chat });
   } catch (error) {
     console.error("Error en getChatId:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "Error interno del servidor" });
   }
 };
 
@@ -226,7 +226,7 @@ const getChatList = async (req, res) => {
     res.status(200).json(chats);
   } catch (error) {
     console.error("Error al obtener la lista de chats:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "Error interno del servidor" });
   }
 };
 
@@ -265,7 +265,7 @@ const getAvailableChatUsers = async (req, res) => {
     res.status(200).json(contacts);
   } catch (error) {
     console.error("Error al obtener contactos para chat:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(400).json({ message: "Error interno del servidor" });
   }
 };
 

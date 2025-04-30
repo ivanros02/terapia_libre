@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ⬅️ Para la redirección
 import CalendarAvailability from "./CalendarAvailability";
-
+import "../styles/ProfessionalDetailsComponent.css"; // Asegúrate de que la ruta sea correcta
+import axios from "axios";
+const url = import.meta.env.VITE_API_BASE_URL;
 
 interface Professional {
     id_profesional: number;
@@ -23,19 +25,43 @@ interface ProfessionalDetailsComponentProps {
 const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> = ({ professional }) => {
     const [showCalendar, setShowCalendar] = useState(false);
     const navigate = useNavigate();
+    const formattedPrice = Number(professional.valor).toLocaleString("es-AR", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    });
 
-    const handleOpenCalendar = () => {
+    const handleOpenCalendar = async () => {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            // Guardamos la URL actual antes de redirigir al login
+            console.log("No hay token, redirigiendo a login...");
             localStorage.setItem("prevPath", location.pathname);
             navigate("/login");
             return;
         }
 
-        // Si hay token, abrir el calendario
-        setShowCalendar(true);
+        try {
+            const id = localStorage.getItem("id"); // 🔥 Acordate que también guardás el id
+            if (!id) {
+                localStorage.removeItem("token");
+                navigate("/login");
+                return;
+            }
+
+            // 🔥 Validar contra backend
+            await axios.get(`${url}/api/auth/usuario/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // ✅ Si todo bien, mostrar el calendario
+            setShowCalendar(true);
+        } catch (error) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("id");
+            navigate("/login");
+        }
     };
 
     const getGoogleDriveImageUrl = (url: string) => {
@@ -54,11 +80,16 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
     };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center align-items-stretch">
+        <div className="container mt-5 ">
+            <div className="row justify-content-center align-items-stretch ">
                 {/* Imagen */}
-                <div className="col-12 col-md-4 d-flex justify-content-center">
-                    <div className="card shadow-lg rounded-4 p-0 h-100" style={{ width: "300px", height: "300px", overflow: "hidden" }}>
+                <div className="col-12 col-md-4 d-flex justify-content-center tu-contenedor-flex">
+                    <div className="card shadow-lg p-0" style={{
+                        width: "231px",
+                        height: "275px",
+                        overflow: "hidden",
+                        borderRadius: "32px",
+                    }}>
                         <img
                             src={getGoogleDriveImageUrl(professional.foto_perfil_url)}
                             alt={professional.nombre}
@@ -69,23 +100,45 @@ const ProfessionalDetailsComponent: React.FC<ProfessionalDetailsComponentProps> 
                 </div>
 
                 {/* Datos */}
-                <div className="col-12 col-md-7 mt-4 mt-md-0 d-flex">
-                    <div className="card shadow-lg rounded-4 p-4 text-white w-100 h-100" style={{ backgroundColor: "var(--verde)", minHeight: "300px" }}>
-                        <p className="small text-light">{`Disponibilidad en ${professional.disponibilidad}`}</p>
-                        <h2 className="fw-bold">
-                            {professional.nombre} <span className="fw-normal text-light"> ${professional.valor}.-</span>
-                        </h2>
-                        <p className="fw-semibold">
-                            {professional.especialidades.map(e => e.nombre).join(" • ")}
-                        </p>
-                        <p className="text-light">{professional.descripcion}</p>
+                <div className="col-12 col-md-7 mt-4 mt-md-0 d-flex justify-content-center">
+                    <div className="card-datos-wrapper">
+                        <div className="card-datos card shadow-lg text-white p-3">
 
-                        {/* Botón para abrir el calendario flotante */}
-                        <button className="btn btn-light fw-bold mt-3" onClick={handleOpenCalendar}>
-                            Agendar turno
-                        </button>
+                            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 datos-header">
+                                <p className="disponibilidad-datos mb-0">
+                                    {`Disponibilidad en ${professional.disponibilidad}`}
+                                </p>
+
+                                <div className="datos-centrales flex-grow-1 text-center">
+                                    <h2 className="titulo-datos mb-1">
+                                        {professional.nombre} <span> ${formattedPrice}.-</span>
+                                    </h2>
+                                    <p className="especialidad-datos mb-0">
+                                        {professional.especialidades.map((e) => e.nombre).join(" • ")}
+                                    </p>
+                                </div>
+                            </div>
+
+
+                            <p
+                                className="descripcion-datos descripcion-ajustada"
+                                title={professional.descripcion}
+                            >
+                                {professional.descripcion}
+                            </p>
+
+
+                            <div className="text-center">
+                                <button className="btn btn-agendar btn-link mt-3" onClick={handleOpenCalendar}>
+                                    Agendar turno
+                                </button>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+
+
             </div>
 
             {/* Calendario flotante */}

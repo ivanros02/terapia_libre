@@ -12,6 +12,7 @@ exports.googleCallback = async (req, res) => {
     // Guarda el token en la base de datos o en el perfil de sesión del usuario
     res.json({ message: 'Autenticación exitosa', tokens });
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener el token', error });
+    console.error("Error en googleCallback:", error);
+    res.status(400).json({ message: "No se pudo completar la autenticación con Google. Intentá nuevamente." });
   }
 };
