@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, Modal } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import axios from "axios";
 import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
@@ -7,7 +7,7 @@ import DashboardCard from "../components/dashboard/DashboardCard";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
 import HistorialSesiones from "../components/dashboard/HistorialSesiones";
 import { useNavigate } from "react-router-dom";
-import CalendarAvailability from "../components/CalendarAvailability";
+
 import "../styles/DashboardProfesional.css"
 import LoadingSpinner from "../components/LoadingSpinner";
 const url = import.meta.env.VITE_API_BASE_URL;
@@ -46,9 +46,6 @@ const DashboardUsuario = () => {
   const [terapeuta, setTerapeuta] = useState<Terapeuta | null>(null);
   const userId = localStorage.getItem("id"); // 🔹 Obtener el ID almacenado en localStorage
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-  const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -196,6 +193,7 @@ const DashboardUsuario = () => {
           patientName={turnoHoy?.nombre_profesional || "Sin sesion hoy"}
           appointmentTime={turnoHoy ? `${turnoHoy.hora_turno}` : "Sin turnos"}
           newPatients={3}
+          terapeuta={terapeuta?.id_profesional}
         />
       </div>
 
@@ -233,17 +231,6 @@ const DashboardUsuario = () => {
       {!isMobile && <div className="proximos-turnos">
         <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />
       </div>}
-
-
-      {/* Modal con CalendarAvailability */}
-      <Modal show={showModal} onHide={handleCloseModal} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Agendar Turno</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <CalendarAvailability id_profesional={terapeuta?.id_profesional ?? 0} showModal={showModal} />
-        </Modal.Body>
-      </Modal>
 
     </div>
   );

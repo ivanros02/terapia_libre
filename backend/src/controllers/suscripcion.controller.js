@@ -12,20 +12,15 @@ exports.obtenerSuscripcion = async (req, res) => {
 
         console.log("🔹 Buscando suscripción activa para:", email);
 
-        // 🔹 Consultar TODAS las suscripciones
-        const response = await axios.get("https://api.mercadopago.com/preapproval/search?limit=100", {
+        const response = await axios.get(`${MERCADO_PAGO_URL}?payer_email=${email}`, {
             headers: { Authorization: `Bearer ${MP_ACCESS_TOKEN}` }
         });
 
-        console.log("🔹 TODAS LAS SUSCRIPCIONES RECIBIDAS:");
-        console.log(JSON.stringify(response.data.results, null, 2));
-
         const suscripciones = response.data.results;
 
-        // 🔹 FILTRAR solo las suscripciones activas
+        // 🔹 Buscar una suscripción activa
         const suscripcion = suscripciones.find(sub =>
-            (sub.status === "authorized" || sub.status === "active") &&
-            sub.payer_first_name.toLowerCase().includes("monica") // 🔹 Filtra por nombre ya que el email no aparece
+            sub.status === "authorized" || sub.status === "active"
         );
 
         if (!suscripcion) {
@@ -33,13 +28,16 @@ exports.obtenerSuscripcion = async (req, res) => {
             return res.status(200).json({ estado: "inexistente", monto: 0, proxima_factura: "N/A" });
         }
 
-        console.log(`✅ Suscripción activa encontrada:`, suscripcion);
+        console.log(`✅ Suscripción activa encontrada:`, suscripcion.id);
 
         res.json({
-            estado: suscripcion.status || "inactive",
+            estado: suscripcion.status,
             monto: suscripcion.auto_recurring?.transaction_amount || 0,
-            proxima_factura: suscripcion.next_payment_date?.split("T")[0] || "N/A"
+            proxima_factura: suscripcion.next_payment_date?.split("T")[0] || "N/A",
+            fecha_inicio: suscripcion.date_created?.split("T")[0] || "N/A",
+            metodo_pago: suscripcion.payment_method_id || "Desconocido"
         });
+
 
     } catch (error) {
         console.error("❌ Error al obtener suscripción:", error.response?.data || error.message);

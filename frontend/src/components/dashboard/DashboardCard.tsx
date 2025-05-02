@@ -1,6 +1,8 @@
+import {  useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Card, Container } from "react-bootstrap";
+import { Card, Container,Modal } from "react-bootstrap";
 import imagen from "/quienes_somos.png"; // Asegúrate de importar la imagen correctamente
+import CalendarAvailability from "../CalendarAvailability";
 import "../../styles/DashboardCard.css";
 import { Link } from "react-router-dom";
 
@@ -9,11 +11,15 @@ interface DashboardCardProps {
     patientName: string;
     appointmentTime: string;
     newPatients: number;
+    terapeuta?: number; // ← opcional
 }
 
 
-const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appointmentTime, newPatients }) => {
+const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appointmentTime, newPatients , terapeuta }) => {
     const esProfesional = localStorage.getItem("esProfesional") === "true";
+    const handleShowModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+    const [showModal, setShowModal] = useState(false);
 
     return (
         <Container fluid>
@@ -79,11 +85,21 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
 
                 {/* ✅ Mover el botón fuera del Card */}
                 {!esProfesional && (
-                    <div className="btn-agendar-turno mt-3">
+                    <div className="btn-agendar-turno mt-3" onClick={handleShowModal}>
                         Agendar un nuevo turno
                     </div>
                 )}
             </div>
+
+            {/* Modal con CalendarAvailability */}
+            <Modal show={showModal} onHide={handleCloseModal} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Agendar Turno</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <CalendarAvailability id_profesional={terapeuta??0} showModal={showModal} />
+                </Modal.Body>
+            </Modal>
         </Container>
     );
 };

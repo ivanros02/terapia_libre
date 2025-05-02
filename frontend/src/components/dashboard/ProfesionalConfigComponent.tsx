@@ -108,8 +108,14 @@ function ProfesionalConfigComponent() {
                     fetchProfesionalData={fetchProfesionalData}
                 />
             )}
+
             {/* 🔹 Mostrar la información de la suscripción */}
-            {profesional?.correo_electronico && <SuscripcionInfo email={profesional.correo_electronico} />}
+            {profesional?.correo_electronico && (
+                <div className="container mt-4">
+                    <SuscripcionInfo email={profesional.correo_electronico} />
+                </div>
+            )}
+
 
         </div>
     );
