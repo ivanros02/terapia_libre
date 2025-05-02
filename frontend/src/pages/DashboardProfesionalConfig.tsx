@@ -71,14 +71,14 @@ const Dashboard = () => {
 
   return (
     <div className="parent">
-      {!isMobile && <div className="div1"><Sidebar /></div>}
-      <div className="div2">
+      {!isMobile && <div className="div-side-bar"><Sidebar /></div>}
+      <div className="div-search-navbar">
         <SearchNavbar
           profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
         />
       </div>
-      <div className="div6"><ProfesionalConfigComponent /></div>
+      <div className="div-centrado-solo"><ProfesionalConfigComponent /></div>
     </div>
   );
 };

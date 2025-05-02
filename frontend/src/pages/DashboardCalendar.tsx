@@ -105,13 +105,13 @@ const DashboardCalendar = () => {
 
   return (
     <div className="parent">
-      {!isMobile && <div className="div1"><Sidebar /></div>} 
-      <div className="div2">
+      {!isMobile && <div className="div-search-navbar"><Sidebar /></div>} 
+      <div className="div-search-navbar">
         <SearchNavbar
           profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")} />
       </div>
-      <div className="div6">
+      <div className="div-centrado-solo">
         <GoogleCalendar turnos={turnos} usuarioRol={esProfesional ? "profesional" : "usuario"} />
       </div>
     </div>

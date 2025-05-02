@@ -4,6 +4,8 @@ import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
 import EditarUsuario from "../components/dashboard/EditarUsuario";
 const url = import.meta.env.VITE_API_BASE_URL;
+import "../styles/DashboardProfesional.css"
+import "../styles/DashboardUsuarioConfig.css";
 import { Button, Container, Row, Col } from "react-bootstrap";
 
 // Tipos de datos
@@ -72,17 +74,17 @@ const Dashboard = () => {
 
     return (
         <div className="parent">
-             {!isMobile && <div className="div1"><Sidebar /></div>}
-            <div className="div2"><SearchNavbar
+             {!isMobile && <div className="div-side-bar"><Sidebar /></div>}
+            <div className="div-search-navbar"><SearchNavbar
                 profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
                 profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
             /></div>
             
-            <div className="div6">{/* Contenedor centrado */}
-            <Container className="d-flex flex-column justify-content-center align-items-center vh-100">
+            <div className="div-centrado-solo">{/* Contenedor centrado */}
+            <Container className="d-flex flex-column justify-content-center align-items-center">
                 <Row className="w-100 text-center">
                     <Col>
-                        <h2 className="fw-bold">Perfil de Usuario</h2>
+                        <h2 className="titulo-config">Perfil de Usuario</h2>
                         <p className="text-muted">{userData?.correo_electronico}</p>
                     </Col>
                 </Row>
@@ -90,7 +92,7 @@ const Dashboard = () => {
                 <Row className="mt-3">
                     <Col className="text-center">
                         {/* 🔹 Botón centrado y responsivo */}
-                        <Button variant="primary" onClick={() => setModalShow(true)} className="px-4 py-2">
+                        <Button variant="primary" onClick={() => setModalShow(true)} className="px-4 py-2 btn-edit">
                             Editar Perfil
                         </Button>
                     </Col>

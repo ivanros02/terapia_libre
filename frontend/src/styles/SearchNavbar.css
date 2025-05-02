@@ -1,26 +1,37 @@
 /* Ajuste del navbar */
 .navbar-custom {
-    height: 150px;
+    height: 57.35px;
     display: flex;
-    align-items: center; /* Centrar verticalmente */
+    align-items: center;
+    /* Centrar verticalmente */
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 /* Contenedor principal dentro del navbar */
 .navbar-custom .container-fluid {
     display: flex;
-    align-items: center; /* Asegurar alineación vertical */
-    justify-content: space-between; /* Espaciado entre elementos */
+    align-items: center;
+    /* Asegurar alineación vertical */
+    justify-content: space-between;
+    /* Espaciado entre elementos */
     height: 100%;
 }
 
 /* Estilo de la barra de búsqueda */
 .search-bar {
-    background-color: #dddddd !important; /* Fondo gris claro */
-    border-radius: 12px !important; /* Bordes redondeados */
-    border: none !important; /* Eliminar bordes */
-    height: 45px; /* Más grosor */
-    padding-left: 15px; /* Espaciado interno */
-    font-size: 16px; /* Tamaño de texto */
+    background-color: #dddddd !important;
+    /* Fondo gris claro */
+    border-radius: 12px !important;
+    /* Bordes redondeados */
+    border: none !important;
+    /* Eliminar bordes */
+    height: 45px;
+    /* Más grosor */
+    padding-left: 15px;
+    /* Espaciado interno */
+    font-size: 16px;
+    /* Tamaño de texto */
 }
 
 .search-bar:focus {
@@ -34,7 +45,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%; /* Asegurar alineación vertical */
+    height: 100%;
+    /* Asegurar alineación vertical */
 }
 
 /* Imagen de perfil */
@@ -47,24 +59,30 @@
 /* 🔹 Responsividad en móviles */
 @media (max-width: 991px) {
     .search-container {
-        display: none !important; /* Oculta la barra de búsqueda */
+        display: none !important;
+        /* Oculta la barra de búsqueda */
     }
 
     .navbar-custom {
-        margin-left: 0px !important; /* Elimina el margen izquierdo en móviles */
-        height: auto; /* Ajuste automático de altura */
-        justify-content: center !important; /* Centra los elementos */
+        margin-left: 0px !important;
+        /* Elimina el margen izquierdo en móviles */
+        height: auto;
+        /* Ajuste automático de altura */
+        justify-content: center !important;
+        /* Centra los elementos */
+
     }
 
     .profile-wrapper {
-        margin-left: auto; /* Empuja el perfil a la derecha */
+        margin-left: auto;
+        /* Empuja el perfil a la derecha */
         border: none !important;
         padding: 0 !important;
-      }
-      
-      .profile-container {
+    }
+
+    .profile-container {
         justify-content: flex-end !important;
-      }
+    }
 
     /* Ocultar el nombre en móviles pequeños */
     .profile-content span {

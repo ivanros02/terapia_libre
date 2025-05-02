@@ -13,7 +13,7 @@
 }
 
 /* Sidebar */
-.div1 {
+.div-side-bar {
     grid-row: 1 / 4;
     grid-column: 1 / 2;
     display: flex;
@@ -22,14 +22,14 @@
 
 
 /* Search Bar */
-.div2 {
+.div-search-navbar {
     grid-column: 2 / 5;
     /* Ocupar todas las columnas excepto la del sidebar */
     grid-row: 1 / 2;
 }
 
 /* Card 1 (Principal) */
-.div3 {
+.div-dashboard-card {
     grid-column: 2 / 4;
     /* Se reduce su ancho */
     grid-row: 2 / 3;
@@ -37,7 +37,7 @@
 }
 
 /* Card 2 */
-.div4 {
+.div-hc-card {
     grid-column: 2 / 4;
     /* Se reduce su ancho */
     grid-row: 3 / 4;
@@ -45,7 +45,7 @@
 }
 
 /* Card 3 (Calendario) */
-.div5 {
+.proximos-turnos {
     grid-column: 4 / 5;
     /* Ahora es más ancho */
     grid-row: 2 / 4;
@@ -63,28 +63,28 @@
         height: 70vh !important;
     }
 
-    .div2 {
+    .div-search-navbar {
         grid-column: span 2 / span 2 !important;
     }
 
-    .div3 {
+    .div-dashboard-card {
         grid-column: span 2 / span 2 !important;
         grid-row-start: 2 !important;
     }
 
-    .div5 {
+    .proximos-turnos {
         grid-column: span 5 / span 2 !important;
         grid-column-start: 1 !important;
         grid-row-start: 5 !important;
         margin-top: 6rem;
     }
 
-    .div9 {
+    .chats-div-movil {
         grid-column-start: 2 !important;
         grid-row-start: 4 !important;
     }
 
-    .div7 {
+    .config-div-movil {
         grid-column-start: 1 !important;
         grid-row-start: 4 !important;
     }

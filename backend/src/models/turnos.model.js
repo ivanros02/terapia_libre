@@ -123,7 +123,6 @@ class Turno {
             FROM turnos t
             JOIN profesionales p ON t.id_profesional = p.id_profesional
             WHERE t.id_usuario = ?
-            AND CONCAT(t.fecha_turno, ' ', t.hora_turno) >= NOW()  -- 🔹 Solo turnos futuros
             ORDER BY t.fecha_turno ASC, t.hora_turno ASC
             LIMIT 5`,
             [id_usuario]

@@ -24,7 +24,7 @@ interface HistorialProps {
 
 const HistorialSesiones: React.FC<HistorialProps> = ({ sesiones, terapeuta, onCambiarTerapeuta }) => {
     return (
-        <Container fluid className=" historial-container rounded-4 p-4" style={{ backgroundColor: "#f8f9fa" }}>
+        <Container fluid className="historial-container rounded-4 p-4" style={{ backgroundColor: "#f8f9fa" }}>
             <Row className="align-items-start">
                 {/* Historial de Sesiones */}
                 <Col xs={12} md={6} className="mb-4 ">

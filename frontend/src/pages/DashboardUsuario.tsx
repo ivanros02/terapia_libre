@@ -9,6 +9,7 @@ import HistorialSesiones from "../components/dashboard/HistorialSesiones";
 import { useNavigate } from "react-router-dom";
 import CalendarAvailability from "../components/CalendarAvailability";
 import "../styles/DashboardProfesional.css"
+import LoadingSpinner from "../components/LoadingSpinner";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 interface TurnoHoy {
@@ -143,8 +144,6 @@ const DashboardUsuario = () => {
         const turnosResponse = await axios.get(`${url}/api/turnos/usuarioDashboard/${id}`);
         const turnos = Array.isArray(turnosResponse.data) ? turnosResponse.data : [];
 
-
-
         // 🔹 Extraer próximos turnos (máximo 5)
         const proximosTurnos = turnos.map((turno: any) => ({
           fecha: turno.fecha_turno,
@@ -174,18 +173,24 @@ const DashboardUsuario = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (loading) return <div>Cargando...</div>;
+  console.log("Sesiones:", proximosTurnos);
+  console.log("Eventos:", eventos);
+
+  if (loading) return <LoadingSpinner />; // 🔹 Mostrar un spinner de carga mientras se obtienen los datos
   
   return (
     <div className="parent">
-      {!isMobile && <div className="div1"><Sidebar /></div>}
-      <div className="div2">
+      {/* 🔹 Sidebar solo en pantallas grandes */}
+      {!isMobile && <div className="div-side-bar"><Sidebar /></div>}
+
+      <div className="div-search-navbar">
         <SearchNavbar
           profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
           profileName={userName || "Usuario"} // 🔹 Mostrar el nombre del usuario o un valor por defecto
         />
       </div>
-      <div className="div3">
+
+      <div className="div-dashboard-card">
         <DashboardCard
           name={userName || "Usuario"}
           patientName={turnoHoy?.nombre_profesional || "Sin sesion hoy"}
@@ -197,20 +202,7 @@ const DashboardUsuario = () => {
       {/* 🔹 Estas tarjetas SOLO aparecen en móviles */}
       {isMobile && (
         <>
-          <div className="div8">
-            <Card
-              className="shadow-lg border-0 rounded-4 p-3 calendario-card d-flex align-items-center justify-content-center gap-2"
-              style={{ backgroundColor: "var(--naranja)", display: "flex", flexDirection: "row" }}
-            >
-              <img src="/sidebar/calendar.png" alt="Calendar" width="24" height="24" />
-              <span className="text-white" onClick={handleShowModal}>AGENDAR NUEVO TURNO</span>
-            </Card>
-          </div>
-
-
-
-
-          <div className="div7" onClick={() => navigate('/dashboard/usuario/config_usuario')} style={{ cursor: "pointer" }}>
+          <div className="config-div-movil" onClick={() => navigate('/dashboard/usuario/config_usuario')} style={{ cursor: "pointer" }}>
             <Card
               className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
             >
@@ -220,7 +212,7 @@ const DashboardUsuario = () => {
           </div>
 
 
-          <div className="div9" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
+          <div className="chats-div-movil" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
             <Card
               className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
             >
@@ -228,18 +220,17 @@ const DashboardUsuario = () => {
               <span style={{ color: "var(--verde)" }}>Chats</span>
             </Card>
           </div>
-
-
         </>
       )}
+      {/* 🔹 FIN DE tarjetas SOLO aparecen en móviles */}
 
-      <div className={isMobile ? "div5" : "div4"}>
+      <div className={isMobile ? "proximos-turnos" : "div-hc-card"}>
         {terapeuta && (
           <HistorialSesiones sesiones={sesiones} terapeuta={terapeuta} onCambiarTerapeuta={() => alert("Cambiar terapeuta")} />
         )}
       </div>
 
-      {!isMobile && <div className="div5 calendarioAncho">
+      {!isMobile && <div className="proximos-turnos">
         <CalendarioTurnos eventos={eventos} proximosTurnos={proximosTurnos} />
       </div>}
 
@@ -253,6 +244,7 @@ const DashboardUsuario = () => {
           <CalendarAvailability id_profesional={terapeuta?.id_profesional ?? 0} showModal={showModal} />
         </Modal.Body>
       </Modal>
+
     </div>
   );
 };

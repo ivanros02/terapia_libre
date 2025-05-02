@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Card, Button, Container } from "react-bootstrap";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import moment, { Moment } from "moment";
+import "../../styles/CalendarioTurnos.css";
+
 moment.locale("es");
 
 interface Turno {
@@ -46,11 +48,13 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
     const eventosNormalizados = eventos.map(fecha => moment(fecha).format("YYYY-MM-DD"));
 
     return (
-        <Container fluid style={{ paddingBottom: "25px" }}>
-            <Card className="shadow-sm p-3 rounded-4">
+        <Container fluid className="calendario-container">
+
+            <Card className="shadow-sm p-3 rounded-4 card-calendario">
                 {/* 🔹 Solo se muestra en pantallas medianas en adelante */}
                 <div className="d-none d-md-block">
-                    <h1 style={{fontSize:"20.48px"}}>Calendario</h1>
+                    <h1 className="titulo-calendario">Calendario</h1>
+
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <Button variant="light" size="sm" onClick={() => cambiarMes(-1)}>
                             <FaChevronLeft />
@@ -63,7 +67,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
 
                     <div className="d-flex justify-content-around text-muted small">
                         {diasSemana.map((dia, index) => (
-                            <div key={index} style={{ width: "14%", textAlign: "center" }}>
+                            <div key={index} className="calendario-dia-header">
                                 {dia}
                             </div>
                         ))}
@@ -82,18 +86,7 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
                                 >
                                     {dia.date()}
                                     {tieneEvento && (
-                                        <div
-                                            style={{
-                                                width: "6px",
-                                                height: "6px",
-                                                backgroundColor: "red",
-                                                borderRadius: "50%",
-                                                position: "absolute",
-                                                bottom: "3px",
-                                                left: "50%",
-                                                transform: "translateX(-50%)",
-                                            }}
-                                        ></div>
+                                        <div className="calendario-evento"></div>
                                     )}
                                 </div>
                             );
@@ -103,24 +96,20 @@ const CalendarioTurnos: React.FC<CalendarioTurnosProps> = ({
                     <hr className="my-2" />
                 </div>
 
-                {/* 🔹 Siempre visible, pero con visibilidad adaptada a móvil */}
+                {/* 🔹 Siempre visible, incluso en móvil */}
                 <div className="d-block">
-                    <h6 className=" mb-2 fw-bold" style={{fontSize:"20.48px", color:"black"}}>Próximos Turnos</h6>
+                    <h6 className="mb-2 proxtitulo">Próximos Turnos</h6>
                     <div className="d-flex flex-column">
                         {proximosTurnos.length > 0 ? (
                             proximosTurnos.map((turno, index) => (
-                                <div key={index} className="d-flex align-items-center p-2 rounded mb-1" style={{ backgroundColor: "#ece2c6" }}>
-                                    <div
-                                        className="rounded-circle text-white text-center proxTurno"
-                                        style={{ width: "30px", height: "30px", lineHeight: "30px", fontSize: "12px", backgroundColor: "var(--naranja)" }}
-                                    >
+                                <div key={index} className="d-flex align-items-center p-2 rounded mb-1 prox-turno-contenedor">
+                                    <div className="rounded-circle text-white text-center proxTurno d-none d-md-flex">
                                         {turno.paciente ? turno.paciente.charAt(0).toUpperCase() : "?"}
                                     </div>
-                                    <div className="ms-2">
-                                        <span className="fw-bold" style={{fontSize:"16.39px"}}>{turno.paciente}</span>
-                                        <br />
-                                        <span className="text-muted small">
-                                            {moment(turno.fecha).format("DD/MM/YYYY")}
+                                    <div className="ms-2 d-flex flex-row flex-md-column justify-content-between w-100">
+                                        <span className="fw-bold" style={{ fontSize: "16.39px" }}>{turno.paciente}</span>
+                                        <span className="fecha-prox-turno text-end text-md-start">
+                                            {moment(turno.fecha).locale("es").format("D [de] MMMM")}
                                         </span>
                                     </div>
                                 </div>

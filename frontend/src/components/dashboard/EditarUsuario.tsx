@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import axios from "axios";
+import "../../styles/DashboardUsuarioConfig.css";
 import { toast } from "react-toastify";
 
 const url = import.meta.env.VITE_API_BASE_URL;
@@ -94,7 +95,7 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
     return (
         <Modal show={show} onHide={onHide} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Editar Perfil</Modal.Title>
+                <Modal.Title className="titulo-config">Editar Perfil</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {loading ? (
@@ -143,7 +144,7 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
                         </Form.Group>
 
 
-                        <Button variant="primary" className="w-100" onClick={handleSave} disabled={saving}>
+                        <Button variant="primary" className="w-100 btn-edit" onClick={handleSave} disabled={saving}>
                             {saving ? <Spinner size="sm" animation="border" /> : "Guardar Cambios"}
                         </Button>
                     </Form>

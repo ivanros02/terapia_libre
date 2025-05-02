@@ -56,7 +56,7 @@ function DisponibilidadList({ onEdit, onAdd, fetchDisponibilidades }: Disponibil
 
 
     return (
-        <div className="container mt-4">
+        <div className="container">
             {/* Contenedor flexible para el título y botón */}
             <div className="row align-items-center mb-3">
                 <div className="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
@@ -66,11 +66,7 @@ function DisponibilidadList({ onEdit, onAdd, fetchDisponibilidades }: Disponibil
                     <Button
                         variant="success"
                         onClick={onAdd}
-                        className="px-4 py-2 fw-bold"
-                        style={{
-                            backgroundColor: "var(--naranja)",
-                            borderColor: "var(--naranja)",
-                        }}
+                        className="btn-agregar"
                     >
                         Agregar
                     </Button>
@@ -84,23 +80,20 @@ function DisponibilidadList({ onEdit, onAdd, fetchDisponibilidades }: Disponibil
                         key={disp.id_disponibilidad}
                         className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center"
                     >
-                        <span className="mb-2 mb-md-0">
+                        <span className="text-disponibilidad mb-2 mb-md-0">
                             {disp.dia_semana}: {disp.hora_inicio} - {disp.hora_fin}
                         </span>
+
                         <div>
                             <Button
-                                variant="primary"
-                                className="me-2 px-3"
-                                style={{ backgroundColor: "var(--verde)", borderColor: "var(--verde)" }}
+                                className="btn-editar me-2"
                                 size="sm"
                                 onClick={() => onEdit(disp)}
                             >
                                 Editar
                             </Button>
                             <Button
-                                variant="danger"
-                                className="px-3"
-                                style={{ backgroundColor: "grey", borderColor: "grey" }}
+                                className="btn-eliminar"
                                 size="sm"
                                 onClick={() => handleDelete(disp.id_disponibilidad)}
                             >

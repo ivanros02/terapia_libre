@@ -21,17 +21,18 @@ interface PatientHistoryProps {
 
 const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatient }) => {
     return (
-        <Container fluid>
+        <Container fluid className="patient-history-wrapper">
             <Card className="shadow-lg p-3 rounded-4 border-0 patient-history-card">
                 <Row>
                     {/* Lista de Pacientes */}
                     <Col md={5} className="border-end">
-                        <h5 className="fw-bold mb-0" style={{fontSize:"24.58px"}}>Lista de pacientes</h5>
+                        <h5 className="mb-0" style={{fontSize:"24.58px",fontWeight:"500"}}>Lista de pacientes</h5>
+
                         <ListGroup variant="flush">
                             {patients.map((patient, index) => (
                                 <ListGroup.Item key={index} className="d-flex align-items-center border-0">
                                     <div className="circle-container">
-                                        <div className="circle-inner" style={{fontSize:"18.43px"}}>
+                                        <div className="circle-inner">
                                             {patient.name
                                                 .split(" ")
                                                 .map(word => word.charAt(0).toUpperCase())
@@ -39,12 +40,13 @@ const PatientHistory: React.FC<PatientHistoryProps> = ({ patients, selectedPatie
                                         </div>
                                     </div>
                                     <div>
-                                        <p className="mb-0 fw-semibold" style={{marginLeft:"5px"}}>{patient.name}</p>
+                                        <p className="mb-0 nombre-lista" style={{marginLeft:"5px"}}>{patient.name}</p>
                                         <Badge className="transparent-badge">{patient.frequency}</Badge>
                                     </div>
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>
+
                     </Col>
 
                     {/* Historia Clínica */}
