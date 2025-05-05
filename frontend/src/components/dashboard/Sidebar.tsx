@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // 👈 Importamos useNavigate
 import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../styles/SideBar.css";
+import "../../styles/Sidebar.css";
 import { Link } from "react-router-dom"; // 👈 Importamos Link
 declare global {
   interface Window {

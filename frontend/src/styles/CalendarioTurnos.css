@@ -4,6 +4,7 @@
         width: 413.75px;
         height: 889.22px;
     }
+
     .calendario-container {
         padding-left: 50px !important;
     }
@@ -11,7 +12,7 @@
 
 @media (min-width: 1920px) {
     .card-calendario {
-        width:500px !important;
+        width: 500px !important;
         height: 870px;
         margin-left: 2rem;
     }
@@ -28,6 +29,20 @@
         height: auto;
     }
 }
+
+@media (max-width: 1366px) and (min-width: 1025px) {
+    .calendario-container {
+        padding-left: 100px !important;
+        /* o menos */
+    }
+
+    .card-calendario {
+        width: 300px;
+        margin-left: 0.5rem;
+        /* un poco más compacto si querés */
+    }
+}
+
 
 /* Título del calendario */
 .titulo-calendario {
