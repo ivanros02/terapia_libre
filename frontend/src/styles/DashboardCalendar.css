@@ -1,10 +1,5 @@
 /* 🔹 Contenedor del Google Calendar */
-.div-centrado-solo {
-    grid-column: span 3 / span 4;
-    grid-row: span 1 / span 1;
-    grid-column-start: 2;
-    grid-row-start: 2;
-}
+
 
 /* 🔹 Ajuste para reducir el tamaño de la barra de herramientas */
 .fc-header-toolbar {
@@ -30,13 +25,7 @@
 
 /* 🔹 Ajustes para móviles */
 @media (max-width: 768px) {
-    .div-centrado-solo {
-        grid-column: span 4 / span 4 !important; /* 🔹 Expande en móviles */
-        grid-row: span 1 / span 1 !important;
-        grid-column-start: 1 !important;
-        width: 100% !important; /* 🔹 Asegura que el calendario ocupe el 100% */
-        margin: 0; /* 🔹 Elimina cualquier margen que reduzca el ancho */
-    }
+    
 
     .calendar-wrapper {
         width: 100% !important; /* 🔹 Permite que el calendario use todo el ancho */

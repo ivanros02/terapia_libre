@@ -81,3 +81,10 @@
         width: 740px !important;
     }
 }
+
+@media (min-width: 1920px) {
+    .patient-history-card {
+        width: 1150px !important;
+        margin-top: 0.5rem;
+    }
+}

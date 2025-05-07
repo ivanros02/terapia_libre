@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 const url = import.meta.env.VITE_API_BASE_URL;
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT;
 
 // 🔥 Función para detectar si estás en WebView
 const isInWebView = () => {
@@ -75,7 +76,6 @@ const LoginGoogle = () => {
   const handleLogin = () => {
     if (isInWebView()) {
       // 🚀 Si está en WebView, redirige a Google login directamente
-      const clientId = "TU_CLIENT_ID_WEB_GOOGLE.apps.googleusercontent.com"; // ⚡ Tu client_id real
       const redirectUri = "https://terapialibre.com.ar/auth/callback"; // ⚡ Tu URL de redirección real
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=openid%20email%20profile`;
 

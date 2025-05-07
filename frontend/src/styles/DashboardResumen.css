@@ -1,0 +1,151 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 405px 355px 305px;
+  /* Columnas exactas */
+  grid-template-rows: auto auto auto;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  align-items: start;
+}
+
+/* Tarjeta 1 - Total facturado */
+.total-facturado {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  background-color: var(--verde);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 16.39px;
+  width: 100%;
+  height: 262.89px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+
+
+}
+
+/* Card base (usada por 3 tarjetas) */
+.card-base {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 16.39px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* centra verticalmente */
+  align-items: center;
+  /* centra horizontalmente */
+  width: 100%;
+  height: 240.36px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  margin-left: 0.5rem;
+
+}
+
+.titulo-base {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.numero-base {
+  margin: 0;
+  font-size: 96px;
+  font-weight: 700;
+}
+
+.titulo-verde {
+  color: var(--verde);
+}
+
+.numero-verde {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--verde);
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  /* en lugar de 5rem */
+}
+
+
+/* Turnos nuevos */
+.turnos-nuevos {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.tu-suscripcion {
+  position: relative;
+  padding-top: 2rem;
+}
+
+.titulo-suscripcion {
+  position: absolute;
+  top: -1.5rem;
+  left: 1rem;
+}
+
+
+/* Tu suscripción */
+.tu-suscripcion {
+  grid-column: 3 / 4;
+  grid-row: 1 / 3;
+  /* Ocupa dos filas */
+  background-color: white;
+  padding: 1rem;
+  border-radius: 16.39px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  height: 466.83px;
+  box-sizing: border-box;
+  margin-left: 0.5rem;
+}
+
+.titulo-suscripcion {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--naranja)
+}
+
+.label-bold {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--naranja);
+}
+
+.tu-suscripcion p {
+  font-weight: 400;
+  font-size: 16px;
+}
+
+
+
+/* Pacientes atendidos */
+.pacientes-atendidos {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+/* Total a facturar */
+.total-a-facturar {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+/* Últimos cobros */
+.ultimos-cobros {
+  grid-column: 1 / span 3;
+  grid-row: 3 / 4;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 16.39px;
+  overflow-x: auto;
+  height: 216.32px;
+  width: 100%;
+  box-sizing: border-box;
+}

@@ -11,8 +11,6 @@
         width: 815.21px;
         height: 484.42px;
         margin: 0 auto;
-        /* Centrar horizontalmente si querés */
-        
     }
 
     .historial-terapeuta-card {
@@ -22,9 +20,8 @@
 
 @media (min-width: 1025px) {
     .historial-container {
-        margin-left: 0.5 !important;
-
         margin-top: -0.5rem;
+        margin-left: 0 !important;
     }
 }
 
@@ -41,6 +38,7 @@
         width: 1150px !important;
         height: auto;
         margin-left: 0.5rem !important;
+        margin-top: 0.5rem ;
     }
 }
 

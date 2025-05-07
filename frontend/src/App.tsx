@@ -29,6 +29,7 @@ import "./index.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import DashboardFacturacion from "./pages/DashboardFacturacion";
 
 const App: React.FC = () => {
   return (
@@ -48,6 +49,7 @@ const App: React.FC = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/formProfessionals" element={<FormProfessionals />} />
               <Route path="/dashboard/profesional" element={<RutaProtegida> <DashboardProfesional /> </RutaProtegida>} />
+              <Route path="/dashboard/profesionalFacturacion" element={<RutaProtegida> <DashboardFacturacion /> </RutaProtegida>} />
               <Route path="/dashboard/usuario" element={<RutaProtegida> <DashboardUsuario /> </RutaProtegida>}/>
               <Route path="/dashboard/calendario" element={<RutaProtegida> <DashboardCalendar /> </RutaProtegida>}/>
               <Route path="/messages" element={<RutaProtegida> <DashboardMensajes /> </RutaProtegida>} />
