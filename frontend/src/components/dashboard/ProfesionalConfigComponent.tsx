@@ -111,7 +111,7 @@ function ProfesionalConfigComponent() {
 
             {/* 🔹 Mostrar la información de la suscripción */}
             {profesional?.correo_electronico && (
-                <div className="container mt-4">
+                <div className="container">
                     <SuscripcionInfo email={profesional.correo_electronico} />
                 </div>
             )}

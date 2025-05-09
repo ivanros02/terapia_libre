@@ -9,11 +9,13 @@ import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
 import "../styles/DashboardProfesional.css"
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { getGoogleDriveImageUrl } from "../utils/googleDrive";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos
 interface ProfesionalData {
   nombre: string;
+  foto_perfil_url: string;
 }
 
 interface TurnoHoy {
@@ -69,8 +71,6 @@ const DashboardProfesional = () => {
         const turnoMasCercano = turnoResponse.data || null; // ✅ Manejar el caso `null`
         setTurnoHoy(turnoMasCercano);
 
-
-
         // 🔹 Obtener turnos del profesional
         const turnosResponse = await axios.get(`${url}/api/turnos/profesionalDashboard/${id}`);
         const turnos = Array.isArray(turnosResponse.data) ? turnosResponse.data : [];
@@ -90,10 +90,6 @@ const DashboardProfesional = () => {
             }])
           ).values()
         ).slice(0, 5);
-
-
-
-
 
         setProximosTurnos(proximosTurnos);
         setListaPacientes(listaPacientes);
@@ -119,6 +115,7 @@ const DashboardProfesional = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -128,7 +125,7 @@ const DashboardProfesional = () => {
 
       <div className="div-search-navbar">
         <SearchNavbar
-          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+          profileImage={getGoogleDriveImageUrl(profesionalData?.foto_perfil_url || "")}
           profileName={profesionalData?.nombre || "Profesional"} // Usar el nombre del profesional
         />
       </div>
@@ -169,8 +166,8 @@ const DashboardProfesional = () => {
             </Card>
           </div>
 
-          {/* Tarjeta de "CHATS" */}
-          <div className="chats-div-movil" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
+          {/* Tarjeta de "CHATS" 
+            <div className="chats-div-movil" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
             <Card
               className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center"
 
@@ -179,6 +176,8 @@ const DashboardProfesional = () => {
               <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>Chats</span>
             </Card>
           </div>
+          */}
+
 
         </>
       )}

@@ -3,6 +3,7 @@ import axios from "axios";
 import { Modal, Button, Form } from "react-bootstrap";
 import EspecialidadSelectEditable from "./EspecialidadSelectEditable";
 import { toast } from 'react-toastify';
+import { getGoogleDriveImageUrl } from "../../utils/googleDrive";
 
 interface Profesional {
     id_profesional: number;
@@ -126,6 +127,27 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                         <Form.Label>Nombre</Form.Label>
                         <Form.Control type="text" name="nombre" value={formData.nombre} onChange={handleChange} />
                     </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>URL de la Foto de Perfil</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="foto_perfil_url"
+                            value={formData.foto_perfil_url ?? ""}
+                            onChange={handleChange}
+                            placeholder="Pegá aquí el enlace de la foto (por ejemplo, de Google Drive)"
+                        />
+                    </Form.Group>
+                    {formData.foto_perfil_url && (
+                        <div className="text-center mt-3">
+                            <img
+                                src={getGoogleDriveImageUrl(formData.foto_perfil_url)}
+                                alt="Foto de perfil"
+                                style={{ maxWidth: "100px", borderRadius: "50%" }}
+                            />
+                        </div>
+                    )}
+
                     <Form.Group className="mb-3">
                         <Form.Label>Título Universitario</Form.Label>
                         <Form.Control type="text" name="titulo_universitario" value={formData.titulo_universitario} onChange={handleChange} />

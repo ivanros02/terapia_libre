@@ -35,7 +35,7 @@ const SuscripcionInfo: React.FC<SuscripcionInfoProps> = ({ email }) => {
     }, [email]);
 
     return (
-        <div className="container mt-4">
+        <div className="container" style={{ marginTop: '-30px' }}>
             <h1 style={{ fontSize: '20px' }} className="mb-3">Suscripción</h1>
 
             <div

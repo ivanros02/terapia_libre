@@ -1,20 +1,16 @@
 import { useState, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
 import Modal from "react-bootstrap/Modal";
 import { gapi } from "gapi-script";
 import Button from "react-bootstrap/Button";
 import axios from 'axios';
 const url = import.meta.env.VITE_API_BASE_URL;
 import { useGoogleAuth } from "./useGoogleAuth";
-import { Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/GoogleCalendar.css"
 import { toast } from "react-toastify";
+import Calendario from "../components/dashboard/Calendario";
 
 declare global {
   interface Window {
@@ -50,37 +46,6 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
   const [showModal, setShowModal] = useState(false);
   const [showMeetModal, setShowMeetModal] = useState(false);
   const [meetUrl] = useState<string | null>(null);
-  const [calendarView, setCalendarView] = useState("timeGridWeek");
-  const [headerConfig, setHeaderConfig] = useState({});
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        // 🔹 En móviles: Solo mostrar "prev" y "next"
-        setCalendarView("timeGridDay");
-        setHeaderConfig({
-          left: "prev,next",
-          center: "title",
-          right: "" // 🔹 No mostrar botones de vista
-        });
-      } else {
-        // 🔹 En pantallas grandes: Mostrar todos los botones
-        setCalendarView("timeGridWeek");
-        setHeaderConfig({
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay"
-        });
-      }
-    };
-
-    handleResize(); // Ejecutar al montar el componente
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-
-
 
   const formatearFechaHora = (fecha: string, hora: string): string | null => {
     if (!fecha || !hora) return null;
@@ -251,7 +216,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
             const googleEventId = response.result.id;
             const meetUrl = response.result?.conferenceData?.entryPoints?.[0]?.uri;
-            console.log(meetUrl, 'url evento');
+
             await axios.post(`${url}/api/turnos/guardar-google-event`, {
               id_turno: turno.id_turno,
               [campoGoogleEvent]: googleEventId,
@@ -316,6 +281,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
             title: tituloEvento,
             start: fechaFinal,
             allDay: false,
+            className: "custom-event", // se aplica el estilo
             extendedProps: { ...turno },
           };
         } catch (error) {
@@ -437,9 +403,9 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
   };
 
   // 📌 Función para realizar acciones cuando finaliza la llamada
-  const registrarFinDeLlamada = async (turno: Turno) => {
+  const registrarFinDeLlamada = async (_turno: Turno) => {
     try {
-      await axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno });
+      //await axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno });
 
       toast.success("✅ La videollamada ha finalizado correctamente.", {
         position: "top-right",
@@ -520,40 +486,12 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol }) =
 
   return (
     <div className="calendar-page d-flex justify-content-center align-items-start w-100" style={{ marginTop: "-2rem" }}>
-      {isSignedIn ? (
+      {usuarioRol === "usuario" || isSignedIn ? (
         <>
-          <Container fluid className="d-flex justify-content-center align-items-center py-3">
-            <Row className="w-100 justify-content-center">
-              <Col xs={12} md={10} lg={8} className="content-box">
-                <div className="d-flex flex-column align-items-center w-100">
-                  <div className="calendar-wrapper">
-                    <h3 className="text-center w-100">Agenda</h3>
-                    <FullCalendar
-                      plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                      initialView={calendarView}
-                      locale="es"
-                      headerToolbar={headerConfig}
-                      buttonText={{
-                        today: "Hoy",
-                        month: "Mes",
-                        week: "Semana",
-                        day: "Día"
-                      }}
-                      events={formattedEvents}
-                      eventClick={handleEventClick}
-                      height="parent" /* 🔹 Asegura que respete el contenedor */
-                      slotMinTime="07:00:00" /* 🔹 Define el inicio a las 7 AM */
-                      slotLabelFormat={{
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                      }} /* 🔹 Formato de 12 horas con AM/PM */
-                    />
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          </Container>
+          <Calendario
+            events={formattedEvents}
+            onEventClick={handleEventClick}
+          />
 
 
           <Modal show={showModal} onHide={() => setShowModal(false)}>

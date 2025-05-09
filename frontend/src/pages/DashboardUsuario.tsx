@@ -25,7 +25,7 @@ interface Turno {
 }
 
 type Terapeuta = {
-  id_profesional : number;
+  id_profesional: number;
   nombre: string;
   correo_electronico: string;
   ultimaConsulta: string;
@@ -64,7 +64,7 @@ const DashboardUsuario = () => {
 
         const terapeutaResponse = await axios.get(`${url}/api/turnos/usuario/${userId}/terapeuta`);
         const terapeutaData = terapeutaResponse.data;
-        
+
         // 🔹 Transformar `ultimaConsulta` a un formato legible
         if (!terapeutaData) {
           setTerapeuta({
@@ -134,7 +134,7 @@ const DashboardUsuario = () => {
         // 🔹 Obtener el próximo turno más cercano
         const turnoResponse = await axios.get(`${url}/api/turnos/${id}/turnos-hoy-paciente`);
         const turnoMasCercano = turnoResponse.data || null; // ✅ Manejar el caso `null`
-      
+
         setTurnoHoy(turnoMasCercano);
 
         // 🔹 Obtener turnos del profesional
@@ -174,7 +174,7 @@ const DashboardUsuario = () => {
   console.log("Eventos:", eventos);
 
   if (loading) return <LoadingSpinner />; // 🔹 Mostrar un spinner de carga mientras se obtienen los datos
-  
+
   return (
     <div className="parent">
       {/* 🔹 Sidebar solo en pantallas grandes */}
@@ -182,7 +182,7 @@ const DashboardUsuario = () => {
 
       <div className="div-search-navbar">
         <SearchNavbar
-          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+          profileImage="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png"
           profileName={userName || "Usuario"} // 🔹 Mostrar el nombre del usuario o un valor por defecto
         />
       </div>
@@ -210,6 +210,7 @@ const DashboardUsuario = () => {
           </div>
 
 
+          {/*
           <div className="chats-div-movil" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
             <Card
               className="shadow-lg border-0 rounded-4 text-center p-3 d-flex flex-column align-items-center calendario-card"
@@ -218,6 +219,7 @@ const DashboardUsuario = () => {
               <span style={{ color: "var(--verde)" }}>Chats</span>
             </Card>
           </div>
+          */}
         </>
       )}
       {/* 🔹 FIN DE tarjetas SOLO aparecen en móviles */}

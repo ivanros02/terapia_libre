@@ -61,6 +61,7 @@ const App: React.FC = () => {
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
+
             </Routes>
             <WhatsAppButton />
           </Router>

@@ -14,6 +14,9 @@ const FormProfessionalsComponent = () => {
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [descripcionAviso, setDescripcionAviso] = useState("");
+    const MAX_CARACTERES = 430; // por ejemplo
+
 
     const [formData, setFormData] = useState(() => {
         const savedForm = localStorage.getItem("formProfesional");
@@ -48,6 +51,20 @@ const FormProfessionalsComponent = () => {
                 setFormData({ ...formData, foto_perfil_url: file.name }); // Guardamos solo el nombre del archivo
             }
         } else {
+            const { name, value } = e.target;
+
+            if (name === "descripcion") {
+                const cantidad = value.length;
+
+                if (cantidad > MAX_CARACTERES) {
+                    setDescripcionAviso(`⚠️ Has alcanzado el límite de ${MAX_CARACTERES} caracteres.`);
+                    return; // opcional: evitar que escriba más
+                } else {
+                    setDescripcionAviso("");
+                }
+            }
+
+
             setFormData({ ...formData, [e.target.name]: e.target.value });
         }
     };
@@ -273,6 +290,17 @@ const FormProfessionalsComponent = () => {
                                     onChange={handleChange}
                                 />
                             </Form.Group>
+                            {formData.descripcion && (
+                                <div className="d-flex justify-content-between">
+                                    <small className="text-muted">
+                                        {formData.descripcion.length} / {MAX_CARACTERES} caracteres
+                                    </small>
+                                    {descripcionAviso && <small className="text-danger">{descripcionAviso}</small>}
+                                </div>
+                            )}
+
+
+
 
                             <hr />
 

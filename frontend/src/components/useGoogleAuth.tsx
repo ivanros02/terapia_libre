@@ -25,7 +25,6 @@ export const useGoogleAuth = () => {
                 setGoogleAuth(authInstance);
                 setIsSignedIn(authInstance.isSignedIn.get());
                 authInstance.isSignedIn.listen(setIsSignedIn);
-                console.log("✅ Google API inicializada correctamente.");
                 verificarPermisos(); // 🔹 Verifica permisos después de iniciar sesión
                 resolve(true);
               })
@@ -58,11 +57,6 @@ export const useGoogleAuth = () => {
 
     const user = googleAuth.currentUser.get();
     const grantedScopes = user.getGrantedScopes();
-    const email = user.getBasicProfile()?.getEmail();
-
-    console.log(`🔍 Usuario autenticado: ${email}`);
-    console.log("🔍 Scopes actuales concedidos por el usuario:", grantedScopes);
-
     if (!grantedScopes.includes("https://www.googleapis.com/auth/calendar.events")) {
       console.warn("⚠️ Permisos insuficientes. Se requiere reautenticación.");
       signIn(); // 🔹 Si no tiene los permisos correctos, fuerza reautenticación
@@ -76,7 +70,6 @@ export const useGoogleAuth = () => {
     if (!googleAuth) return;
 
     try {
-      console.log("🔍 Iniciando sesión con Google...");
       await googleAuth.signIn({
         scope: SCOPES,
         prompt: "consent", // 🔹 Forzar a Google a pedir permisos nuevamente

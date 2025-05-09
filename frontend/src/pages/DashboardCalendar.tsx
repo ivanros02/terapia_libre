@@ -5,6 +5,7 @@ import Sidebar from "../components/dashboard/Sidebar";
 import GoogleCalendar from "../components/GoogleCalendar";
 const url = import.meta.env.VITE_API_BASE_URL;
 import "../styles/DashboardCalendar.css"
+import { getGoogleDriveImageUrl } from "../utils/googleDrive";
 // Tipos de datos
 interface Turno {
   id_turno: number;
@@ -22,6 +23,7 @@ interface Turno {
 interface UserData {
   nombre: string;
   correo_electronico: string;
+  foto_perfil_url?: string;
 }
 
 const DashboardCalendar = () => {
@@ -108,7 +110,7 @@ const DashboardCalendar = () => {
       {!isMobile && <div className="div-search-navbar"><Sidebar /></div>} 
       <div className="div-search-navbar">
         <SearchNavbar
-          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+          profileImage={getGoogleDriveImageUrl(userData?.foto_perfil_url || "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png")}
           profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")} />
       </div>
       <div className="div-centrado-solo">

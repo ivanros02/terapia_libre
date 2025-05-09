@@ -13,8 +13,8 @@ interface FilterBarProps {
 const FilterBar: React.FC<FilterBarProps> = ({
   selectedEspecialidad,
   setSelectedEspecialidad,
-  selectedDisponibilidad,
-  setSelectedDisponibilidad,
+  //selectedDisponibilidad,
+  //setSelectedDisponibilidad,
   selectedOrden,
   setSelectedOrden,
 }) => {
@@ -24,7 +24,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
         {/* Especialidad */}
         <EspecialidadFilter selectedEspecialidad={selectedEspecialidad} setSelectedEspecialidad={setSelectedEspecialidad} />
 
-        {/* Disponibilidad */}
+        {/* Disponibilidad 
+        
         <div className="col-12 col-md-4 mb-3">
           <label className="form-label fw-bold">Disponibilidad:</label>
           <select
@@ -40,6 +41,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
             <option value="96 horas">96 Horas</option>
           </select>
         </div>
+        */}
+        
 
         {/* Ordenar por */}
         <div className="col-12 col-md-4 mb-3">

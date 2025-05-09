@@ -6,12 +6,14 @@ import EditarUsuario from "../components/dashboard/EditarUsuario";
 const url = import.meta.env.VITE_API_BASE_URL;
 import "../styles/DashboardProfesional.css"
 import "../styles/DashboardUsuarioConfig.css";
+import { getGoogleDriveImageUrl } from "../utils/googleDrive";
 import { Button, Container, Row, Col } from "react-bootstrap";
 
 // Tipos de datos
 interface UserData {
     nombre: string;
     correo_electronico: string;
+    foto_perfil_url?: string;
 }
 
 const Dashboard = () => {
@@ -76,7 +78,7 @@ const Dashboard = () => {
         <div className="parent">
              {!isMobile && <div className="div-side-bar"><Sidebar /></div>}
             <div className="div-search-navbar"><SearchNavbar
-                profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+                profileImage={getGoogleDriveImageUrl(userData?.foto_perfil_url || "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png")}
                 profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
             /></div>
             

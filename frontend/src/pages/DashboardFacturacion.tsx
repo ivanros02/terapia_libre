@@ -64,8 +64,8 @@ const DashboardFacturacion = () => {
                 />
             </div>
 
-            <div className="div-centrado-solo">
-                <h1 className="">Dashboard de Facturación</h1>
+            <div className="div-centrado-solo" style={{backgroundColor: "#F8F8F8", borderRadius: "25px", marginTop: "-7rem"}}>
+                <h1 style={{color:"var(--verde)",fontSize:"32px",fontWeight:"900", paddingLeft:"5rem"}}>FACTURACIÓN Y ESTADÍSTICAS</h1>
                     <DashboardResumen />
             </div>
         </div>

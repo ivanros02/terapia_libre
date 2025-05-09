@@ -4,12 +4,15 @@ import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
 const url = import.meta.env.VITE_API_BASE_URL;
 import ProfesionalConfigComponent from "../components/dashboard/ProfesionalConfigComponent";
+import { getGoogleDriveImageUrl } from "../utils/googleDrive";
+
 import "../styles/DashboardProfesional.css"
 
 // Tipos de datos
 interface UserData {
   nombre: string;
   correo_electronico: string;
+  foto_perfil_url?: string;
 }
 
 const Dashboard = () => {
@@ -74,7 +77,7 @@ const Dashboard = () => {
       {!isMobile && <div className="div-side-bar"><Sidebar /></div>}
       <div className="div-search-navbar">
         <SearchNavbar
-          profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+          profileImage={getGoogleDriveImageUrl(userData?.foto_perfil_url || "")}
           profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")}
         />
       </div>

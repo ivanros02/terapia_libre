@@ -79,7 +79,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
                         </Card>
                     ) : (
                         // 🔹 Espacio reservado si NO es profesional
-                        <div style={{ minHeight: "120px" }}></div>
+                        <div style={{ minHeight: "" }}></div>
                     )}
                 </Card>
 

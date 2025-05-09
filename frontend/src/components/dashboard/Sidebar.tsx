@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // 👈 Importamos useNavigate
 import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
     socket = null;
   }
 
-  const [hasNewMessages, setHasNewMessages] = useState(false);
+  //const [hasNewMessages, setHasNewMessages] = useState(false);
   const userId = localStorage.getItem("id");
   const esProfesional = localStorage.getItem("esProfesional") === "true";
   const homeRoute = esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
@@ -79,6 +79,7 @@ const Sidebar: React.FC = () => {
   }, [socket, userId]);
 
   // 🔹 Escuchar notificaciones de nuevos mensajes
+  /*
   useEffect(() => {
     if (!socket || !userId) return;
 
@@ -93,13 +94,15 @@ const Sidebar: React.FC = () => {
       socket.off("notification", handleNotification);
     };
   }, [socket, userId]);
+  */
 
   // 🔹 Marcar mensajes como leídos al hacer clic en el botón de mensajes
+  /*
   const handleMessagesClick = async () => {
     setHasNewMessages(false);
     navigate("/messages");
   };
-
+  */
 
   return (
     <div className="sidebar">
@@ -116,6 +119,7 @@ const Sidebar: React.FC = () => {
           </Link>
         </li>
 
+        {/* 
         <li className="nav-item position-relative">
           <button onClick={handleMessagesClick} className="nav-link text-white py-3 bg-transparent border-0 w-100 position-relative">
             <img src="/sidebar/chat.png" alt="Home" width="24" height="24" />
@@ -127,6 +131,7 @@ const Sidebar: React.FC = () => {
             )}
           </button>
         </li>
+        */}
 
         <li className="nav-item">
           <button onClick={handleConfigClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
