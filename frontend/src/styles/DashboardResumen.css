@@ -1,0 +1,266 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 405px 355px 305px;
+  /* Columnas exactas */
+  grid-template-rows: auto auto auto;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  align-items: start
+}
+
+/* Tarjeta 1 - Total facturado */
+.total-facturado {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  background-color: var(--verde);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 16.39px;
+  width: 100%;
+  height: 262.89px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Nuevo estilo para cada línea */
+.titulo-total {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.monto-total {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.subtexto-total {
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Card base (usada por 3 tarjetas) */
+.card-base {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 16.39px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* centra verticalmente */
+  align-items: center;
+  /* centra horizontalmente */
+  width: 100%;
+  height: 240.36px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  margin-left: 0.5rem;
+
+}
+
+.titulo-base {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  /* reduce separación */
+}
+
+.numero-base {
+  margin: -20px;
+  font-size: 96px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+}
+
+.titulo-verde {
+  color: var(--verde);
+}
+
+.numero-verde {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--verde);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  /* en lugar de 5rem */
+}
+
+
+/* Turnos nuevos */
+.turnos-nuevos {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.tu-suscripcion {
+  position: relative;
+  padding-top: 2rem;
+}
+
+.titulo-suscripcion {
+  position: absolute;
+  top: -20px;
+  left: 16px;
+  background-color: #fff;
+  /* fondo para que se vea por encima limpio */
+  padding: 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--naranja);
+}
+
+
+/* Tu suscripción */
+.contenedor-suscripcion {
+  grid-column: 3 / 4;
+  grid-row: 1 / 3;
+  position: relative;
+  width: 100%;
+  margin-left: 0.5rem;
+}
+
+.titulo-suscripcion {
+  position: absolute;
+  top: -1px;
+  left: 16px;
+  background-color: transparent;
+  padding: 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--naranja);
+  z-index: 2;
+
+  
+}
+
+.tu-suscripcion {
+  background-color: white;
+  padding: 2rem 1rem 1rem 1rem;
+  border-radius: 16.39px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  height: 466.84px;
+  box-sizing: border-box;
+  margin-top: 3rem;
+  /* espacio para el título */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* esto empuja los enlaces al fondo */
+}
+
+.acciones-suscripcion {
+  margin-top: auto; /* asegura que quede al fondo incluso con espacio */
+}
+
+.label-bold {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--naranja);
+}
+
+.tu-suscripcion a {
+  color: var(--naranja);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+
+
+/* Pacientes atendidos */
+.pacientes-atendidos {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+/* Total a facturar */
+.total-a-facturar {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+/* Últimos cobros */
+.ultimos-cobros {
+  grid-column: 1 / span 3;
+  grid-row: 3 / 4;
+  background-color: #EFEFEF;
+  padding: 1rem;
+  border-radius: 16.39px;
+  height: 216.32px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 1rem;
+  overflow: hidden;
+  /* evita scroll aquí */
+}
+
+.tabla-scroll {
+  max-height: 160px;
+  /* o el valor que necesites */
+  overflow-y: auto;
+  overflow-x: auto;
+  /* por si hay muchas columnas */
+  width: 100%;
+}
+
+/* Redondear solo la primera y última fila */
+.fila-top td:first-child {
+  border-top-left-radius: 11px;
+}
+
+.fila-top td:last-child {
+  border-top-right-radius: 11px;
+}
+
+.fila-bottom td:first-child {
+  border-bottom-left-radius: 11px;
+}
+
+.fila-bottom td:last-child {
+  border-bottom-right-radius: 11px;
+}
+
+/* Opcional: dar fondo para que se note mejor */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  /* separación entre filas */
+  table-layout: fixed;
+  /* opcional para que no se estire raro */
+}
+
+.table tbody tr {
+  border-radius: 11px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.table tbody td {
+  padding: 12px 16px;
+  background-color: #FAFAFA7D !important;
+  font-size: 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Redondeo: aplicalo solo a las celdas de los extremos */
+.table tbody tr td:first-child {
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+}
+
+.table tbody tr td:last-child {
+  border-top-right-radius: 11px;
+  border-bottom-right-radius: 11px;
+}

@@ -1,0 +1,100 @@
+.titulo-config {
+    font-size: 48px !important;
+    font-weight: 400 !important;
+    font-family: var(--fuente-secundaria) !important;
+}
+
+.btn-agregar {
+    width: 147px;
+    height: 42px;
+    background-color: var(--naranja);
+    border: 1px solid var(--naranja);
+    border-radius: 9px;
+    font-weight: bold;
+    color: white;
+    /* Asegurate de que el texto se vea bien */
+    transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+/* 🔽 Efecto hundido */
+.btn-agregar:active {
+    transform: scale(0.95);
+    background-color: var(--naranja) !important;
+    border-color: var(--naranja) !important;
+}
+
+/* 🔼 Opcional: efecto hover */
+.btn-agregar:hover {
+    background-color: var(--naranja);
+    /* más oscuro que var(--naranja) */
+    border-color: var(--naranja);
+}
+
+.btn-editar {
+    width: 102px;
+    height: 28px;
+    background-color: var(--verde);
+    border: 1px solid var(--verde);
+    border-radius: 9px;
+    font-weight: bold;
+    color: white;
+    font-size: 0.875rem;
+    /* Aproximado para tamaño "sm" */
+    padding: 0.25rem 0.75rem;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+/* Efecto al hacer clic */
+.btn-editar:active {
+    transform: scale(0.95);
+}
+
+/* Opcional: efecto hover */
+.btn-editar:hover {
+    background-color: var(--verde);
+    /* tono más oscuro de verde */
+    border-color: var(--verde);
+}
+
+.btn-eliminar {
+    width: 102px;
+    height: 28px;
+    background-color: #616161;
+    border: 1px solid #616161;
+    border-radius: 9px;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: bold;
+    padding: 0.25rem 0.75rem;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+/* Hundirse al hacer clic */
+.btn-eliminar:active {
+    transform: scale(0.95);
+}
+
+/* Hover opcional */
+.btn-eliminar:hover {
+    background-color: #616161;
+    border-color: #616161;
+}
+
+.text-disponibilidad {
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.parrafo-profesional {
+    font-size: 20px;
+    margin-bottom: 0.25rem; /* equivale a Bootstrap's mb-1 */
+}
+
+
+@media screen and (max-width: 768px) {
+
+    .titulo-config {
+        font-size: 40px !important;
+    }
+
+}

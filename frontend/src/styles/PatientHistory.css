@@ -1,0 +1,90 @@
+/* 🔹 Ajustar ancho y largo del Card principal */
+.patient-history-wrapper {
+    margin-top: -4rem !important;
+    padding-top: -500 !important;
+    padding-left: 1 !important;
+    padding-right: 0 !important;
+}
+
+.patient-history-card {
+    max-width: 100% !important;
+    padding: 2rem;
+    margin-left: 0 !important;
+}
+
+/* 🔹 Ajustar la lista de pacientes */
+.patient-list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+/* Contenedor del círculo externo */
+.circle-container {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 0.82px solid var(--verde) !important;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Círculo interno */
+.circle-inner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #567C6F4D !important;
+    color: black;
+    font-size: 16.39px !important;
+    font-weight: 400 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Badge transparente */
+.transparent-badge {
+    background-color: transparent !important;
+    border: none !important;
+    color: var(--verde) !important;
+    font-size: 12.29px !important;
+    font-weight: 400 !important;
+}
+
+.nombre-lista {
+    font-size: 18.43px !important;
+    font-weight: 400 !important;
+}
+
+/* 🔹 Ajuste para la historia clínica */
+.patient-history {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+@media (min-width: 1025px) {
+    .patient-history-card {
+        width: 815.21px !important;
+        max-width: unset !important;
+        margin: 0 auto;
+        height: 484.42px;
+        /* Centra el card */
+    }
+}
+
+@media (max-width: 1280px) and (min-width: 1025px) {
+    .patient-history-card {
+        width: 740px !important;
+    }
+}
+
+@media (min-width: 1920px) {
+    .patient-history-card {
+        width: 1150px !important;
+        margin-top: 0.5rem;
+    }
+}

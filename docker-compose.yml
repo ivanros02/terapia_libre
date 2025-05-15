@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql_terapia
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: terapia_libre
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./terapia_libre.sql:/docker-entrypoint-initdb.d/terapia_libre.sql
+    networks:
+      - terapia_net
+
+  backend:
+    build: ./backend
+    container_name: backend_terapia
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: terapia_libre
+    volumes:
+      - ./backend:/app
+      - /app/node_modules  # evita conflictos con node_modules locales
+    networks:
+      - terapia_net
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_terapia
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # evita conflictos con node_modules locales
+    networks:
+      - terapia_net
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_terapia
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    depends_on:
+      - mysql
+    networks:
+      - terapia_net
+
+networks:
+  terapia_net:
+    driver: bridge

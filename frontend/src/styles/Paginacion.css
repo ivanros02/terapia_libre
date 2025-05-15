@@ -1,0 +1,33 @@
+/* Estilos personalizados para la paginación */
+.pagination {
+    gap: 5px;
+    /* Espacio entre los botones */
+}
+
+.page-link {
+    border-radius: 4px;
+    /* Bordes redondeados */
+    transition: background-color 0.3s ease;
+    /* Transición suave */
+}
+
+.page-link:hover {
+    background-color: #f5f5f5;
+    /* Color de fondo al pasar el mouse */
+}
+
+.page-item.active .page-link {
+    background-color: #000000;
+    /* Color de fondo para la página activa */
+    border-color: #080808;
+    /* Color del borde para la página activa */
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    /* Color del texto para los botones deshabilitados */
+    background-color: #f8f9fa;
+    /* Color de fondo para los botones deshabilitados */
+    border-color: #ddd;
+    /* Color del borde para los botones deshabilitados */
+}

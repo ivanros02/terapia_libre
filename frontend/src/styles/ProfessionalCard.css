@@ -1,0 +1,95 @@
+/* Estilos base (para pantallas pequeñas, ya definidos por vos) */
+/* Estilo base para móviles (hasta 767px) */
+.professional-card {
+    width: 150px;
+    height: 179px;
+    margin: 0 auto;
+    transition: all 0.2s ease;
+    border-radius: 32px;
+}
+
+.card-footer-custom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0.5rem;
+    /* equivale a p-1 de Bootstrap */
+    color: white;
+    background: var(--degrade-verde);
+    /* asegurate de definir esta variable */
+    height: 92px;
+    overflow: hidden;
+    border-bottom-left-radius: 32px;
+    border-bottom-right-radius: 32px;
+}
+
+.card-footer-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0;
+    white-space: nowrap;
+    /* No permitir salto de línea */
+    overflow: hidden;
+    /* Ocultar el exceso de texto */
+    text-overflow: ellipsis;
+    /* Mostrar "..." al final */
+    display: block;
+    max-width: 100%;
+    /* Asegura que se corte según el ancho del contenedor */
+}
+
+.card-footer-specialties {
+    max-height: 40px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.card-footer-availability {
+    font-size: 13px;
+}
+
+.card-footer-price {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+/* En móviles: hasta 767px */
+@media (max-width: 767px) {
+    .card-footer-price {
+        font-size: 14px;
+    }
+}
+
+
+/* En móviles: hasta 767px */
+@media (max-width: 767px) {
+    .card-footer-specialties {
+        font-size: 6px;
+    }
+}
+
+
+/* En móviles: hasta 767px */
+@media (max-width: 767px) {
+    .card-footer-title {
+        font-size: 12px;
+    }
+}
+
+
+/* Móviles: hasta 767px */
+@media (max-width: 767px) {
+    .card-footer-custom {
+        height: 59px;
+    }
+}
+
+
+/* Medianas (md) ≥ 768px */
+@media (min-width: 768px) {
+    .professional-card {
+        width: 234px;
+        height: 279px;
+    }
+}

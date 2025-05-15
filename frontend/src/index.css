@@ -1,0 +1,37 @@
+:root {
+    --verde: #567C6F;
+    --verde-oscuro:#4C655C;
+    --naranja: #F1974C;
+    --naranja-claro:#F1974C29;
+    --crema: #d8d3bc;
+    --degrade-verde: #4C655C99; 
+    --degrade-verde-oscuro: #4C655CE5;
+    --fuente-monserrat: 'Montserrat', sans-serif; /* Definir la fuente como variable */
+    --fuente-secundaria: 'Things', sans-serif; /* Nueva fuente "Things" */
+    --verde-claro: #7ED9BA;
+}
+
+/* ✅ Fuente "Things" Regular */
+@font-face {
+    font-family: 'Things';
+    src: url('./fuente/things-serif-font/things.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: var(--fuente-monserrat) !important;
+}
+
+/* ✅ Fuente "Things" Italic */
+@font-face {
+    font-family: 'Things';
+    src: url('./fuente/things-serif-font/things-italic.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+
+h2 {
+    font-size: 3rem !important;
+}

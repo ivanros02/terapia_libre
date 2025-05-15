@@ -1,0 +1,127 @@
+/* 🔹 Ajustar ancho y largo del Card principal */
+
+.historial-container {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    /* 🔥 sombra más profunda */
+}
+
+/* 🔷 Estilos solo para pantallas grandes (escritorio amplio) */
+@media (min-width: 1280px) {
+    .historial-container {
+        width: 815.21px;
+        height: 484.42px;
+        margin: 0 auto;
+    }
+
+    .historial-terapeuta-card {
+        min-height: 300px;
+    }
+}
+
+@media (min-width: 1025px) {
+    .historial-container {
+        margin-top: -0.5rem;
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 1280px) and (min-width: 1025px) {
+    .historial-container {
+        width: 740px;
+        height: auto;
+        margin-left: 0 !important;
+    }
+}
+
+@media (min-width: 1920px) {
+    .historial-container {
+        width: 1150px !important;
+        height: auto;
+        margin-left: 0.5rem !important;
+        margin-top: 0.5rem ;
+    }
+}
+
+
+/* 🔹 Ajustar la lista de sesiones */
+.historial-sesiones {
+    max-height: 306px;
+    /* Limita el tamaño de la lista */
+    overflow-y: auto;
+    /* Agregar scroll si hay demasiadas sesiones */
+
+}
+
+.profile-initials {
+    width: 40px;
+    /* Aumentamos ligeramente el tamaño */
+    height: 40px;
+    font-size: 1rem;
+    background-color: #b0bec5;
+    /* 🔹 Fondo más oscuro para mayor contraste */
+    color: black;
+    border: 2px solid black;
+    /* 🔹 Borde negro más visible */
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+    /* 🔹 Sombra interior para resaltar */
+}
+
+/* Contenedor del círculo externo */
+.circle-container {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    /* Borde gris */
+    background-color: white;
+    /* Espacio en blanco entre los círculos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Círculo interno */
+.circle-inner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #567C6F4D !important;
+    /* Color de fondo similar a la imagen */
+    color: black;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    /* Sombra ligera */
+}
+
+
+
+/* 🔹 Ajuste para la tarjeta del terapeuta */
+.historial-terapeuta-card {
+    width: 100%;
+    padding: 2rem;
+    min-height: 300px;
+}
+
+
+
+/* 🔥 Responsividad en móviles */
+@media (max-width: 768px) {
+    .historial-container {
+        max-width: 100%;
+        min-height: auto;
+        padding: 1.5rem;
+    }
+
+    .historial-sesiones {
+        max-height: 300px;
+    }
+
+    .historial-terapeuta-card {
+        padding: 1rem;
+        min-height: auto;
+    }
+}

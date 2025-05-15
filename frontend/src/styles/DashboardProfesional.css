@@ -1,0 +1,116 @@
+.parent {
+    display: grid;
+    width: 100vw;
+    min-height: 100vh !important;
+    height: auto !important;
+    grid-template-columns: 120px 2.5fr 2.5fr 3fr;
+    /* 🔹 Sidebar con ancho fijo */
+    grid-template-rows: 0.5fr 2.2fr 2.2fr;
+    gap: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: scroll !important;
+}
+
+.div-centrado-solo {
+    grid-column: span 3 / span 4;
+    grid-row: span 1 / span 1;
+    grid-column-start: 2;
+    grid-row-start: 2;
+    margin-top: -5rem;
+}
+
+/* Sidebar */
+.div-side-bar {
+    grid-row: 1 / 4;
+    grid-column: 1 / 2;
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Search Bar */
+.div-search-navbar {
+    grid-column: 2 / 5;
+    /* Ocupar todas las columnas excepto la del sidebar */
+    grid-row: 1 / 2;
+}
+
+/* Card 1 (Principal) */
+.div-dashboard-card {
+    grid-column: 2 / 4;
+    /* Se reduce su ancho */
+    grid-row: 2 / 3;
+
+}
+
+/* Card 2 */
+.div-hc-card {
+    grid-column: 2 / 4;
+    /* Se reduce su ancho */
+    grid-row: 3 / 4;
+
+}
+
+/* Card 3 (Calendario) */
+.proximos-turnos {
+    grid-column: 4 / 5;
+    /* Ahora es más ancho */
+    grid-row: 2 / 4;
+    /* Mantiene la altura ocupando el espacio sobrante */
+}
+
+@media screen and (max-width: 768px) {
+
+    .parent {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(5, 1fr) !important;
+        gap: 8px !important;
+        overflow: scroll !important;
+        height: 70vh !important;
+    }
+
+    .div-centrado-solo {
+        grid-column: span 4 / span 4 !important;
+        /* 🔹 Expande en móviles */
+        grid-row: span 1 / span 1 !important;
+        grid-column-start: 1 !important;
+        width: 100% !important;
+        /* 🔹 Asegura que el calendario ocupe el 100% */
+        margin: 0;
+        /* 🔹 Elimina cualquier margen que reduzca el ancho */
+    }
+
+    .div-search-navbar {
+        grid-column: span 2 / span 2 !important;
+    }
+
+    .div-dashboard-card {
+        grid-column: span 2 / span 2 !important;
+        grid-row-start: 2 !important;
+    }
+
+    .proximos-turnos {
+        grid-column: span 5 / span 2 !important;
+        grid-column-start: 1 !important;
+        grid-row-start: 5 !important;
+        margin-top: 6rem;
+    }
+
+    .chats-div-movil {
+        grid-column-start: 2 !important;
+        grid-row-start: 4 !important;
+    }
+
+    .config-div-movil {
+        grid-column-start: 1 !important;
+        grid-row-start: 4 !important;
+    }
+
+    .calendar-div-movil {
+        grid-column: span 2 / span 2 !important;
+        grid-column-start: 1 !important;
+        grid-row-start: 3 !important;
+    }
+}
