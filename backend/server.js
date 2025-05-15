@@ -19,7 +19,10 @@ const adminRoutes = require("./src/routes/admin.routes"); // Nueva ruta para el 
 const suscripcionRoutes = require("./src/routes/suscripcion.routes");
 const app = express();
 const server = http.createServer(app);
-
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://terapialibre.com.ar"
+];
 
 // Configuración de Socket.io
 const io = new Server(server, {
@@ -29,18 +32,12 @@ const io = new Server(server, {
     credentials: true
   }
 });
-
-
+ 
 // Middlewares
 app.use(express.json());
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://terapialibre.com.ar"
-];
-
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
+  origin: allowedOrigins,
+  credentials: true
 }));
 app.use(helmet());
 
