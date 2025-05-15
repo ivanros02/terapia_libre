@@ -23,17 +23,26 @@ const server = http.createServer(app);
 
 // Configuración de Socket.io
 const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:5173", // Cambiar en produccion por dominio https://terapialibre.com.ar
-        methods: ["GET", "POST"],
-    },
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
+
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://terapialibre.com.ar"
+];
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
 app.use(helmet());
-app.use(morgan("dev"));
 
 // Rutas para produccion agregar /api_terapia
 app.use("/api/profesionales", profesionalRoutes);
@@ -51,7 +60,7 @@ app.use("/api/suscripcion", suscripcionRoutes);
 app.use("/api/chat", (req, res, next) => {
     req.io = io;
     next();
-  }, chatRoutes);
+}, chatRoutes);
 
 // Socket.io
 io.on("connection", (socket) => {
