@@ -1,0 +1,249 @@
+/* 📌 Quitar bordes del calendario */
+.custom-calendar {
+    border: none !important;
+    box-shadow: none !important;
+    width: 130% !important;
+    /* 🔹 Aumenta el ancho del calendario */
+    background: transparent !important;
+    font-family: "Montserrat", sans-serif !important;
+
+}
+
+/* 📌 Ajustes para mejorar el estilo de los días */
+.custom-calendar .react-calendar__tile {
+    border-radius: 10px !important;
+    padding: 12px !important;
+    font-size: 20px;
+}
+
+/* 📌 Estilizar el día seleccionado */
+.custom-calendar .react-calendar__tile--active {
+    background-color: var(--verde) !important;
+    color: white !important;
+}
+
+/* 📌 Aplicar Montserrat al título del calendario (Ejemplo: "Marzo de 2025") */
+.custom-calendar .react-calendar__navigation {
+    font-family: "Montserrat", sans-serif !important;
+    font-weight: 600;
+    font-size: 18px;
+    /* 🔹 Aumentar tamaño */
+}
+
+/* 📌 Estilizar el día seleccionado */
+.custom-calendar .react-calendar__tile--active {
+    background-color: var(--verde) !important;
+    color: white !important;
+}
+
+/* 📌 Estilo de los días disponibles */
+.custom-calendar .available-day {
+    font-weight: bold;
+    color: var(--verde);
+}
+
+/* Fondo semitransparente cuando el calendario está abierto */
+.floating-calendar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    /* Fondo oscuro semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Para asegurarse de que esté sobre todo */
+    padding: 20px;
+    /* Evita que en móviles quede pegado a los bordes */
+}
+
+/* Contenedor flotante del calendario */
+.floating-calendar-container {
+    background: white;
+    padding: 25px;
+    border-radius: 25px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    width: 1050px;
+    /* 🔹 Ajuste para mantener buena proporción */
+    height: auto;
+    /* 🔹 Ajuste dinámico según contenido */
+    text-align: center;
+    position: relative;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 90vh !important;
+    /* 🔹 Evita que sea más alto que la pantalla */
+    overflow: auto;
+    /* 🔽 Fondo con imagen */
+    background-image: url('/papel.png');
+    /* Cambiá esto por la ruta real */
+    background-size: cover;
+    /* Ajusta para cubrir todo el área */
+    background-position: center;
+    /* Centra la imagen */
+    background-repeat: no-repeat;
+    /* Evita que se repita */
+}
+
+
+/* 🟢 Botón "Cerrar" más arriba */
+.floating-calendar-container .btn-danger {
+    position: absolute;
+    /* 🔹 Lo saca del flujo normal */
+    top: 0px;
+    /* 🔹 Lo acerca a la parte superior */
+    right: 15px;
+    /* 🔹 Lo mantiene alineado a la derecha */
+    padding: 4px 10px;
+    /* 🔹 Ajusta el tamaño del botón */
+    font-size: 12px;
+    /* 🔹 Reduce el tamaño del texto */
+    border-radius: 8px;
+    /* 🔹 Bordes redondeados */
+    z-index: 10;
+    /* 🔹 Asegura que se muestre sobre otros elementos */
+}
+
+
+/* Contenedor principal del calendario y horarios */
+.calendar-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    /* 🔹 Asegura que ambos elementos sean del mismo tamaño */
+    width: 100%;
+    max-width: 1000px;
+    padding: 20px;
+    margin: 0 auto;
+    gap: 20px;
+    /* 🔹 Reduce el espacio entre los elementos */
+}
+
+.calendar-wrappercalendar-wrapper-details {
+    flex: 1;
+    /* 🔹 Permite que el calendario se ajuste automáticamente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 350px;
+    /* 🔹 Ajustado para igualar los horarios */
+}
+
+
+
+/* Contenedor de horarios más ancho */
+.available-times {
+    flex-grow: 2;
+    max-width: 700px;
+    /* Ajustado para pantallas grandes */
+    min-width: 400px;
+    height: 350px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background: transparent;
+    padding: 1px !important;
+    overflow-y: auto;
+    border-color: transparent;
+}
+
+/* Botones de horarios más grandes y espaciados */
+.available-times button {
+    width: 55% !important;
+    padding: 16px 44px;
+    font-size: 25px !important;
+    border-radius: 10px;
+    color: var(--verde);
+    border: 2px solid grey;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* 🔹 Agrega una transición suave */
+}
+
+/* 📌 Cambio de color cuando el cursor está sobre la hora */
+.available-times button:hover {
+    background-color: var(--verde) !important;
+    /* 🔹 Cambia el fondo a verde */
+    color: white !important;
+    /* 🔹 Cambia el texto a blanco */
+    border-color: var(--verde) !important;
+}
+
+/* 🔹 Estilo para horarios no disponibles (ausencias) */
+.time-unavailable {
+    width: 55% !important;
+    padding: 16px 44px;
+    font-size: 25px !important;
+    border-radius: 10px;
+    background-color: #8e44ad !important;
+    /* Violeta */
+    color: white !important;
+    border: 2px solid #8e44ad !important;
+    font-weight: 600;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+    transition: none !important;
+    /* Desactivar transición para unavailable */
+}
+
+/* 🔹 Evitar hover en horarios no disponibles */
+.time-unavailable:hover {
+    background-color: #8e44ad !important;
+    /* Mantener violeta */
+    color: white !important;
+    border-color: #8e44ad !important;
+    opacity: 0.8 !important;
+}
+
+/* 🔹 Estilo para días completamente no disponibles en el calendario */
+.custom-calendar .unavailable-day {
+    background-color: #8e44ad !important;
+    /* Violeta */
+    color: white !important;
+    font-weight: bold;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+}
+
+/* 🔹 Evitar hover en días no disponibles */
+.custom-calendar .unavailable-day:hover {
+    background-color: #8e44ad !important;
+    color: white !important;
+}
+
+/* 🔹 RESPONSIVE para móviles y tablets */
+
+/* 🔹 RESPONSIVE para móviles pequeños */
+@media (max-width: 600px) {
+    .floating-calendar-container {
+        width: 95%;
+        max-width: 500px;
+        /* Más pequeño en móviles */
+        padding: 15px;
+        margin-top: 25vh;
+    }
+
+    .calendar-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .available-times {
+        max-width: 100%;
+        min-width: 100%;
+        height: auto;
+        padding: 15px;
+    }
+
+    .calendar-wrapper {
+        max-width: 100%;
+    }
+}

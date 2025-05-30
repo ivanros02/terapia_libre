@@ -1,0 +1,153 @@
+.parent {
+    display: grid;
+    width: 100vw;
+    min-height: 100vh !important;
+    height: auto !important;
+    grid-template-columns: 120px 2.5fr 2.5fr 3fr;
+    /* 🔹 Sidebar con ancho fijo */
+    grid-template-rows: 0.5fr 2.2fr 2.2fr;
+    gap: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: scroll !important;
+}
+
+.div-centrado-solo {
+    grid-column: span 3 / span 4;
+    grid-row: span 1 / span 1;
+    grid-column-start: 2;
+    grid-row-start: 2;
+    margin-top: -5rem;
+}
+
+/* Sidebar */
+.div-side-bar {
+    grid-row: 1 / 4;
+    grid-column: 1 / 2;
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Search Bar */
+.div-search-navbar {
+    grid-column: 2 / 5;
+    /* Ocupar todas las columnas excepto la del sidebar */
+    grid-row: 1 / 2;
+}
+
+/* Card 1 (Principal) */
+.div-dashboard-card {
+    grid-column: 2 / 4;
+    /* Se reduce su ancho */
+    grid-row: 2 / 3;
+
+}
+
+/* Card 2 */
+.div-hc-card {
+    grid-column: 2 / 4;
+    /* Se reduce su ancho */
+    grid-row: 3 / 4;
+
+}
+
+/* Card 3 (Calendario) */
+.proximos-turnos {
+    grid-column: 4 / 5;
+    /* Ahora es más ancho */
+    grid-row: 2 / 4;
+    /* Mantiene la altura ocupando el espacio sobrante */
+}
+
+.card-movil {
+    height: 90px !important;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px !important;
+    border-radius: 10px;
+    background: #FFF;
+    border-color: #FFF;
+    box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.19);
+}
+
+.card-calendar-movil {
+    width: 388px;
+    height: 65px;
+    border-radius: 10px;
+    background: #FFF;
+    box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.19);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+}
+
+.calendar-text {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--verde);
+}
+
+
+
+@media screen and (max-width: 1024px) {
+
+    .parent {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: 0.2fr 0.2fr 0.2fr  !important;
+        gap: 5px !important;
+    }
+
+    .div-centrado-solo {
+        grid-column: span 4 / span 4 !important;
+        /* 🔹 Expande en móviles */
+        grid-row: span 1 / span 1 !important;
+        grid-column-start: 1 !important;
+        width: 100% !important;
+        /* 🔹 Asegura que el calendario ocupe el 100% */
+        margin: 0;
+        /* 🔹 Elimina cualquier margen que reduzca el ancho */
+    }
+
+    .div-search-navbar {
+        grid-column: span 2 / span 2 !important;
+    }
+
+    .div-dashboard-card {
+        grid-column: span 2 / span 2 !important;
+        grid-row-start: 2 !important;
+    }
+
+    .proximos-turnos {
+        grid-column: span 5 / span 2 !important;
+        grid-column-start: 1 !important;
+        grid-row-start: 5 !important;
+        margin-top: 6rem;
+    }
+
+    .chats-div-movil {
+        grid-column-start: 2 !important;
+        grid-row-start: 4 !important;
+    }
+
+    .config-div-movil {
+        grid-column-start: 1 !important;
+        grid-row-start: 4 !important;
+    }
+
+    .calendar-div-movil {
+        grid-column: span 2 / span 2 !important;
+        grid-column-start: 1 !important;
+        grid-row-start: 3 !important;
+
+        display: flex;
+        justify-content: center;
+    }
+
+}

@@ -1,0 +1,27 @@
+.volver-container {
+  width: 10%;
+}
+
+.volver-link {
+  text-decoration: underline;
+  color: black;
+  font-family: sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.volver-link:hover {
+  opacity: 0.7;
+}
+
+@media (max-width: 767px) {
+  .volver-container,
+  .volver-link {
+    display: none;
+  }
+}

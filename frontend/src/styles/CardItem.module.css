@@ -1,0 +1,89 @@
+/* CardItem.module.css */
+
+.cardContainer {
+  width: 180px;
+  height: 245px;
+  flex-shrink: 0;
+  border-radius: 36px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+  background-size: cover;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  
+  margin: 19px; /* Espacio entre tarjetas en todos lados */
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 36px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 36px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.overlayText {
+  font-size: 12px;
+  font-weight: 300px !important;
+  line-height: 1.2;
+  text-align: center;
+  max-width: 90%;
+  max-height: 80%;
+  overflow: hidden;
+  color: white ;
+}
+
+.rectangleDiv {
+  width: 100%;
+  position: relative;
+  background-color: rgba(76, 101, 92, 0.7);
+  height: 71px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom-left-radius: 36px;
+  border-bottom-right-radius: 36px;
+}
+
+.middleStripe {
+  width: 180px;
+  height: 71px;
+  flex-shrink: 0;
+  background: rgba(76, 101, 92, 0.7);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  text-align: center;
+}
+
+.middleStripe h5 {
+  font-size: 1rem;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+  max-height: calc(1.2em * 2); /* Hasta 2 líneas */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}

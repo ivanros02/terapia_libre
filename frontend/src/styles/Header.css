@@ -1,0 +1,199 @@
+.logo-img {
+    height: 30px;
+    margin-right: 5px;
+}
+
+.nav-link {
+    font-size: 20px !important;
+    font-weight: 500 !important;
+}
+
+/* Texto "Terapia Libre" más pequeño en móviles */
+.brand-text {
+    font-size: 16px;
+    font-weight: 600 !important;
+    color: var(--verde-oscuro);
+}
+
+/* Sección "Atención Inmediata" en móviles */
+.atencion-movil {
+    text-align: center;
+    /* Asegura que todo quede centrado */
+    font-weight: bold;
+}
+
+/* Texto "ATENCIÓN INMEDIATA" en móviles */
+.atencion-text {
+    font-size: 0.7rem;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--naranja);
+}
+
+
+
+
+/* Número debajo de "ATENCIÓN INMEDIATA" en móviles */
+.atencion-numero {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--naranja);
+    text-decoration: none !important;
+}
+
+@media (max-width: 360px) {
+
+    /* Galaxy S8+ tiene 360px de ancho en modo vertical */
+    .atencion-movil {
+        max-width: 40%;
+        /* Evita que ocupe demasiado espacio */
+        font-size: 0.65rem;
+        /* Reduce tamaño de fuente */
+    }
+
+    .navbar-collapse .nav-link {
+        color: white !important;
+    }
+
+
+    .atencion-text {
+        font-size: 0.6rem;
+    }
+
+    .atencion-numero {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-collapse {
+        position: absolute;
+        top: 100%;
+        /* justo debajo del header */
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background-color: var(--verde);
+    }
+
+    .navbar-collapse .nav-link {
+        color: white !important;
+    }
+
+
+    .navbar .container-fluid {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px;
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        margin-left: -1.5rem;
+    }
+
+    .logo-img {
+        height: 28px;
+    }
+
+    .brand-text {
+        font-size: 0.9rem;
+        margin-left: 4px;
+    }
+
+    .atencion-movil {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.1;
+        padding: 0 6px;
+        flex: 1;
+    }
+
+    .atencion-text {
+        font-size: 0.55rem;
+        text-transform: uppercase;
+        color: var(--naranja);
+        font-weight: bold;
+    }
+
+    .atencion-numero {
+        font-size: 0.80rem;
+        color: var(--naranja);
+        font-weight: bold;
+    }
+
+    .navbar-toggler {
+        flex-shrink: 0;
+        margin-right: -1rem !important;
+    }
+
+    .navbar-toggler {
+        border: none;
+        background: none;
+        padding: 0.5rem;
+        outline: none;
+        box-shadow: none !important;
+        /* ✅ elimina la línea negra si es sombra */
+    }
+
+    .navbar-toggler-icon {
+        display: block;
+        width: 28px;
+        /* 📏 más ancho */
+        height: 3px;
+        /* 📏 más grueso */
+        background-color: var(--verde);
+        border-radius: 4px;
+        /* ✅ bordes redondeados */
+        position: relative;
+        transition: all 0.3s ease-in-out;
+        background-image: none !important;
+        /* ❌ Elimina ícono nativo de Bootstrap */
+    }
+
+    .navbar-toggler-icon::before,
+    .navbar-toggler-icon::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 28px;
+        height: 3px;
+        background-color: var(--verde);
+        border-radius: 4px;
+        /* ✅ bordes redondeados */
+        transition: all 0.3s ease-in-out;
+        background-image: none !important;
+    }
+
+    .navbar-toggler-icon::before {
+        top: -8px;
+    }
+
+    .navbar-toggler-icon::after {
+        top: 8px;
+    }
+
+    .navbar-collapse {
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        display: block !important;
+        /* evita display:none */
+    }
+
+    .navbar-collapse.show {
+        max-height: 500px;
+        /* suficiente para el contenido */
+        opacity: 1;
+    }
+}

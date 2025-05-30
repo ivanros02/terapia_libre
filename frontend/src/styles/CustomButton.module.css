@@ -1,0 +1,16 @@
+.customButton {
+  width: 246px;
+  height: 38px;
+  border-radius: 58px;
+  background-color: var(--verde);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  padding: 0; /* Removemos padding de Bootstrap */
+  transition: background-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+}

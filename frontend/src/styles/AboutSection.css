@@ -1,0 +1,20 @@
+.h2-custom{
+    color: var(--naranja) !important; 
+    font-family: var(--fuente-secundaria);
+    font-size: 36px !important;
+    font-weight: 400 !important;
+}
+
+.p-custom{
+    font-size: 16px !important;
+    font-weight: 400 !important;
+}
+
+@media (max-width: 768px) {
+    .about-section {
+        margin-top: -40rem !important;
+        /* o menos, ajustalo a gusto */
+        font-size: 48px !important;
+        /* opcional: más chico en móvil */
+    }
+}

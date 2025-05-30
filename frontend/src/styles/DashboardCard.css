@@ -1,0 +1,308 @@
+/* 🔹 Ajustes generales */
+.card-responsive {
+    background: var(--verde);
+}
+
+@media (min-width: 1025px) {
+    .card-responsive {
+        width: 815.15px;
+        height: 312.68px;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+}
+
+@media (min-width: 1920px) {
+    .card-responsive {
+        width: 1150px !important;
+    }
+}
+
+/* 🔹 Para notebooks (≤1280px) reducir un poco */
+@media (max-width: 1280px) and (min-width: 1025px) {
+    .card-responsive {
+        width: 740px;
+        height: auto;
+    }
+}
+
+/* 🔹 Ajuste para hacer que el contenedor se expanda */
+.position-relative.w-100 {
+    width: 100%;
+    max-width: 100%;
+}
+
+.titulo-card {
+    font-size: 48px !important;
+    font-weight: 400 !important;
+    font-family: var(--fuente-secundaria);
+}
+
+
+/* 🔹 Tarjeta interna (Próximo paciente) */
+.card-interna {
+    background-color: transparent;
+    max-width: 40%;
+    border: 1px solid #ccc !important;
+    /* 👈 Borde gris */
+}
+
+@media (min-width: 1025px) {
+    .contenedor-interno.centrado-vertical {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /* centrado vertical */
+        align-items: flex-start;
+        /* a la izquierda horizontalmente */
+        min-height: 300px;
+        padding-left: 1rem;
+        /* opcional: separación desde el borde izquierdo */
+    }
+
+    .contenedor-interno {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .card-interna {
+        width: 363px !important;
+        height: 110px !important;
+        flex-shrink: 0 !important;
+        max-width: none !important;
+    }
+
+    /* 🔹 Estilos para dividir en 2 filas dentro de la card */
+    .card-interna .d-flex {
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .card-interna .btn-ingresar {
+        width: 100%;
+    }
+
+    /* 🔹 Imagen decorativa RESPONSIVA */
+    .imagen-decorativa {
+        position: absolute;
+        right: -45px;
+        top: -100px;
+        width: 430px;
+        height: 430px;
+        z-index: 1;
+        max-width: 100%;
+    }
+
+    .card-nueva {
+        width: 219.6px !important;
+        height: 122.75px !important;
+        flex-shrink: 0 !important;
+        /* evita que un contenedor flex la achique */
+    }
+}
+
+.titulo-card-interna {
+    color: #FFFFFF;
+    font-size: 24.58px;
+}
+
+
+
+.btn-ingresar {
+    text-decoration: underline;
+    color: var(--verde-claro) !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+}
+
+/* 🔹 Estilo para el texto dentro de la tarjeta interna casos especiales */
+.imagen-decorativa {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* 🔹 Tarjeta pequeña (Pacientes nuevos) */
+.card-nueva {
+    background: rgba(214, 212, 212, 0.58);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+}
+
+.card-nueva h6 {
+    font-size: 18.02px;
+    font-weight: 500;
+}
+
+.icono-stonks-floating {
+    position: absolute;
+    bottom: 30px;
+    /* 🔽 lo baja cerca del número */
+    right: -18px;
+    /* 🔹 lo saca hacia la derecha fuera del borde */
+    background-color: #DFFDDD;
+    width: 73px;
+    height: 37.03px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
+.icono-stonks-floating img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+
+.icono-stonks-floating img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+
+/*SOLO PARA PACIENTES*/
+@media (max-width: 1280px) and (min-width: 1025px) {
+    .btn-agendar-turno {
+        width: 740px !important;
+        height: auto;
+
+    }
+}
+
+@media (min-width: 1025px) {
+    .btn-agendar-turno {
+        width: 807.6px;
+        height: 62.2px;
+        margin-left: 0 !important;
+
+    }
+}
+
+@media (min-width: 1920px) {
+    .btn-agendar-turno {
+        width: 1150px !important;
+    }
+}
+
+.btn-agendar-turno {
+    background-color: var(--naranja);
+    border-radius: 16.39px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 62.2px;
+    /* centra el texto verticalmente */
+    margin: 0 auto;
+    /* centrar horizontalmente */
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.btn-agendar-turno:active {
+    transform: scale(0.97);
+}
+
+
+
+/* 🔥 Responsividad en móviles */
+@media (max-width: 768px) {
+    .position-relative.w-100 {
+        width: auto !important;
+        max-width: unset !important;
+    }
+
+    .btn-agendar-turno {
+        width: 100% !important;
+        max-width: 807.6px !important;
+        width: 388px;
+        height: 65px;
+        min-height: 65px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-transform: uppercase;
+    }
+
+    .card-responsive {
+        width: 100% !important;
+        /* 🔹 ocupa el 100% del contenedor */
+        max-width: 388px !important;
+        /* 🔹 pero nunca más que 388px */
+        height: 175px !important;
+        /* 🔹 se adapta al contenido si es necesario */
+        min-height: 175px !important;
+        /* 🔹 asegura altura mínima */
+        background-color: var(--verde-oscuro) !important;
+    }
+
+    .titulo-card-interna {
+        font-size: 20px !important;
+        font-weight: 500 !important;
+    }
+
+
+    .card-interna {
+        width: 176px !important;
+        height: 114px !important;
+        max-width: none !important;
+        padding: 0.5rem !important;
+        border: none !important;
+        background-color: rgba(255, 255, 255, 0.1);
+        /* opcional: para visibilidad */
+        margin-left: 0 !important;
+        margin-right: auto !important;
+        /* 🔹 fuerza alineación a la izquierda */
+        padding: 0 !important;
+    }
+
+    .card-interna .d-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+    }
+
+    .card-interna h5 {
+        font-size: 0.85rem !important;
+        white-space: nowrap !important;
+    }
+
+    .card-interna p {
+        font-size: 0.7rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+
+    .imagen-decorativa {
+        position: static !important;
+        width: 155px !important;
+        height: 155px !important;
+        margin: 0 !important;
+    }
+
+    /* Contenedor que alinea la tarjeta y la imagen */
+    .contenedor-interno {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.5rem;
+    }
+
+    /* Imagen centrada verticalmente al lado derecho */
+    .imagen-decorativa {
+        width: 155px !important;
+        height: 155px !important;
+        object-fit: contain;
+        transform: translateY(-15px);
+        /* 🔼 Sube solo la imagen visualmente */
+    }
+
+}

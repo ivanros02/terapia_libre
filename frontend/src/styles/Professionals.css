@@ -1,0 +1,14 @@
+.h1-custom-profs {
+    font-size: 40px !important;
+    color: var(--verde) !important;
+    font-family: var(--fuente-secundaria) !important;
+}
+
+@media (max-width: 768px) {
+    .h1-custom-profs {
+        margin-top: -5rem !important;
+        /* o menos, ajustalo a gusto */
+        font-size: 48px !important;
+        /* opcional: más chico en móvil */
+    }
+}

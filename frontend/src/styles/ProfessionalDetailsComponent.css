@@ -1,0 +1,95 @@
+.btn-agendar {
+    font-size: 20px;
+    color: aliceblue !important;
+    font-weight: 600 !important;
+}
+
+.datos-header {
+    width: 100%;
+    padding: 0 8px;
+}
+
+.titulo-datos {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    text-align: center;
+}
+
+.especialidad-datos {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    text-align: center;
+}
+
+.descripcion-datos {
+    font-size: 15px !important;
+    font-weight: 400 !important;
+}
+
+/* Tooltip con pseudo-elemento */
+.descripcion-ajustada {
+
+    margin: 0 auto;
+    /* esto centra horizontalmente el párrafo */
+    padding: 0 8px;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.5;
+    position: relative;
+    cursor: help;
+}
+
+
+
+.disponibilidad-datos {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    white-space: nowrap;
+}
+
+.card-datos {
+    background-color: var(--verde-oscuro) !important;
+    border-radius: 32px;
+}
+
+@media (min-width: 992px) {
+    .card-datos {
+        width: 832px !important;
+        height: 275px !important;
+        width: 100%;
+        padding: 1.5rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .descripcion-ajustada {
+        width: 650px;
+        max-width: 100%;
+        height: 85px;
+    }
+}
+
+@media (min-width: 992px) {
+    .datos-centrales {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 1290px) {
+    .tu-contenedor-flex {
+        /* el que contiene imagen + card */
+        margin-right: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 1370px) and (min-width: 1360px) {
+    .tu-contenedor-flex {
+        margin-right: 1.5rem;
+        /* Ajustá según lo que necesites */
+    }
+}

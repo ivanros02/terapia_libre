@@ -1,0 +1,151 @@
+.calendar-title {
+    text-align: left;
+    width: 100%;
+    font-weight: 500;
+    font-size: 20.48px;
+    line-height: 100%;
+    letter-spacing: 1%;
+    text-transform: capitalize;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+}
+
+/* Borde redondeado y control del contenido del calendario (área central) */
+.fc .fc-timegrid,
+.fc .fc-timegrid-body,
+.fc .fc-scrollgrid {
+    border-radius: 16.39px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.fc .fc-timegrid,
+.fc .fc-scrollgrid {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.fc .fc-button.fc-button-active {
+    background-color: var(--naranja) !important;
+    /* o usa un color fijo como #ff9800 */
+    border-color: var(--naranja) !important;
+    color: white;
+    border-radius: 8px !important;
+
+}
+
+.fc .fc-button {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    font-weight: 500;
+    margin: 0 4px;
+    transition: all 0.2s ease-in-out;
+    font-size: 14px !important;
+}
+
+.fc .fc-button:hover {
+    background-color: var(--naranja) !important;
+    border-radius: 8px !important;
+
+}
+
+/* Fondo del evento */
+.custom-event {
+    background-color: #0ea4e95b !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-event:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenido dentro del evento */
+.custom-event-content {
+    color: #0369A1;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.custom-event-time {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* separa el texto del icono */
+}
+
+.custom-event-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.icon-container {
+    width: 12px;
+    height: 12px;
+    border-radius: 100px;
+    background-color: #0369A1;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.event-icon {
+    width: 8px;
+    height: 8px;
+    object-fit: contain;
+}
+
+/* Estilo del encabezado superior del calendario */
+/* Fuerza el alineado del encabezado */
+.fc-col-header-cell-cushion {
+    display: block !important;
+    text-align: left !important;
+    padding-left: 8px !important;
+    padding-top: 4px !important;
+    padding-bottom: 20px !important;
+}
+
+/* Contenedor del encabezado personalizado */
+.encabezado-dia {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* 🔹 esto lo alinea a la izquierda */
+    font-family: Poppins, sans-serif;
+    text-decoration: none !important;
+}
+
+.encabezado-dia__nombre {
+    font-size: 10px;
+    color: #6b7280;
+    /* gris tipo Tailwind slate-500 */
+    text-transform: uppercase;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none !important;
+}
+
+.encabezado-dia__numero {
+    font-size: 22px;
+    font-weight: 400;
+    color: #000000;
+    /* negro suave */
+    line-height: 1;
+    text-decoration: none !important;
+}
+
+.fc-col-header-cell a {
+    text-decoration: none !important;
+}

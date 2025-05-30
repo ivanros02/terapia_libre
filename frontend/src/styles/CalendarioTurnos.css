@@ -1,0 +1,107 @@
+/* === Calendario en escritorio === */
+@media (min-width: 1025px) {
+    .card-calendario {
+        width: 413.75px;
+        height: 889.22px;
+    }
+
+    .calendario-container {
+        padding-left: 50px !important;
+    }
+}
+
+@media (min-width: 1920px) {
+    .card-calendario {
+        width: 500px !important;
+        height: 870px;
+        margin-left: 2rem;
+    }
+}
+
+/* 🔹 Para notebooks (≤1280px) reducir un poco */
+@media (max-width: 1280px) and (min-width: 1025px) {
+    .calendario-container {
+        padding-left: 300px !important;
+    }
+
+    .card-calendario {
+        width: 360px;
+        height: auto;
+    }
+}
+
+@media (max-width: 1366px) and (min-width: 1025px) {
+    .calendario-container {
+        padding-left: 100px !important;
+        /* o menos */
+    }
+
+    .card-calendario {
+        width: 300px;
+        margin-left: 0.5rem;
+        /* un poco más compacto si querés */
+    }
+}
+
+
+/* Título del calendario */
+.titulo-calendario {
+    font-size: 20.48px;
+    font-weight: 500;
+}
+
+/* Día de la semana en encabezado */
+.calendario-dia-header {
+    width: 14%;
+    text-align: center;
+}
+
+/* Evento en el calendario (circulito rojo) */
+.calendario-evento {
+    width: 6px;
+    height: 6px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Título de próximos turnos */
+.proxtitulo {
+    font-size: 20.48px;
+    color: #23262F;
+    font-weight: 700;
+}
+
+/* 📱 Estilo solo para pantallas chicas */
+@media (max-width: 767.98px) {
+    .proxtitulo {
+        font-size: 20px;
+        font-weight: 500;
+    }
+}
+
+
+.proxTurno {
+    width: 47.11px;
+    height: 47.11px;
+    font-size: 16.39px;
+    font-weight: 700;
+    line-height: 30px;
+    background-color: var(--naranja);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fecha-prox-turno {
+    font-size: 12.29px;
+    font-weight: 400;
+    color: #0D0D0D99;
+}
+
+.prox-turno-contenedor {
+    background-color: var(--naranja-claro);
+}

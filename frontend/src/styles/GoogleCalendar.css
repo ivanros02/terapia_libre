@@ -1,0 +1,113 @@
+/* Bordes redondeados en el contenedor del calendario */
+.fc {
+    width: 100% !important;
+    height: 100% !important; /* 🔹 Se ajusta al contenedor */
+    max-height: inherit; /* 🔹 Evita que se reduzca demasiado */
+    flex-grow: 1; /* 🔹 Permite que ocupe el espacio disponible */
+    
+}
+
+/* Bordes redondeados en las celdas de la grilla */
+.fc-daygrid-day {
+    border-radius: 8px;
+}
+
+/* Bordes redondeados en la cabecera del calendario */
+.fc-header-toolbar {
+    border-radius: 12px;
+    background-color: #f8f9fa;
+    /* Opcional: mejora la visibilidad */
+    padding: 4px; /* 🔹 Reducir padding para hacerla más delgada */
+    font-size: 1px !important; /* 🔹 Reducir tamaño de fuente */
+    height: 35px !important; /* 🔹 Ajustar altura automáticamente */
+}
+
+/* Aumentar la altura de los eventos */
+.fc-event {
+    min-height: 40px;
+    /* Aumenta el tamaño del evento */
+    padding: 5px;
+    /* Ajusta el espacio dentro del evento */
+    font-size: 12px;
+    /* Reduce el tamaño del texto */
+    line-height: 1.3;
+    /* Ajusta la separación entre líneas */
+    overflow: hidden;
+    /* Evita que el texto salga del evento */
+    white-space: nowrap;
+    /* Evita que el texto haga salto de línea */
+    text-overflow: ellipsis;
+    /* Muestra "..." si el texto es muy largo */
+}
+
+/* Asegurar que el contenido del evento tenga suficiente espacio */
+.fc-daygrid-event {
+    height: auto !important;
+    display: flex;
+    align-items: center;
+}
+
+.fc-toolbar {
+    text-align: left !important;
+}
+
+/* Centrar el contenido principal sin afectar el sidebar */
+.calendar-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 80vh;
+    /* Para que no se pegue arriba */
+    padding-top: 20px;
+    /* Espacio debajo del buscador */
+}
+
+/* Ajustar tamaño del contenedor para ocupar todo el ancho */
+.content-box {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Asegurar que el título y calendario estén bien alineados */
+h3 {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px; /* 🔹 Reducir espacio debajo del título */
+}
+
+/* Alinear la cabecera del FullCalendar a la izquierda */
+.fc-toolbar {
+    padding: 0px 0 !important; /* 🔹 Reduce el grosor del encabezado */
+    font-size: 14px !important; /* 🔹 Reduce el tamaño de la fuente */
+    min-height: -1px !important; /* 🔹 Limita la altura mínima */
+}
+
+
+/* Ajustar altura y ancho del calendario dentro de div6 */
+.calendar-wrapper {
+    width: 100% !important;
+    height: calc(100vh - 190px) !important; /* 🔹 Ajustar altura restando menos espacio del encabezado */
+    max-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important; 
+}
+
+.calendar-wrapper .fc {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important; /* 🔹 Ajustar al tamaño del contenedor */
+    flex-grow: 1 !important;
+}
+
+/* En móviles, ajustar la altura */
+@media (max-width: 768px) {
+    .calendar-wrapper {
+        height: calc(100vh - 80px) !important; /* 🔹 Ajusta en móviles */
+    }
+
+    .fc {
+        height: auto !important;
+    }
+}

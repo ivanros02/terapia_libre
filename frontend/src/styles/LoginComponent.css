@@ -1,0 +1,49 @@
+.bg-transparent {
+    background-color: transparent !important; /* Asegura que sea transparente */
+}
+
+.row, .container, .col {
+    background: transparent !important; /* Previene herencias */
+    box-shadow: none !important; /* Quita cualquier sombra que haga parecer que tiene fondo */
+    border: none !important;
+}
+
+.rounded-personalizado{
+    border-radius: 5% !important;
+    height: 390px !important;
+    width: 331px !important;
+}
+
+.login-container {
+    background: url("../assets/home.jpg") no-repeat center center;
+    background-size: cover;
+    height: 110vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-title-card{
+    font-size: 40px;
+    font-family: var(--fuente-secundaria);
+}
+
+.title-login{
+    font-size:  24px;
+    font-family: var(--fuente-secundaria);
+}
+
+.title-login-movil{
+    font-size: 36px;
+    font-family: var(--fuente-secundaria);  
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        margin-top: 1rem !important;
+    }
+
+    .title-login{
+        font-size: 36px;
+    }
+}

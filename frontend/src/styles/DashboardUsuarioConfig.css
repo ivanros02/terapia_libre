@@ -1,0 +1,15 @@
+.titulo-config{
+    font-size: 48px !important;
+    font-weight: 400 !important;
+    font-family: var(--fuente-secundaria);
+}
+
+.btn-edit{
+    background-color: var(--verde) !important;
+    border-radius: 1rem !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    border: none !important;
+}
+
