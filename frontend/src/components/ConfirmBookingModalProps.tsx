@@ -18,16 +18,16 @@ interface ConfirmBookingModalProps {
     profesionalName: string | null;
 }
 
-const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide, selectedDateTime, id_profesional, id_usuario, precio, precioInternacional, profesionalName }) => {
+const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide, selectedDateTime, id_profesional, id_usuario, }) => {
     // ✅ Inicializa Mercado Pago solo una vez
     initMercadoPago(public_key_mp, { locale: 'es-AR' });
 
-    const [, setOrderID] = useState<string | null>(null);
     const [showPayPal, setShowPayPal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [preferenceId, setPreferenceId] = useState(null);
     const [loadingWallet, setLoadingWallet] = useState(false);
     const [cupon, setCupon] = useState('');
+    const [bookingToken, setBookingToken] = useState<string | null>(null); // 🔒 Token para PayPal
 
     const navigate = useNavigate();
 
@@ -35,19 +35,18 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     const handleCreateOrder = async (): Promise<string> => {
         try {
             const [fecha_turno, hora_turno] = selectedDateTime?.split(" - ") ?? [];
-            const precioNumerico = Number(precioInternacional); // ✅ Usar precio en USD
-            if (isNaN(precioNumerico)) throw new Error("El precio no es un número válido.");
 
+            // ✅ Solo enviamos datos de identificación, NO precios
             const response = await axios.post(`${url}/api/turnos/paypal/create-order`, {
                 id_profesional,
                 id_usuario,
                 fecha_turno,
                 hora_turno,
-                precio: precioNumerico.toFixed(2),
-                cupon,
+                cupon, // El backend calculará el precio final
             });
 
-            setOrderID(response.data.id);
+            // 🔒 Guardar token de seguridad para la captura
+            setBookingToken(response.data.booking_token);
             return response.data.id;
         } catch (error) {
             console.error("Error creando la orden de PayPal:", error);
@@ -58,28 +57,19 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     // 🔹 Capturar el pago en PayPal
     const handleApprove = async (data: any) => {
         try {
-            let [fecha_turno, hora_turno] = selectedDateTime?.split(" - ") ?? [];
-            if (!fecha_turno || !hora_turno) return;
+            if (!bookingToken) {
+                throw new Error("Token de seguridad no disponible");
+            }
 
-            const fechaFormatted = new Date(fecha_turno).toISOString().split("T")[0];
             const response = await axios.post(`${url}/api/turnos/paypal/capture-order`, {
                 orderID: data.orderID,
-                id_profesional,
-                id_usuario,
-                fecha_turno: fechaFormatted,
-                hora_turno,
-                precio,
-                cupon,
+                booking_token: bookingToken, // 🔒 Usar token en lugar de datos manuales
             });
 
             if (response.data.message === "Pago exitoso y turno reservado") {
                 setShowSuccessModal(true);
                 onHide();
-
-                // Redirigir después de un pequeño retraso
-                setTimeout(() => {
-                    navigate("/dashboard/calendario");
-                }, 2000); // Redirige después de 2 segundos para mostrar el modal
+                setTimeout(() => navigate("/dashboard/calendario"), 2000);
             }
         } catch (error) {
             console.error("❌ Error al capturar el pago:", error);
@@ -91,20 +81,19 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     const create_preference = async () => {
         try {
             const response = await axios.post(`${url}/api/mercadopago/create-order`, {
-                title: profesionalName,
-                quantity: 1,
-                price: precio,
+                // ✅ Solo datos de identificación
                 id_profesional,
                 id_usuario,
                 fecha_turno: selectedDateTime?.split(" - ")[0],
                 hora_turno: selectedDateTime?.split(" - ")[1],
                 cupon,
+                // ❌ NO enviamos: title, quantity, price
             });
 
-            const { id } = response.data;
-            return id;
+            return response.data.id;
         } catch (error) {
             console.error('Error al crear la preferencia de pago:', error);
+            throw error;
         }
     };
 

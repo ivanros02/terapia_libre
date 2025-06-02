@@ -200,26 +200,29 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
                         isDayCompletelyUnavailable(selectedDate.toISOString().split("T")[0]) ? (
                             <p className="text-muted text-center">
                                 <span style={{ color: '#8e44ad', fontWeight: 'bold' }}>
-                                    ⚠️
+                                    ⚠️ No hay horarios disponibles para este día
                                 </span>
                             </p>
                         ) : (
-                            availableTimes[selectedDate.toISOString().split("T")[0]].map((time, index) => {
+                            (() => {
                                 const fechaSeleccionada = selectedDate.toISOString().split("T")[0];
-                                const estaEnAusencia = isTimeInAbsence(fechaSeleccionada, time.hora_inicio, time.hora_fin);
+                                const horariosDisponibles = availableTimes[fechaSeleccionada].filter(time => {
+                                    return !isTimeInAbsence(fechaSeleccionada, time.hora_inicio, time.hora_fin);
+                                });
 
-                                return (
-                                    <button
-                                        key={index}
-                                        className={estaEnAusencia ? 'time-unavailable' : ''}
-                                        onClick={() => handleSelectTime(time.hora_inicio, time.hora_fin)}
-                                        disabled={estaEnAusencia}
-                                    >
-                                        {`${time.hora_inicio.slice(0, 5)} a ${time.hora_fin.slice(0, 5)}`}
-                                        {estaEnAusencia && <span className="ms-2">⚠️</span>}
-                                    </button>
+                                return horariosDisponibles.length > 0 ? (
+                                    horariosDisponibles.map((time, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleSelectTime(time.hora_inicio, time.hora_fin)}
+                                        >
+                                            {`${time.hora_inicio.slice(0, 5)} a ${time.hora_fin.slice(0, 5)}`}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <p className="text-muted text-center">No hay horarios disponibles</p>
                                 );
-                            })
+                            })()
                         )
                     ) : (
                         <p className="text-muted text-center">No hay horarios disponibles</p>

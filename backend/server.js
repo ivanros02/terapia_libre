@@ -53,7 +53,7 @@ app.use("/google-meet", googleMeetRoutes);
 app.use("/api/mercadopago", mercadoPagoRoutes);
 app.use("/api/admin", adminRoutes); // 🔹 Agregamos la ruta de administración
 app.use("/api/suscripcion", suscripcionRoutes);
-app.use("/ausencias", ausenciaRoutes)
+app.use("/ausencias", ausenciaRoutes);
 
 // Pasar `io` al cargar las rutas del chat
 app.use("/api/chat", (req, res, next) => {

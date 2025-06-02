@@ -15,39 +15,74 @@ const client = new MercadoPagoConfig({ accessToken: ACCESS_TOKEN });
 exports.crearOrdenMercadoPago = async (req, res) => {
     try {
         const {
-            title,
-            price,
             id_profesional,
             id_usuario,
             fecha_turno,
             hora_turno,
-            cupon // 👈 lo esperamos desde el frontend
+            cupon
         } = req.body;
 
+        
 
-        const precioNumerico = Number(price);
-        if (isNaN(precioNumerico) || precioNumerico <= 0) {
-            return res.status(400).json({ message: "El precio debe ser un número válido y mayor a 0" });
+        // 🔒 PASO 2: Validar datos obligatorios
+        if (!id_profesional || !id_usuario || !fecha_turno || !hora_turno) {
+            return res.status(400).json({ message: "Todos los campos son obligatorios" });
         }
 
-        // ✅ Aplicar cupón si se envió
+        // 🔒 PASO 3: Validar disponibilidad y obtener datos del profesional
+        
+        const { profesional, usuario } = await Turno.validarDatosTurno(
+            id_profesional,
+            id_usuario,
+            fecha_turno,
+            hora_turno
+        );
+
+        // 🔒 PASO 4: Obtener precio REAL del profesional (ARS para Mercado Pago)
+        const precioBase = parseFloat(profesional.precio_ars); // 🔧 Convertir a número
+        if (!precioBase || precioBase <= 0) {
+            return res.status(400).json({
+                message: "Precio en pesos no configurado para este profesional"
+            });
+        }
+
+        // 🔒 PASO 5: Aplicar cupón de descuento (si existe)
         const {
             precio_final,
             cupon_valido,
             registrar,
             cupon_codigo
-        } = await aplicarCupon({ id_usuario, cupon, precio_original: precioNumerico });
+        } = await aplicarCupon({
+            id_usuario,
+            cupon,
+            precio_original: precioBase
+        });
 
-        // ✅ Crear preferencia en Mercado Pago
-        const booking_token = uuidv4(); // token seguro para capturar luego
+        // 🔧 Asegurar que precio_final también sea número
+        const precioFinalNumerico = parseFloat(precio_final);
 
+        // 🔒 PASO 6: Generar token de seguridad
+        const booking_token = uuidv4();
+        
+
+        // 🔐 Guardar temporalmente los datos asociados al booking_token
+        await Turno.guardarTokenTemporal(booking_token, {
+            id_profesional,
+            id_usuario,
+            fecha_turno,
+            hora_turno,
+            precio_original: precioBase,
+            precio_final,
+            cupon: cupon_valido ? cupon_codigo : null,
+            registrar_cupon: cupon_valido && registrar
+        });
 
         // ✅ Crear preferencia en Mercado Pago
         const body = {
             items: [
                 {
-                    title: `Turno con el profesional ${title}`,
-                    unit_price: precio_final,
+                    title: `Turno con ${profesional.nombre}`, // 🔒 Nombre del backend
+                    unit_price: precioFinalNumerico, // 🔒 Precio calculado en backend
                     quantity: 1,
                     currency_id: "ARS",
                 },
@@ -59,20 +94,8 @@ exports.crearOrdenMercadoPago = async (req, res) => {
             },
             auto_return: "approved",
             notification_url: "https://api.terapialibre.com.ar/api_terapia/api/mercadopago/webhook",
-            external_reference: booking_token, // token en lugar de datos sensibles
+            external_reference: booking_token, // 🔒 Token seguro
         };
-
-        // 🔐 Guardar temporalmente los datos asociados al booking_token
-        await Turno.guardarTokenTemporal(booking_token, {
-            id_profesional,
-            id_usuario,
-            fecha_turno,
-            hora_turno,
-            precio_original: precioNumerico,
-            precio_final,
-            cupon: cupon_valido ? cupon_codigo : null,
-            registrar_cupon: cupon_valido && registrar
-        });
 
         // ✅ Crear la preferencia en Mercado Pago
         const preference = new Preference(client);
@@ -115,6 +138,13 @@ exports.capturarPagoMercadoPago = async (req, res) => {
             return res.status(400).json({ message: "Datos no encontrados para el token" });
         }
 
+        // 🔒 Verificar expiración del token (30 minutos)
+        const tiempoExpiracion = 30 * 60 * 1000; // 30 minutos
+        if (datos.timestamp && (Date.now() - datos.timestamp > tiempoExpiracion)) {
+            await Turno.eliminarTokenTemporal(booking_token);
+            return res.status(400).json({ message: "Token expirado, inicia el proceso nuevamente" });
+        }
+
         const {
             id_profesional,
             id_usuario,
@@ -125,20 +155,63 @@ exports.capturarPagoMercadoPago = async (req, res) => {
             registrar_cupon
         } = datos;
 
-        const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
-        await Turno.notificarTurnoConfirmado(id_turno);
-
-        await Pago.registrarPago(id_turno, precio_final, "MercadoPago", "Pagado", payment_id);
-
-        if (cupon && registrar_cupon) {
-            await registrarUsoCupon(id_usuario, cupon);
+        // 🔒 RE-VALIDAR disponibilidad antes de confirmar
+        try {
+            await Turno.validarDatosTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
+            
+        } catch (error) {
+            console.log("❌ Re-validación falló:", error.message);
+            await Turno.eliminarTokenTemporal(booking_token);
+            return res.status(400).json({ message: error.message });
         }
 
-        res.status(201).json({
-            message: "Pago exitoso y turno reservado",
-            id_turno,
-            id_transaccion: payment_id
-        });
+        // ✅ Verificar que el pago esté aprobado
+        if (paymentResponse.status !== "approved") {
+            console.log(`❌ Pago no aprobado. Status: ${paymentResponse.status}`);
+            return res.status(400).json({ message: "Pago no aprobado" });
+        }
+
+        // 🔒 TRANSACCIÓN ATÓMICA: Todo o nada
+        try {
+            // ✅ Crear turno
+            const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
+            
+            // ✅ Registrar pago
+            await Pago.registrarPago(id_turno, precio_final, "MercadoPago", "Pagado", payment_id);
+
+            // ✅ Aplicar cupón si corresponde
+            if (cupon && registrar_cupon) {
+                await registrarUsoCupon(id_usuario, cupon);
+            }
+
+            // ✅ Notificar confirmación
+            await Turno.notificarTurnoConfirmado(id_turno);
+
+            // 🔒 Limpiar token usado
+            await Turno.eliminarTokenTemporal(booking_token);
+
+            res.status(201).json({
+                message: "Pago exitoso y turno reservado",
+                id_turno,
+                id_transaccion: payment_id
+            });
+
+        } catch (dbError) {
+            console.error("❌ Error en base de datos:", dbError);
+
+            // 🚨 CRÍTICO: Pago exitoso pero error en BD
+            console.error("🚨 CRÍTICO: Pago exitoso en Mercado Pago pero error en BD:", {
+                payment_id,
+                booking_token,
+                precio_final,
+                error: dbError.message
+            });
+
+            return res.status(500).json({
+                message: "Error interno. El pago fue procesado, contacta soporte.",
+                support_code: booking_token
+            });
+        }
 
     } catch (error) {
         console.error("❌ Error al capturar pago:", error);
@@ -152,7 +225,6 @@ exports.capturarPagoMercadoPago = async (req, res) => {
 /* ======================= */
 exports.webhookMercadoPago = async (req, res) => {
     try {
-        console.log("🔔 Webhook recibido de Mercado Pago:", JSON.stringify(req.body, null, 2));
 
         const { type, data } = req.body;
 

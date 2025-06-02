@@ -10,59 +10,108 @@ const PAYPAL_API = process.env.PAYPAL_API;
 // 🔹 Crear una orden en PayPal
 exports.crearOrdenPayPal = async (req, res) => {
     try {
-        const { id_profesional, id_usuario, fecha_turno, hora_turno, precio, cupon } = req.body;
+        const {
+            id_profesional,
+            id_usuario,
+            fecha_turno,
+            hora_turno,
+            cupon
+        } = req.body;
 
-        if (!id_profesional || !id_usuario || !fecha_turno || !hora_turno || !precio) {
+        // 🔒 PASO 2: Validar datos obligatorios
+        if (!id_profesional || !id_usuario || !fecha_turno || !hora_turno) {
             return res.status(400).json({ message: "Todos los campos son obligatorios" });
         }
 
-        const precioNumerico = Number(precio);
-        if (isNaN(precioNumerico) || precioNumerico <= 0) {
-            return res.status(400).json({ message: "Precio inválido" });
+        // 🔒 PASO 3: Validar disponibilidad y obtener datos del profesional
+        const { profesional, usuario } = await Turno.validarDatosTurno(
+            id_profesional,
+            id_usuario,
+            fecha_turno,
+            hora_turno
+        );
+
+        // 🔒 PASO 4: Obtener precio REAL del profesional (USD para PayPal)
+        const precioBase = parseFloat(profesional.precio_usd);
+        if (!precioBase || precioBase <= 0) {
+            return res.status(400).json({
+                message: "Precio internacional no configurado para este profesional"
+            });
         }
 
+        // 🔒 PASO 5: Aplicar cupón de descuento (si existe)
         const {
             precio_final,
             cupon_valido,
             registrar,
             cupon_codigo
-        } = await aplicarCupon({ id_usuario, cupon, precio_original: precioNumerico });
+        } = await aplicarCupon({
+            id_usuario,
+            cupon,
+            precio_original: precioBase
+        });
 
+        // 🔧 Convertir precio_final a número
+        const precioFinalNumerico = parseFloat(precio_final);
+
+        // 🔒 PASO 6: Generar token de seguridad
         const booking_token = uuidv4();
 
+        // 🔐 Guardar temporalmente los datos asociados al booking_token
         await Turno.guardarTokenTemporal(booking_token, {
             id_profesional,
             id_usuario,
             fecha_turno,
             hora_turno,
-            precio_original: precioNumerico,
-            precio_final,
+            precio_original: precioBase,
+            precio_final: precioFinalNumerico,
             cupon: cupon_valido ? cupon_codigo : null,
-            registrar_cupon: cupon_valido && registrar
+            registrar_cupon: cupon_valido && registrar,
+            timestamp: Date.now() // 🔧 Agregar timestamp
         });
 
         // Autenticación en PayPal
         const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString("base64");
 
-        // Crear orden en PayPal
-        const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders`, {
+        // ✅ Crear orden en PayPal con datos del backend
+        const orderData = {
             intent: "CAPTURE",
             purchase_units: [{
-                amount: { currency_code: "USD", value: precio_final.toFixed(2) },
-                description: `Turno ${fecha_turno} ${hora_turno}`,
-                custom_id: booking_token
+                amount: {
+                    currency_code: "USD",
+                    value: precioFinalNumerico.toFixed(2) // 🔧 Precio calculado en backend
+                },
+                description: `Turno con ${profesional.nombre} - ${fecha_turno} ${hora_turno}`,
+                custom_id: booking_token // 🔒 Token seguro
             }],
-        }, {
+        };
+
+        const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders`, orderData, {
             headers: {
                 Authorization: `Basic ${auth}`,
                 "Content-Type": "application/json",
             },
         });
 
-        res.json(response.data); // Enviar `orderID` al frontend
+        // ✅ Devolver orderID y token al frontend
+        res.json({
+            id: response.data.id,
+            booking_token // 🔒 Frontend necesita el token para capturar
+        });
+
     } catch (error) {
-        console.error("Error creando la orden de PayPal:", error);
-        res.status(400).json({ message: "No se pudo completar la operación. Verificá los datos e intentá nuevamente." });
+        console.error("❌ [PayPal] Error creando la orden:", error);
+
+        // 🔒 No exponer detalles internos
+        const mensaje = error.message.includes("disponible") ||
+            error.message.includes("encontrado") ||
+            error.message.includes("pasadas") ||
+            error.message.includes("configurado") ||
+            error.message.includes("inactivo")
+            ? error.message
+            : "No se pudo completar la operación. Verificá los datos e intentá nuevamente.";
+
+        res.status(400).json({ message: mensaje });
     }
 };
 
@@ -72,9 +121,44 @@ exports.capturarPagoPayPal = async (req, res) => {
         const { orderID, booking_token } = req.body;
 
         if (!orderID || !booking_token) {
-            return res.status(400).json({ message: "Faltan datos" });
+            return res.status(400).json({ message: "Faltan datos de seguridad" });
         }
 
+        // 🔒 Validar y obtener datos del token
+        const datos = await Turno.obtenerTokenTemporal(booking_token);
+        if (!datos) {
+            return res.status(400).json({ message: "Token inválido o expirado" });
+        }
+
+        // 🔒 Verificar expiración del token (30 minutos)
+        const tiempoExpiracion = 30 * 60 * 1000;
+        if (datos.timestamp && (Date.now() - datos.timestamp > tiempoExpiracion)) {
+            await Turno.eliminarTokenTemporal(booking_token);
+            return res.status(400).json({ message: "Token expirado, inicia el proceso nuevamente" });
+        }
+
+        const {
+            id_profesional,
+            id_usuario,
+            fecha_turno,
+            hora_turno,
+            precio_final,
+            cupon,
+            registrar_cupon
+        } = datos;
+
+
+        // 🔒 RE-VALIDAR disponibilidad antes de confirmar
+        try {
+            await Turno.validarDatosTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
+            
+        } catch (error) {
+            console.log("❌ [PayPal] Re-validación falló:", error.message);
+            await Turno.eliminarTokenTemporal(booking_token);
+            return res.status(400).json({ message: error.message });
+        }
+
+        // ✅ Capturar pago en PayPal
         const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString("base64");
 
         const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`, {}, {
@@ -87,38 +171,59 @@ exports.capturarPagoPayPal = async (req, res) => {
         if (response.data.status === "COMPLETED") {
             const id_transaccion = response.data.id;
 
-            const datos = await Turno.obtenerTokenTemporal(booking_token);
-            if (!datos) {
-                return res.status(400).json({ message: "Token inválido o expirado" });
+            // 🔒 TRANSACCIÓN ATÓMICA: Todo o nada
+            try {
+
+                // ✅ Crear turno
+                const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
+                
+
+                // ✅ Registrar pago
+                await Pago.registrarPago(id_turno, precio_final, "PayPal", "Pagado", id_transaccion);
+                
+
+                // ✅ Aplicar cupón si corresponde
+                if (cupon && registrar_cupon) {
+                    await registrarUsoCupon(id_usuario, cupon);
+                    
+                }
+
+                // ✅ Notificar confirmación
+                await Turno.notificarTurnoConfirmado(id_turno);
+
+                // 🔒 Limpiar token usado
+                await Turno.eliminarTokenTemporal(booking_token);
+
+                return res.status(201).json({
+                    message: "Pago exitoso y turno reservado",
+                    id_turno
+                });
+
+            } catch (dbError) {
+                console.error("❌ [PayPal] Error en base de datos:", dbError);
+
+                // 🚨 CRÍTICO: Si falla la BD pero PayPal se cobró
+                console.error("🚨 [PayPal] CRÍTICO: Pago exitoso en PayPal pero error en BD:", {
+                    orderID,
+                    id_transaccion,
+                    booking_token,
+                    precio_final,
+                    error: dbError.message
+                });
+
+                return res.status(500).json({
+                    message: "Error interno. El pago fue procesado, contacta soporte.",
+                    support_code: booking_token // Para que soporte pueda rastrear
+                });
             }
-
-            const {
-                id_profesional,
-                id_usuario,
-                fecha_turno,
-                hora_turno,
-                precio_final,
-                cupon,
-                registrar_cupon
-            } = datos;
-
-            const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
-            await Turno.notificarTurnoConfirmado(id_turno);
-            await Pago.registrarPago(id_turno, precio_final, "PayPal", "Pagado", id_transaccion);
-
-            if (cupon && registrar_cupon) {
-                await registrarUsoCupon(id_usuario, cupon);
-            }
-
-            await Turno.eliminarTokenTemporal(booking_token);
-
-            return res.status(201).json({ message: "Pago exitoso y turno reservado", id_turno });
         }
 
-        res.status(400).json({ message: "Pago no completado" });
+        console.log(`❌ [PayPal] Pago no completado. Status: ${response.data.status}`);
+        res.status(400).json({ message: "Pago no completado en PayPal" });
+
     } catch (error) {
-        console.error("Error al capturar el pago:", error);
-        res.status(400).json({ message: "No se pudo completar la operación. Verificá los datos e intentá nuevamente." });
+        console.error("❌ [PayPal] Error al capturar el pago:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
     }
 };
 

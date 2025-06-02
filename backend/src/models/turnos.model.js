@@ -335,6 +335,82 @@ class Turno {
         return rows[0] || null;
     }
 
+    static async obtenerProfesionalConPrecios(id_profesional) {
+        const [rows] = await pool.execute(
+            `SELECT id_profesional, nombre, correo_electronico, 
+                    valor as precio_ars, 
+                    valor_internacional as precio_usd
+             FROM profesionales 
+             WHERE id_profesional = ? AND estado = 1`,
+            [id_profesional]
+        );
+
+        if (rows.length === 0) {
+            throw new Error("Profesional no encontrado o inactivo");
+        }
+
+        return rows[0];
+    }
+
+    // 🔒 NUEVO MÉTODO: Verificar que el usuario existe y está activo
+    static async verificarUsuario(id_usuario) {
+        const [rows] = await pool.execute(
+            `SELECT id_usuario, nombre, correo_electronico 
+             FROM usuarios 
+             WHERE id_usuario = ?`,
+            [id_usuario]
+        );
+
+        if (rows.length === 0) {
+            throw new Error("Usuario no encontrado o inactivo");
+        }
+
+        return rows[0];
+    }
+
+    // 🔒 ACTUALIZAR: Método de verificación completa de datos
+    static async validarDatosTurno(id_profesional, id_usuario, fecha_turno, hora_turno) {
+        // ✅ Verificar que el profesional existe y obtener precios
+        const profesional = await this.obtenerProfesionalConPrecios(id_profesional);
+
+        // ✅ Verificar que el usuario existe
+        const usuario = await this.verificarUsuario(id_usuario);
+
+        // ✅ Verificar disponibilidad del horario
+        const horarioDisponible = await this.verificarDisponibilidad(id_profesional, fecha_turno, hora_turno);
+        if (!horarioDisponible) {
+            throw new Error("El horario ya no está disponible");
+        }
+
+        // ✅ Validar que la fecha no sea pasada (solo comparar fechas, no horas)
+        const hoyArgentina = new Date().toLocaleDateString('sv-SE', {
+            timeZone: 'America/Argentina/Buenos_Aires'
+        }); // Formato: YYYY-MM-DD
+
+        // 🔹 Comparar fechas como strings (más seguro)
+        if (fecha_turno < hoyArgentina) {
+            throw new Error("No se pueden reservar turnos en fechas pasadas");
+        }
+
+        return { profesional, usuario };
+    }
+
+    // 🔒 NUEVO MÉTODO: Limpiar tokens expirados (llamar periódicamente)
+    static async limpiarTokensExpirados() {
+        await pool.execute(
+            `DELETE FROM tokens_temporales 
+             WHERE created_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)`
+        );
+    }
+
+    // 🔒 ACTUALIZAR: Método para eliminar token temporal
+    static async eliminarTokenTemporal(booking_token) {
+        await pool.execute(
+            `DELETE FROM tokens_temporales WHERE booking_token = ?`,
+            [booking_token]
+        );
+    }
+
 }
 
 module.exports = Turno;
