@@ -425,9 +425,9 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol, fec
   };
 
   // 📌 Función para realizar acciones cuando finaliza la llamada
-  const registrarFinDeLlamada = async (_turno: Turno) => {
+  const registrarFinDeLlamada = async (turno: Turno) => {
     try {
-      //await axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno });
+      await axios.post(`${url}/google-meet/terminar-llamada`, { id_turno: turno.id_turno });
 
       toast.success("✅ La videollamada ha finalizado correctamente.", {
         position: "top-right",

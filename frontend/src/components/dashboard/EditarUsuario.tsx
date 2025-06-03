@@ -10,6 +10,7 @@ interface Usuario {
     id_usuario: number;
     correo_electronico: string;
     nombre: string;
+    telefono: string | null; // 🔹 Agregado campo teléfono
     id_google: string | null;
     created_at: string;
 }
@@ -21,13 +22,13 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
     const [formData, setFormData] = useState({
         nombre: "",
         correo_electronico: "",
+        telefono: "", // 🔹 Agregado teléfono al estado del formulario
     });
     const token = localStorage.getItem("token");
     const [mostrarPasswordForm, setMostrarPasswordForm] = useState(false);
     const [contrasenaActual, setContrasenaActual] = useState("");
     const [nuevaContrasena, setNuevaContrasena] = useState("");
     const [confirmarContrasena, setConfirmarContrasena] = useState("");
-
 
     // 🔹 Cargar datos del usuario
     useEffect(() => {
@@ -44,6 +45,7 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
                 setFormData({
                     nombre: response.data.nombre || "",
                     correo_electronico: response.data.correo_electronico || "",
+                    telefono: response.data.telefono || "", // 🔹 Cargar teléfono (vacío si es null)
                 });
             } catch (error) {
                 console.error("Error al obtener usuario:", error);
@@ -78,14 +80,13 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
             }
         }
 
-
         try {
             const dataEnviar = {
                 ...formData,
+                telefono: formData.telefono || null, // 🔹 Enviar null si está vacío
                 contrasena: mostrarPasswordForm ? nuevaContrasena : undefined,
                 contrasena_actual: mostrarPasswordForm ? contrasenaActual : undefined,
             };
-
 
             await axios.put(`${url}/api/auth/usuario/${userId}`, dataEnviar, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -100,8 +101,6 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
             setSaving(false);
         }
     };
-
-
 
     return (
         <Modal show={show} onHide={onHide} centered>
@@ -132,9 +131,24 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
                                 type="email"
                                 name="correo_electronico"
                                 value={formData.correo_electronico}
-                                readOnly // 🔹 Ahora usa `readOnly` en lugar de `disabled`
+                                readOnly
                                 placeholder="correo@ejemplo.com"
                             />
+                        </Form.Group>
+
+                        {/* 🔹 Nuevo campo para teléfono */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Teléfono</Form.Label>
+                            <Form.Control
+                                type="tel"
+                                name="telefono"
+                                value={formData.telefono}
+                                onChange={handleChange}
+                                placeholder="Ingresá tu número de teléfono (opcional)"
+                            />
+                            <Form.Text className="text-muted">
+                                Opcional. Ej: +54 9 11 1234-5678
+                            </Form.Text>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -149,20 +163,33 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
                                             day: "numeric",
                                         })
                                         : "Fecha no disponible"
-                                } // ✅ Convierte correctamente la fecha
+                                }
                                 readOnly
                             />
                         </Form.Group>
 
-                        <Button
-                            variant="outline-secondary"
-                            className="mb-3"
-                            onClick={() => setMostrarPasswordForm(!mostrarPasswordForm)}
-                        >
-                            {mostrarPasswordForm ? "Cancelar cambio de contraseña" : "¿Cambiar contraseña?"}
-                        </Button>
+                        {/* 🔹 Solo mostrar cambio de contraseña si NO es usuario de Google */}
+                        {!usuario.id_google && (
+                            <Button
+                                variant="outline-secondary"
+                                className="mb-3"
+                                onClick={() => setMostrarPasswordForm(!mostrarPasswordForm)}
+                            >
+                                {mostrarPasswordForm ? "Cancelar cambio de contraseña" : "¿Cambiar contraseña?"}
+                            </Button>
+                        )}
 
-                        {mostrarPasswordForm && (
+                        {/* 🔹 Mostrar mensaje informativo para usuarios de Google */}
+                        {usuario.id_google && (
+                            <div className="mb-3 p-2 bg-light rounded">
+                                <small className="text-muted">
+                                    <i className="bi bi-info-circle me-1"></i>
+                                    Cuenta registrada con Google. La contraseña se gestiona desde tu cuenta de Google.
+                                </small>
+                            </div>
+                        )}
+
+                        {mostrarPasswordForm && !usuario.id_google && (
                             <>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Contraseña actual</Form.Label>
@@ -194,8 +221,6 @@ const EditarUsuario: React.FC<{ userId: number; show: boolean; onHide: () => voi
                                 </Form.Group>
                             </>
                         )}
-
-
 
                         <Button variant="primary" className="w-100 btn-edit" onClick={handleSave} disabled={saving}>
                             {saving ? <Spinner size="sm" animation="border" /> : "Guardar Cambios"}

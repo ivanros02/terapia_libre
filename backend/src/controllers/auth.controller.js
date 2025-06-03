@@ -12,7 +12,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 
 exports.registrarUsuario = async (req, res) => {
   try {
-    const { correo_electronico, contrasena, nombre, id_google = null } = req.body;
+    const { correo_electronico, contrasena, nombre, telefono = null, id_google = null } = req.body;
 
     if (!correo_electronico || !nombre) {
       return res.status(400).json({ message: "Correo y nombre son obligatorios" });
@@ -26,7 +26,7 @@ exports.registrarUsuario = async (req, res) => {
     }
 
     // Guardar usuario en la BD
-    const id_usuario = await Usuario.create({ correo_electronico, contrasena_hash, nombre, id_google });
+    const id_usuario = await Usuario.create({ correo_electronico, contrasena_hash, nombre, telefono, id_google }); // 🔹 Agregado telefono
 
     res.status(201).json({ message: "Usuario registrado con éxito", id_usuario });
   } catch (error) {
@@ -84,7 +84,7 @@ exports.login = async (req, res) => {
 // 🔥 Nuevo: Inicio de sesión con Google
 exports.loginConGoogle = async (req, res) => {
   try {
-    const { id_google, correo_electronico, nombre } = req.body;
+    const { id_google, correo_electronico, nombre, telefono = null } = req.body;
 
     if (!id_google || !correo_electronico || !nombre) {
       return res.status(400).json({ message: "Datos incompletos para autenticación con Google" });
@@ -95,7 +95,7 @@ exports.loginConGoogle = async (req, res) => {
 
     if (!usuario) {
       // Si el usuario no existe, lo creamos
-      const id_usuario = await Usuario.create({ correo_electronico, contrasena_hash: null, nombre, id_google });
+      const id_usuario = await Usuario.create({ correo_electronico, contrasena_hash: null, nombre, telefono, id_google }); // 🔹 Agregado telefono
       usuario = { id_usuario, correo_electronico, nombre, id_google };
     }
 
@@ -140,7 +140,8 @@ exports.getUserData = async (req, res) => {
     res.json({
       nombre: usuario.nombre,
       correo_electronico: usuario.correo_electronico,
-      created_at: usuario.created_at,  // ✅ Ahora enviamos la fecha de creación
+      telefono: usuario.telefono,
+      created_at: usuario.created_at,
       id_google: usuario.id_google,
     });
   } catch (error) {
@@ -152,11 +153,11 @@ exports.getUserData = async (req, res) => {
 exports.editarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, correo_electronico, contrasena, contrasena_actual } = req.body;
+    const { nombre, correo_electronico, telefono, contrasena, contrasena_actual } = req.body;
 
 
     // Validar que al menos un campo esté presente
-    if (!nombre && !correo_electronico && !contrasena) {
+    if (!nombre && !correo_electronico && !telefono && !contrasena) { // 🔹 Agregado telefono en validación
       return res.status(400).json({ message: "No se enviaron datos para actualizar" });
     }
 
@@ -198,7 +199,7 @@ exports.editarUsuario = async (req, res) => {
 
 
     // Actualizar el usuario en la base de datos
-    const actualizado = await Usuario.editarUsuario(id, { nombre, correo_electronico, contrasena_hash });
+    const actualizado = await Usuario.editarUsuario(id, { nombre, correo_electronico, telefono, contrasena_hash }); // 🔹 Agregado telefono
 
     if (actualizado) {
       return res.json({ message: "Usuario actualizado correctamente." });

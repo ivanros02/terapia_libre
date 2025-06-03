@@ -182,7 +182,7 @@ const FormProfessionalsComponent = () => {
                             <Row>
                                 <Col xs={12} md={6}>
                                     <Form.Group controlId="formName" className="mb-3">
-                                        <Form.Label>Nombre</Form.Label>
+                                        <Form.Label>Nombre y Apellido</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="nombre"

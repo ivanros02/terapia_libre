@@ -17,7 +17,7 @@ import ProfessionalDetails from "./pages/ProfessionalDetails";
 import DashboardMensajes from "./pages/DashboardMsg";
 import DashboardProfesionalConfig from "./pages/DashboardProfesionalConfig";
 import DashboardUsuarioConfig from "./pages/DashboardUsuarioConfig";
-import AdminProfesionales from "./pages/AdminProfesionales";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./components/AdminLogin";
 //import WhatsAppButton from "./components/WhatsAppButton";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -58,7 +58,7 @@ const App: React.FC = () => {
               <Route path="/dashboard/profesional/config_profesional" element={<RutaProtegida> <DashboardProfesionalConfig /> </RutaProtegida>} />
               <Route path="/dashboard/usuario/config_usuario" element={<RutaProtegida> <DashboardUsuarioConfig /> </RutaProtegida>} />
               <Route path="/retorno-pago" element={<RetornoPago />} />
-              <Route path="/admin" element={<AdminProfesionales />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />

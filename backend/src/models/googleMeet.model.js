@@ -11,7 +11,7 @@ class GoogleMeet {
 
     static async obtenerMeetUrl(id_turno) {
         const [rows] = await pool.execute(
-            `SELECT meet_url FROM turnos WHERE id_turno = ? AND estado IN ('Pendiente')`,
+            `SELECT meet_url FROM turnos WHERE id_turno = ?`,
             [id_turno]
         );
         return rows.length ? rows[0].meet_url : null;

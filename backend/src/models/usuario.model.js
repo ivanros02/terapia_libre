@@ -1,7 +1,7 @@
 const pool = require("../config/db");
 
 class Usuario {
-  static async create({ correo_electronico, contrasena_hash, nombre, id_google }) {
+  static async create({ correo_electronico, contrasena_hash, nombre, telefono = null, id_google }) { // 🔹 Agregado telefono
     // 1️⃣ Verificar si el correo ya existe
     const [existingUsers] = await pool.execute(
       `SELECT id_usuario FROM usuarios WHERE correo_electronico = ?`,
@@ -24,8 +24,8 @@ class Usuario {
 
     // 3️⃣ Insertar el nuevo usuario
     const [result] = await pool.execute(
-      `INSERT INTO usuarios (correo_electronico, contrasena_hash, nombre, id_google) VALUES (?, ?, ?, ?)`,
-      [correo_electronico, contrasena_hash, nombre, id_google]
+      `INSERT INTO usuarios (correo_electronico, contrasena_hash, nombre, telefono, id_google) VALUES (?, ?, ?, ?, ?)`, // 🔹 Agregado telefono
+      [correo_electronico, contrasena_hash, nombre, telefono, id_google]
     );
 
     return result.insertId;
@@ -69,7 +69,7 @@ class Usuario {
     return rows[0]; // Retorna el profesional si existe
   }
 
-  static async editarUsuario(id_usuario, { nombre, correo_electronico, contrasena_hash }) {
+  static async editarUsuario(id_usuario, { nombre, correo_electronico, telefono, contrasena_hash }) { // 🔹 Agregado telefono
     let query = "UPDATE usuarios SET ";
     let fields = [];
     let values = [];
@@ -81,6 +81,10 @@ class Usuario {
     if (correo_electronico) {
       fields.push("correo_electronico = ?");
       values.push(correo_electronico);
+    }
+    if (telefono !== undefined) { // 🔹 Permitir telefono null
+      fields.push("telefono = ?");
+      values.push(telefono);
     }
     if (contrasena_hash) {
       fields.push("contrasena_hash = ?");

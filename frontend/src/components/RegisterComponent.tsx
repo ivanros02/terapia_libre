@@ -6,10 +6,16 @@ const url = import.meta.env.VITE_API_BASE_URL;
 
 const RegisterComponent: React.FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<{ correo_electronico: string; contrasena: string; nombre: string }>({
+  const [formData, setFormData] = useState<{
+    correo_electronico: string;
+    contrasena: string;
+    nombre: string;
+    telefono: string; // 🔹 Agregado campo teléfono
+  }>({
     correo_electronico: "",
     contrasena: "",
     nombre: "",
+    telefono: "", // 🔹 Inicializado como string vacío
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,14 +25,20 @@ const RegisterComponent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Verifica si algún campo está vacío
+    // Verifica si los campos obligatorios están vacíos
     if (!formData.correo_electronico || !formData.contrasena || !formData.nombre) {
-      alert("Todos los campos son obligatorios.");
+      alert("Correo, contraseña y nombre son obligatorios.");
       return;
     }
 
     try {
-      const response = await axios.post(`${url}/api/auth/registro`, formData);
+      // Enviar datos incluyendo teléfono (puede estar vacío)
+      const dataToSend = {
+        ...formData,
+        telefono: formData.telefono || null // 🔹 Si está vacío, enviar null
+      };
+
+      const response = await axios.post(`${url}/api/auth/registro`, dataToSend);
       alert(response.data.message);
       navigate("/login");
     } catch (error: any) {
@@ -62,6 +74,21 @@ const RegisterComponent: React.FC = () => {
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control type="email" name="correo_electronico" placeholder="Ingresá tu correo electrónico" onChange={handleChange} required />
+            </Form.Group>
+
+            {/* 🔹 Campo teléfono opcional */}
+            <Form.Group className="mb-3">
+              <Form.Label>Teléfono</Form.Label>
+              <Form.Control
+                type="tel"
+                name="telefono"
+                placeholder="Ingresá tu número de teléfono (opcional)"
+                value={formData.telefono}
+                onChange={handleChange}
+              />
+              <Form.Text className="text-muted">
+                Opcional. Ej: +54 9 11 1234-5678
+              </Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-3">
