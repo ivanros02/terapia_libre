@@ -1,14 +1,14 @@
 import { Card, Form, Row, Col, Container, Modal, Button } from "react-bootstrap";
-import "../styles/FormProfessionalsComponent.css"; // Ajusta la ruta según corresponda
-import EspecialidadSelect from "./EspecialidadSelect";
+import "../../styles/FormProfessionalsComponent.css"; // Ajusta la ruta según corresponda
+import EspecialidadSelect from "../EspecialidadSelect";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 const url = import.meta.env.VITE_API_BASE_URL;
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TermsAndConditions from "./TermsAndConditions";
+import TermsAndConditions from "../TermsAndConditions";
 import { useNavigate } from "react-router-dom";
-
+import SubscriptionInfo from "./SubscriptionInfo";
 
 const FormProfessionalsComponent = () => {
 
@@ -34,12 +34,13 @@ const FormProfessionalsComponent = () => {
                 titulo_universitario: "",
                 matricula_nacional: "",
                 matricula_provincial: "",
+                cuit: "",
                 descripcion: "",
-                disponibilidad: "",
                 valor: "",
                 valor_internacional: "",
                 especialidades: [] as number[],
                 foto_perfil_url: "",
+                cbu: "",
             };
     });
 
@@ -104,12 +105,19 @@ const FormProfessionalsComponent = () => {
         try {
             setLoading(true);
             await axios.post(`${url}/api/profesionales`, formData);
+
             toast.success("Profesional registrado con éxito 🎉");
             localStorage.removeItem("formProfesional");
-            // Redirigir a /login
+
+            // 🔹 Abrir MercadoPago en nueva pestaña después del registro exitoso
+            const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084955cc4800195a48f3aa61f98";
+            window.open(mercadoPagoUrl, "_blank");
+
+            // 🔹 Redirigir a /login después de un pequeño delay
             setTimeout(() => {
-                navigate("/login");
-            }, 1000);
+                navigate("/successfulProfessionalRegister");
+            }, 2000); // Aumenté a 2 segundos para que el usuario vea el toast
+
         } catch (error: any) {
             if (error.message === "Network Error") {
                 toast.error("No se pudo conectar al servidor. Verificá tu conexión a Internet.");
@@ -129,14 +137,19 @@ const FormProfessionalsComponent = () => {
             "correo_electronico",
             "contrasena",
             "titulo_universitario",
+            "cuit",
             "descripcion",
-            "disponibilidad",
             "valor",
             "valor_internacional",
+            "cbu",
         ];
 
         for (const field of requiredFields) {
-            if (!formData[field as keyof typeof formData].toString().trim()) {
+            const fieldValue = formData[field as keyof typeof formData];
+
+            // Verificar si el campo existe y no está vacío (sin .toString() directo)
+            if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === "") ||
+                (typeof fieldValue === 'number' && fieldValue === 0)) {
                 return false;
             }
         }
@@ -173,32 +186,26 @@ const FormProfessionalsComponent = () => {
                                 />
                             </Form.Group>
 
-
-
-                            <hr />
-
                             {/* Sección: Datos personales */}
                             <h5>Datos personales</h5>
                             <Row>
-                                <Col xs={12} md={6}>
+                                <Col xs={12}>
                                     <Form.Group controlId="formName" className="mb-3">
-                                        <Form.Label>Nombre y Apellido</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="nombre"
-                                            placeholder="Ingrese su nombre"
+                                            placeholder="Nombre y Apellido"
                                             value={formData.nombre}
                                             onChange={handleChange}
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12} md={6}>
+                                <Col xs={12}>
                                     <Form.Group controlId="formPhone" className="mb-3">
-                                        <Form.Label>Teléfono</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="telefono"
-                                            placeholder="Ingrese su teléfono"
+                                            placeholder="Teléfono"
                                             value={formData.telefono}
                                             onChange={handleChange}
                                         />
@@ -206,30 +213,26 @@ const FormProfessionalsComponent = () => {
                                 </Col>
                             </Row>
 
-                            <hr />
-
                             {/* Sección: Creación de cuenta */}
                             <h5>Creación de cuenta</h5>
                             <Row>
-                                <Col xs={12} md={6}>
+                                <Col xs={12}>
                                     <Form.Group controlId="formEmail" className="mb-3">
-                                        <Form.Label>Correo</Form.Label>
                                         <Form.Control
                                             type="email"
                                             name="correo_electronico"
-                                            placeholder="Ingrese su correo"
+                                            placeholder="Correo electrónico"
                                             value={formData.correo_electronico}
                                             onChange={handleChange}
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12} md={6}>
+                                <Col xs={12}>
                                     <Form.Group controlId="formPassword" className="mb-3">
-                                        <Form.Label>Contraseña</Form.Label>
                                         <Form.Control
                                             type="password"
                                             name="contrasena"
-                                            placeholder="Ingrese su contraseña"
+                                            placeholder="Contraseña"
                                             value={formData.contrasena}
                                             onChange={handleChange}
                                         />
@@ -237,42 +240,39 @@ const FormProfessionalsComponent = () => {
                                 </Col>
                             </Row>
 
-                            <hr />
-
                             {/* Sección: Datos profesionales */}
                             <h5>Datos profesionales</h5>
                             <Row>
-                                <Col xs={12} md={4}>
+                                <Col xs={12}>
                                     <Form.Group controlId="formTitulo" className="mb-3">
-                                        <Form.Label>Título</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="titulo_universitario"
-                                            placeholder="Ingrese su título"
+                                            placeholder="Titulo"
                                             value={formData.titulo_universitario}
                                             onChange={handleChange}
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12} md={4}>
+                            </Row>
+                            <Row>
+                                <Col xs={12} md={6}>
                                     <Form.Group controlId="formMatriculaProvincial" className="mb-3">
-                                        <Form.Label>Matrícula Provincial</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="matricula_provincial"
-                                            placeholder="Ingrese su matrícula provincial"
+                                            placeholder="Matrícula Provincial"
                                             value={formData.matricula_provincial}
                                             onChange={handleChange}
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12} md={4}>
+                                <Col xs={12} md={6}>
                                     <Form.Group controlId="formMatriculaNacional" className="mb-3">
-                                        <Form.Label>Matrícula Nacional</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="matricula_nacional"
-                                            placeholder="Ingrese su matrícula nacional"
+                                            placeholder="Matrícula Nacional"
                                             value={formData.matricula_nacional}
                                             onChange={handleChange}
                                         />
@@ -280,19 +280,16 @@ const FormProfessionalsComponent = () => {
                                 </Col>
                             </Row>
 
-                            <hr />
-
                             {/* Sección: Especialidades */}
                             <h5>Especialidades</h5>
                             <EspecialidadSelect onChange={handleEspecialidadChange} />
 
                             {/* Sección: Descripción */}
-                            <h5>Descripción del Profesional</h5>
                             <Form.Group controlId="formDescripcion" className="mb-3">
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    placeholder="Ejemplo: Médico con 10 años de experiencia en cardiología..."
+                                    placeholder="Descripción personal"
                                     name="descripcion"
                                     value={formData.descripcion}
                                     onChange={handleChange}
@@ -307,34 +304,14 @@ const FormProfessionalsComponent = () => {
                                 </div>
                             )}
 
-
-
-
-                            <hr />
-
-                            {/* Sección: Disponibilidad y Valores */}
-                            <h5>Disponibilidad y Valores</h5>
+                            {/* Valores */}
                             <Row>
-                                <Col xs={12} md={4}>
-                                    <Form.Group controlId="formDisponibilidad" className="mb-3">
-                                        <Form.Label>Disponibilidad</Form.Label>
-                                        <Form.Select name="disponibilidad" value={formData.disponibilidad} onChange={handleChange}>
-                                            <option value="">Seleccione disponibilidad</option>
-                                            <option value="24 horas">24 horas</option>
-                                            <option value="48 horas">48 horas</option>
-                                            <option value="72 horas">72 horas</option>
-                                            <option value="96 horas">96 horas</option>
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Col>
-
-                                <Col xs={12} md={4}>
+                                <Col xs={12} md={8}>
                                     <Form.Group controlId="formValorNacional" className="mb-3">
-                                        <Form.Label>Valor Nacional</Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="valor"
-                                            placeholder="Ingrese valor nacional"
+                                            placeholder="Valor Nacional"
                                             value={formData.valor}
                                             onChange={handleChange}
                                             onKeyDown={(e) => {
@@ -347,11 +324,10 @@ const FormProfessionalsComponent = () => {
                                 </Col>
                                 <Col xs={12} md={4}>
                                     <Form.Group controlId="formValorInternacional" className="mb-3">
-                                        <Form.Label>Valor Internacional</Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="valor_internacional"
-                                            placeholder="Ingrese valor internacional"
+                                            placeholder="Valor Internacional"
                                             value={formData.valor_internacional}
                                             onChange={handleChange}
                                             onKeyDown={(e) => {
@@ -363,24 +339,63 @@ const FormProfessionalsComponent = () => {
                                     </Form.Group>
                                 </Col>
                             </Row>
+                            <Row>
+                                <Col xs={12} md={8}>
+                                    <Form.Group controlId="formCbu" className="mb-3">
+                                        <Form.Control
+                                            type="number"
+                                            name="cbu"
+                                            placeholder="CBU/CVU"
+                                            value={formData.cbu}
+                                            onChange={handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === '.' || e.key === ',' || e.key === 'e' || e.key === '-' || e.key === '+') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                        />
+                                    </Form.Group>
+                                </Col>
+
+                                <Col xs={12} md={4}>
+                                    <Form.Group controlId="formCuit" className="mb-3">
+                                        <Form.Control
+                                            type="text"
+                                            name="cuit"
+                                            placeholder="CUIT"
+                                            value={formData.cuit}
+                                            onChange={handleChange}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+
+                            <SubscriptionInfo /> {/* 🔹 Componente de información de suscripción modularizado */}
 
                             {/* Checkbox: Aceptar términos y condiciones */}
                             <Form.Group controlId="formTerms" className="mb-3 d-flex justify-content-center mt-3">
-                                <div className="d-flex flex-column align-items-center">
+                                <div className="d-flex align-items-center">
                                     <Form.Check
                                         type="checkbox"
-                                        label="He leído y acepto los"
                                         checked={termsChecked}
                                         disabled={!termsAccepted}
                                         onChange={(e) => setTermsChecked(e.target.checked)}
+                                        className="me-2"
                                     />
-
-                                    {/* 🔹 Span aparte para abrir el modal */}
-                                    <span
-                                        style={{ color: "blue", cursor: "pointer", textDecoration: "underline", fontSize: "0.9rem" }}
-                                        onClick={() => setShowTermsModal(true)}
-                                    >
-                                        Términos y Condiciones
+                                    <span style={{ color: '#242424', fontSize: '0.9rem' }}>
+                                        He leído y acepto los{' '}
+                                        <span
+                                            style={{
+                                                color: '#242424',
+                                                cursor: 'pointer',
+                                                textDecoration: 'underline',
+                                                fontSize: '0.9rem'
+                                            }}
+                                            onClick={() => setShowTermsModal(true)}
+                                        >
+                                            Términos y Condiciones
+                                        </span>
                                     </span>
                                 </div>
                             </Form.Group>
@@ -392,14 +407,28 @@ const FormProfessionalsComponent = () => {
                                     type="submit"
                                     disabled={loading}
                                     className="boton-enviar"
+                                    style={{
+                                        width: '100%',
+                                        maxWidth: '297px',
+                                        whiteSpace: 'nowrap',
+                                        display: 'flex',           // 🔹 Para centrar el contenido
+                                        alignItems: 'center',      // 🔹 Centrar verticalmente
+                                        justifyContent: 'center'   // 🔹 Centrar horizontalmente
+                                    }}
                                 >
                                     {loading ? (
-                                        <div className="d-flex align-items-center gap-2">
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            whiteSpace: 'nowrap'
+                                        }}>
                                             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                             Enviando...
                                         </div>
                                     ) : (
-                                        "Enviar"
+                                        "Suscribirme"
                                     )}
                                 </button>
                             </div>

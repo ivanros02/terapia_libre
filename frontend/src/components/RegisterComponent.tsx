@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Form, Container, Row, Col, Card } from "react-bootstrap";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 const RegisterComponent: React.FC = () => {
@@ -26,8 +28,11 @@ const RegisterComponent: React.FC = () => {
     e.preventDefault();
 
     // Verifica si los campos obligatorios están vacíos
-    if (!formData.correo_electronico || !formData.contrasena || !formData.nombre) {
-      alert("Correo, contraseña y nombre son obligatorios.");
+    if (!formData.correo_electronico || !formData.contrasena || !formData.nombre || !formData.telefono) {
+      toast.error("Correo, contraseña, nombre y teléfono son obligatorios.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -39,14 +44,30 @@ const RegisterComponent: React.FC = () => {
       };
 
       const response = await axios.post(`${url}/api/auth/registro`, dataToSend);
-      alert(response.data.message);
-      navigate("/login");
+      toast.success(response.data.message || "Usuario registrado exitosamente 🎉", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
     } catch (error: any) {
       console.error("Error al registrar usuario:", error);
-      alert(`Error: ${error.response?.data?.message || error.message}`);
+
+      if (error.message === "Network Error") {
+        toast.error("No se pudo conectar al servidor. Verificá tu conexión a Internet.", {
+          position: "top-center",
+          autoClose: 4000,
+        });
+      } else {
+        toast.error(error.response?.data?.message || "Error inesperado al registrar usuario", {
+          position: "top-center",
+          autoClose: 4000,
+        });
+      }
     }
   };
-
   return (
     <Container fluid className="login-container mt-5">
       <Row className="shadow-lg overflow-hidden p-3 align-items-center bg-white rounded" style={{ maxWidth: "900px", width: "100%" }}>
@@ -61,7 +82,7 @@ const RegisterComponent: React.FC = () => {
 
         {/* Sección Derecha */}
         <Col md={6} className="p-5 h-100 d-flex flex-column justify-content-center">
-          <h2 className="fw-bold">Registro de Usuario</h2>
+          <h2 style={{fontFamily:"var(--fuente-secundaria)"}}>Registrate acá</h2>
           <p>Si ya tenés una cuenta, <a href="/login">iniciá sesión acá</a></p>
 
           {/* Formulario */}
@@ -82,13 +103,10 @@ const RegisterComponent: React.FC = () => {
               <Form.Control
                 type="tel"
                 name="telefono"
-                placeholder="Ingresá tu número de teléfono (opcional)"
+                placeholder="Ingresá tu número de teléfono"
                 value={formData.telefono}
                 onChange={handleChange}
               />
-              <Form.Text className="text-muted">
-                Opcional. Ej: +54 9 11 1234-5678
-              </Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -111,7 +129,7 @@ const RegisterComponent: React.FC = () => {
                   cursor: "pointer",
                 }}
               >
-                Registrarse
+                Crear Cuenta
               </button>
             </div>
           </Form>

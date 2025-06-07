@@ -507,7 +507,7 @@ const GoogleCalendar: React.FC<GoogleCalendarProps> = ({ turnos, usuarioRol, fec
 
 
   return (
-    <div className="calendar-page d-flex justify-content-center align-items-start w-100" style={{ marginTop: "-2rem" }}>
+    <div className="calendar-page d-flex justify-content-center align-items-start w-100">
       {usuarioRol === "usuario" || isSignedIn ? (
         <>
           <Calendario

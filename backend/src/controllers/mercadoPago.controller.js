@@ -22,7 +22,7 @@ exports.crearOrdenMercadoPago = async (req, res) => {
             cupon
         } = req.body;
 
-        
+
 
         // 🔒 PASO 2: Validar datos obligatorios
         if (!id_profesional || !id_usuario || !fecha_turno || !hora_turno) {
@@ -30,7 +30,7 @@ exports.crearOrdenMercadoPago = async (req, res) => {
         }
 
         // 🔒 PASO 3: Validar disponibilidad y obtener datos del profesional
-        
+
         const { profesional, usuario } = await Turno.validarDatosTurno(
             id_profesional,
             id_usuario,
@@ -61,9 +61,13 @@ exports.crearOrdenMercadoPago = async (req, res) => {
         // 🔧 Asegurar que precio_final también sea número
         const precioFinalNumerico = parseFloat(precio_final);
 
+        // 🔧 Agregar 5% de costo de servicio
+        const costoServicio = Math.round(precioFinalNumerico * 0.05);
+        const precioConServicio = precioFinalNumerico + costoServicio;
+
         // 🔒 PASO 6: Generar token de seguridad
         const booking_token = uuidv4();
-        
+
 
         // 🔐 Guardar temporalmente los datos asociados al booking_token
         await Turno.guardarTokenTemporal(booking_token, {
@@ -82,13 +86,13 @@ exports.crearOrdenMercadoPago = async (req, res) => {
             items: [
                 {
                     title: `Turno con ${profesional.nombre}`, // 🔒 Nombre del backend
-                    unit_price: precioFinalNumerico, // 🔒 Precio calculado en backend
+                    unit_price: precioConServicio, // 🔒 Precio calculado en backend
                     quantity: 1,
                     currency_id: "ARS",
                 },
             ],
             back_urls: {
-                success: "https://terapialibre.com.ar/retorno-pago",
+                success: "https://terapialibre.com.ar/dashboard/usuario",
                 failure: "https://terapialibre.com.ar",
                 pending: "https://terapialibre.com.ar",
             },
@@ -158,7 +162,7 @@ exports.capturarPagoMercadoPago = async (req, res) => {
         // 🔒 RE-VALIDAR disponibilidad antes de confirmar
         try {
             await Turno.validarDatosTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
-            
+
         } catch (error) {
             console.log("❌ Re-validación falló:", error.message);
             await Turno.eliminarTokenTemporal(booking_token);
@@ -175,7 +179,7 @@ exports.capturarPagoMercadoPago = async (req, res) => {
         try {
             // ✅ Crear turno
             const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
-            
+
             // ✅ Registrar pago
             await Pago.registrarPago(id_turno, precio_final, "MercadoPago", "Pagado", payment_id);
 

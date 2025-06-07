@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, Button } from "react-bootstrap";
 import axios from "axios";
+import PacientesLista from "./PacientesLista";
 
 const url = import.meta.env.VITE_API_BASE_URL;
 
@@ -45,20 +46,6 @@ const PacientesView = () => {
     fetchUsuarios();
   }, []);
 
-  const formatearFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-AR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getTipoRegistro = (id_google: string | null) => {
-    return id_google ? "Google" : "Email";
-  };
-
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
@@ -75,7 +62,7 @@ const PacientesView = () => {
       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <h3 className="mb-0 text-dark fw-normal">Usuarios</h3>
         <Button 
-          variant="outline-primary" 
+          variant="outline-primary"
           size="sm"
           onClick={fetchUsuarios}
           className="px-3"
@@ -91,48 +78,8 @@ const PacientesView = () => {
         </Alert>
       )}
 
-      {/* Users List */}
-      {usuarios.length > 0 ? (
-        <div className="row g-3">
-          {usuarios.map((usuario) => (
-            <div key={usuario.id_usuario} className="col-12">
-              <div className="card border-0 shadow-sm h-100">
-                <div className="card-body p-3">
-                  <div className="row align-items-center">
-                    
-                    {/* Nombre */}
-                    <div className="col-12 col-lg-4 mb-2 mb-lg-0">
-                      <div className="fw-medium text-dark mb-1">{usuario.nombre}</div>
-                      <div className="text-muted small">{usuario.correo_electronico}</div>
-                    </div>
-
-                    {/* Fecha */}
-                    <div className="col-6 col-lg-4 mb-2 mb-lg-0">
-                      <div className="text-muted small">Registrado</div>
-                      <div className="text-dark small">{formatearFecha(usuario.created_at)}</div>
-                    </div>
-
-                    {/* Tipo */}
-                    <div className="col-6 col-lg-4 text-lg-end">
-                      <span className={`badge ${usuario.id_google ? 'bg-info' : 'bg-secondary'} bg-opacity-75`}>
-                        {getTipoRegistro(usuario.id_google)}
-                      </span>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-5">
-          <div className="text-muted">
-            <i className="bi bi-people fs-1 mb-3 d-block"></i>
-            <p className="mb-0">No hay usuarios registrados</p>
-          </div>
-        </div>
-      )}
+      {/* Lista de Pacientes */}
+      <PacientesLista usuarios={usuarios} />
 
       {/* Footer */}
       {usuarios.length > 0 && (

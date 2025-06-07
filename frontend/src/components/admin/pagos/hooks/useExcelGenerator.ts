@@ -5,9 +5,7 @@ import { Pago, IngresoProfesional } from "../types/Pago";
 const useExcelGenerator = () => {
     const [loadingExcel, setLoadingExcel] = useState(false);
 
-    // Función auxiliar para formatear fechas correctamente
     const formatearFechaISO = (fechaISO: string): string => {
-        // fechaISO viene en formato "YYYY-MM-DD" del input date
         const [year, month, day] = fechaISO.split('-');
         return `${day}/${month}/${year}`;
     };
@@ -23,11 +21,7 @@ const useExcelGenerator = () => {
 
         try {
             setLoadingExcel(true);
-
-            // Importar XLSX dinámicamente
             const XLSX = await import('xlsx');
-
-            // Obtener datos específicos para el reporte
             const pagosReporte = await fetchPagosParaReporte(excelFiltros.fecha_desde, excelFiltros.fecha_hasta);
 
             if (pagosReporte.length === 0) {
@@ -35,10 +29,9 @@ const useExcelGenerator = () => {
                 return false;
             }
 
-            // Crear nuevo workbook
             const workbook = XLSX.utils.book_new();
 
-            // HOJA 1: Resumen Ejecutivo
+            // HOJA 1: Resumen Ejecutivo (sin cambios)
             const totalIngresos = pagosReporte.reduce((sum: number, pago: Pago) => sum + pago.monto, 0);
             const cantidadTransacciones = pagosReporte.length;
             const ingresoPromedio = totalIngresos / cantidadTransacciones;
@@ -61,7 +54,6 @@ const useExcelGenerator = () => {
                 ['Método', 'Cantidad', 'Monto Total', 'Porcentaje'],
             ];
 
-            // Calcular distribución por método de pago
             const metodosPago = pagosReporte.reduce((acc: Record<string, { cantidad: number; total: number }>, pago) => {
                 if (!acc[pago.metodo_pago]) {
                     acc[pago.metodo_pago] = { cantidad: 0, total: 0 };
@@ -84,13 +76,15 @@ const useExcelGenerator = () => {
             const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
             XLSX.utils.book_append_sheet(workbook, wsResumen, 'Resumen Ejecutivo');
 
-            // HOJA 2: Ingresos por Profesional
+            // HOJA 2: Ingresos por Profesional - 🔹 ACTUALIZADA CON CBU Y CUIT
             const ingresoPorProfesional = pagosReporte.reduce((acc: Record<string, IngresoProfesional>, pago: Pago) => {
                 if (!acc[pago.nombre_profesional]) {
                     acc[pago.nombre_profesional] = {
                         total: 0,
                         cantidad: 0,
-                        pagos: []
+                        pagos: [],
+                        cbu: pago.cbu_profesional || 'No registrado',     // 🔹 AGREGAR CBU
+                        cuit: pago.cuit_profesional || 'No registrado'    // 🔹 AGREGAR CUIT
                     };
                 }
                 acc[pago.nombre_profesional].total += pago.monto;
@@ -102,10 +96,9 @@ const useExcelGenerator = () => {
             const profesionalesData: (string | number)[][] = [
                 ['INGRESOS POR PROFESIONAL'],
                 [''],
-                ['Profesional', 'Cantidad de Sesiones', 'Total de Ingresos', 'Promedio por Sesión', 'Porcentaje del Total'],
+                ['Profesional', 'CUIT', 'CBU', 'Cantidad de Sesiones', 'Total de Ingresos', 'Promedio por Sesión', 'Porcentaje del Total'], // 🔹 AGREGAR COLUMNAS
             ];
 
-            // Ordenar profesionales por ingresos (descendente)
             const profesionalesOrdenados = Object.entries(ingresoPorProfesional)
                 .sort(([, a], [, b]) => (b as IngresoProfesional).total - (a as IngresoProfesional).total);
 
@@ -116,6 +109,8 @@ const useExcelGenerator = () => {
 
                 profesionalesData.push([
                     nombreProfesional,
+                    datosTyped.cuit || 'No registrado',        // 🔹 AGREGAR CUIT
+                    datosTyped.cbu || 'No registrado',         // 🔹 AGREGAR CBU
                     datosTyped.cantidad.toString(),
                     datosTyped.total.toFixed(2),
                     promedioPorSesion.toFixed(2),
@@ -126,7 +121,7 @@ const useExcelGenerator = () => {
             const wsProfesionales = XLSX.utils.aoa_to_sheet(profesionalesData);
             XLSX.utils.book_append_sheet(workbook, wsProfesionales, 'Ingresos por Profesional');
 
-            // HOJA 3: Detalle de Transacciones
+            // HOJA 3: Detalle de Transacciones - 🔹 ACTUALIZADA CON CBU Y CUIT
             const transaccionesData: (string | number)[][] = [
                 ['DETALLE DE TRANSACCIONES'],
                 [''],
@@ -138,6 +133,8 @@ const useExcelGenerator = () => {
                     'Paciente',
                     'Email Paciente',
                     'Profesional',
+                    'CUIT Profesional',        // 🔹 AGREGAR COLUMNA
+                    'CBU Profesional',         // 🔹 AGREGAR COLUMNA
                     'Monto',
                     'Método de Pago',
                     'Estado',
@@ -147,7 +144,6 @@ const useExcelGenerator = () => {
                 ]
             ];
 
-            // Ordenar pagos por fecha
             const pagosOrdenados = [...pagosReporte].sort((a, b) =>
                 new Date(a.fecha_turno).getTime() - new Date(b.fecha_turno).getTime()
             );
@@ -161,6 +157,8 @@ const useExcelGenerator = () => {
                     pago.nombre_usuario,
                     pago.correo_usuario,
                     pago.nombre_profesional,
+                    pago.cuit_profesional || 'No registrado',  // 🔹 AGREGAR CUIT
+                    pago.cbu_profesional || 'No registrado',   // 🔹 AGREGAR CBU
                     pago.monto.toString(),
                     pago.metodo_pago,
                     pago.estado,
@@ -173,7 +171,7 @@ const useExcelGenerator = () => {
             const wsTransacciones = XLSX.utils.aoa_to_sheet(transaccionesData);
             XLSX.utils.book_append_sheet(workbook, wsTransacciones, 'Detalle de Transacciones');
 
-            // HOJA 4: Análisis Temporal
+            // HOJA 4: Análisis Temporal (sin cambios)
             const analisisTemporal = pagosReporte.reduce((acc: Record<string, { cantidad: number; total: number }>, pago) => {
                 const fecha = new Date(pago.fecha_turno).toLocaleDateString('es-AR');
                 if (!acc[fecha]) {
@@ -192,7 +190,6 @@ const useExcelGenerator = () => {
 
             Object.entries(analisisTemporal)
                 .sort(([a], [b]) => {
-                    // Convertir fechas dd/mm/yyyy a Date para ordenar correctamente
                     const fechaA = a.split('/');
                     const fechaB = b.split('/');
                     const dateA = new Date(parseInt(fechaA[2]), parseInt(fechaA[1]) - 1, parseInt(fechaA[0]));
@@ -212,6 +209,7 @@ const useExcelGenerator = () => {
             const wsTemporal = XLSX.utils.aoa_to_sheet(temporalData);
             XLSX.utils.book_append_sheet(workbook, wsTemporal, 'Análisis Temporal');
 
+            // HOJA 5: Análisis de Cupones (sin cambios)
             const cuponesData: (string | number)[][] = [
                 ['ANÁLISIS DE CUPONES'],
                 [''],
@@ -235,7 +233,6 @@ const useExcelGenerator = () => {
                 ['Código de Cupón', 'Cantidad de Usos', 'Monto Total']
             );
 
-            // Agrupar por código de cupón
             const cuponesPorCodigo = pagosConCupon.reduce((acc: Record<string, { cantidad: number; total: number }>, pago) => {
                 const codigo = pago.codigo_cupon || 'Sin código';
                 if (!acc[codigo]) {
@@ -257,11 +254,9 @@ const useExcelGenerator = () => {
             const wsCupones = XLSX.utils.aoa_to_sheet(cuponesData);
             XLSX.utils.book_append_sheet(workbook, wsCupones, 'Análisis de Cupones');
 
-
             // Aplicar estilos básicos a las hojas
             const worksheets = [wsResumen, wsProfesionales, wsTransacciones, wsTemporal];
             worksheets.forEach(ws => {
-                // Ajustar ancho de columnas
                 const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
                 const colWidths = [];
                 for (let C = range.s.c; C <= range.e.c; ++C) {

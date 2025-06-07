@@ -1,0 +1,103 @@
+/* RegisterSuccess.css */
+
+.register-success-container {
+    background-image: url("/papel.png");
+    padding-top: 0;
+    /* Reducido para menos distancia con header */
+    padding-bottom: 0;
+    /* Reducido para menos distancia con footer */
+    min-height: calc(100vh - 200px);
+    /* Reducido para menos distancia total */
+}
+
+.register-success-content {
+    text-align: center;
+}
+
+.register-success-title {
+    color: var(--verde-oscuro);
+    font-size: 75px;
+    font-family: var(--fuente-secundaria);
+    font-weight: 400;
+    word-wrap: break-word;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.07);
+    line-height: 1.2;
+    margin-bottom: 0.2rem;
+    /* Reducido aún más para acercar al subtítulo */
+}
+
+.register-success-subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+    margin-bottom: 3rem;
+    text-align: center; /* Cambiar a center para centrarlo */
+    margin-left: 8rem; /* Mover ligeramente a la derecha desde el centro */
+    margin-top: -1.3rem;
+}
+
+.register-success-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.register-success-message-line {
+    color: #434343;
+    font-size: 20px;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.register-success-message-normal {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.register-success-message-bold {
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .register-success-container {
+        padding-top: 0.25rem;
+        /* Aún menos espacio en móvil */
+        padding-bottom: 0.25rem;
+        min-height: calc(100vh - 100px);
+    }
+
+    .register-success-title {
+        margin-bottom: 0.1rem;
+        font-size: 60px;
+        /* Ajuste para móvil */
+    }
+
+    .register-success-subtitle {
+        margin-bottom: 2rem;
+        padding-right: 1rem;
+        /* Menos padding en móvil */
+        margin-top: -0.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .register-success-container {
+        min-height: calc(100vh - 80px);
+        /* Menos espacio en pantallas muy pequeñas */
+        padding-top: 0.1rem;
+        padding-bottom: 0.1rem;
+    }
+
+    .register-success-title {
+        font-size: 45px;
+        /* Más pequeño en móviles pequeños */
+    }
+
+    .register-success-subtitle {
+        padding-right: 0.5rem;
+        text-align: center;
+        /* En móviles muy pequeños, mejor centrado */
+    }
+}

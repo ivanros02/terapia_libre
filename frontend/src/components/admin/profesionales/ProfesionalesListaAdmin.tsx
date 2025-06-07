@@ -116,7 +116,7 @@ const ProfesionalesListaAdmin = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>ID</th>
+            <th style={{ width: "60px", minWidth: "60px" }}>ID</th> {/* 🔹 AGREGAR ESTE ESTILO */}
             <th>Foto</th>
             <th>Nombre</th>
             <th>Correo</th>
@@ -126,6 +126,7 @@ const ProfesionalesListaAdmin = () => {
             <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
           {profesionales.length > 0 ? (
             profesionales.map((prof) => (

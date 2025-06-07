@@ -4,10 +4,8 @@ import Footer from "../layouts/Footer";
 import RegisterComponent from "../components/RegisterComponent"; // Asegúrate de tener este componente
 
 const Register: React.FC = () => {
-    const menuLinks = [
-        { name: "¿Necesito terapia?", href: "/necesito-terapia" },
+    const menuLinks = [ 
         { name: "Buscar profesional", href: "/professionals" },
-        { name: "Iniciar Sesión", href: "/login" },
     ];
 
     return (

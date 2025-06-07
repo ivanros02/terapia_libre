@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { Row, Col, Card, Alert, Button } from "react-bootstrap";
 import axios from "axios";
+import { VistaAdmin } from "./AdminDashboardCompleto"; // 🔹 IMPORTAR EL TIPO
 
 const url = import.meta.env.VITE_API_BASE_URL;
 
@@ -17,7 +18,13 @@ interface DashboardStats {
   ingresos_semana: number;
 }
 
-const DashboardView = () => {
+// 🔹 AGREGAR INTERFACE PARA LAS PROPS
+interface DashboardViewProps {
+  onNavigateToSection?: (vista: VistaAdmin) => void;
+}
+
+// 🔹 ACTUALIZAR LA FUNCIÓN PARA RECIBIR PROPS
+const DashboardView = ({ onNavigateToSection }: DashboardViewProps) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -56,6 +63,25 @@ const DashboardView = () => {
       currency: 'ARS',
       minimumFractionDigits: 0
     }).format(amount);
+  };
+
+  // 🔹 FUNCIONES DE NAVEGACIÓN
+  const handleNavigateToCupones = () => {
+    if (onNavigateToSection) {
+      onNavigateToSection("cupones");
+    }
+  };
+
+  const handleNavigateToTurnos = () => {
+    if (onNavigateToSection) {
+      onNavigateToSection("turnos");
+    }
+  };
+
+  const handleNavigateToPagos = () => {
+    if (onNavigateToSection) {
+      onNavigateToSection("pagos"); // Para reportes, va a la sección de pagos
+    }
   };
 
   if (loading) {
@@ -241,15 +267,28 @@ const DashboardView = () => {
             </Card.Header>
             <Card.Body>
               <div className="d-grid gap-2">
-                <Button variant="outline-primary" size="sm">
+                {/* 🔹 BOTONES ACTUALIZADOS CON NAVEGACIÓN */}
+                <Button 
+                  variant="outline-primary" 
+                  size="sm"
+                  onClick={handleNavigateToCupones}
+                >
                   <i className="bi bi-plus-circle me-2"></i>
                   Crear Nuevo Cupón
                 </Button>
-                <Button variant="outline-info" size="sm">
+                <Button 
+                  variant="outline-info" 
+                  size="sm"
+                  onClick={handleNavigateToTurnos}
+                >
                   <i className="bi bi-calendar-plus me-2"></i>
                   Ver Turnos de Hoy
                 </Button>
-                <Button variant="outline-success" size="sm">
+                <Button 
+                  variant="outline-success" 
+                  size="sm"
+                  onClick={handleNavigateToPagos}
+                >
                   <i className="bi bi-file-earmark-text me-2"></i>
                   Generar Reporte
                 </Button>

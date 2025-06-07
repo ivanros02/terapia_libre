@@ -13,11 +13,12 @@ interface Profesional {
     matricula_provincial?: string | null;
     descripcion?: string | null;
     telefono?: string | null;
-    disponibilidad: "24 horas" | "48 horas" | "72 horas" | "96 horas";
     correo_electronico: string;
     foto_perfil_url?: string | null;
     valor: number;
     valor_internacional: number;
+    cbu?: string | null;
+    cuit?: string | null;
     creado_en: string;
     especialidades: {
         id_especialidad: number;
@@ -44,11 +45,12 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
         matricula_provincial: "",
         descripcion: "",
         telefono: "",
-        disponibilidad: "24 horas",
         correo_electronico: "",
         foto_perfil_url: "",
         valor: 0.0,
         valor_internacional: 0.0,
+        cbu: "",
+        cuit: "",
         creado_en: "",
         especialidades: []
     });
@@ -172,7 +174,7 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                         <Form.Label>Título Universitario</Form.Label>
                         <Form.Control type="text" name="titulo_universitario" value={formData.titulo_universitario} onChange={handleChange} />
                     </Form.Group>
-                    
+
                     <Form.Group className="mb-3">
                         <Form.Label>Matrícula Nacional</Form.Label>
                         <Form.Control type="text" name="matricula_nacional" value={formData.matricula_nacional} onChange={handleChange} />
@@ -211,6 +213,34 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                     </Form.Group>
 
                     <Form.Group className="mb-3">
+                        <Form.Label>CBU/CVU</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="cbu"
+                            value={formData.cbu ?? ""}
+                            onChange={handleChange}
+                            placeholder="Ingresá tu CBU o CVU"
+                        />
+                        <Form.Text className="text-muted">
+                            Número de CBU (22 dígitos) o CVU para recibir pagos
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>CUIT</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="cuit"
+                            value={formData.cuit ?? ""}
+                            onChange={handleChange}
+                            placeholder="Ingresá tu CUIT"
+                        />
+                        <Form.Text className="text-muted">
+                            Número de CUIT (11 dígitos) para facturación
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
                         <Form.Label>Descripción</Form.Label>
                         <Form.Control as="textarea" name="descripcion" value={formData.descripcion ?? ""} onChange={handleChange} />
                     </Form.Group>
@@ -218,16 +248,6 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                     <Form.Group className="mb-3">
                         <Form.Label>Teléfono</Form.Label>
                         <Form.Control type="text" name="telefono" value={formData.telefono ?? ""} onChange={handleChange} />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Disponibilidad</Form.Label>
-                        <Form.Select name="disponibilidad" value={formData.disponibilidad} onChange={handleChange}>
-                            <option value="24 horas">24 horas</option>
-                            <option value="48 horas">48 horas</option>
-                            <option value="72 horas">72 horas</option>
-                            <option value="96 horas">96 horas</option>
-                        </Form.Select>
                     </Form.Group>
 
                     <Form.Group className="mb-3">
@@ -280,7 +300,7 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                         </>
                     )}
 
-                    
+
 
                     <Button
                         type="submit"

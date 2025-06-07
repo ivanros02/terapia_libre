@@ -66,10 +66,30 @@ enviarBienvenida = async (nombreProfesional, correoDestino) => {
 
 exports.createProfesional = async (req, res) => {
     try {
-        const { nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena, foto_perfil_url, valor, valor_internacional, especialidades } = req.body;
+        const {
+            nombre,
+            titulo_universitario,
+            matricula_nacional,
+            matricula_provincial,
+            cuit,  // 🔹 AGREGAR ESTA LÍNEA
+            descripcion,
+            telefono,
+            correo_electronico,
+            contrasena,
+            foto_perfil_url,
+            valor,
+            valor_internacional,
+            especialidades,
+            cbu
+        } = req.body;
 
         if (!contrasena) {
             return res.status(400).json({ message: "La contraseña es obligatoria" });
+        }
+
+        // 🔹 Validar CBU obligatorio
+        if (!cbu) {
+            return res.status(400).json({ message: "El CBU/CVU es obligatorio" });
         }
 
         // Convertir la URL de Google Drive a formato directo si es necesario
@@ -89,9 +109,19 @@ exports.createProfesional = async (req, res) => {
 
         // Insertar profesional
         const id_profesional = await Profesional.create({
-            nombre, titulo_universitario, matricula_nacional: matriculaNacionalFinal,
+            nombre,
+            titulo_universitario,
+            matricula_nacional: matriculaNacionalFinal,
             matricula_provincial: matriculaProvincialFinal,
-            descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url: fotoFinal, valor, valor_internacional
+            descripcion,
+            telefono,
+            correo_electronico,
+            contrasena_hash,
+            foto_perfil_url: fotoFinal,
+            valor,
+            valor_internacional,
+            cbu,
+            cuit
         });
 
         // Insertar especialidades si hay

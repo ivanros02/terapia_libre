@@ -8,7 +8,7 @@ import TurnosView from "./turnos/TurnosView";
 import PagosView from "./pagos/PagosView";
 import ReportesView from "./reportes/ReportesView";
 import ProfesionalesView from "./profesionales/ProfesionalesView";
-import PacientesView from "./PacientesView";
+import PacientesView from "./pacientes/PacientesView";
 import CuponesView from "./cupones/CuponesView";
 
 // Tipos
@@ -30,7 +30,8 @@ const AdminDashboardCompleto = () => {
   const renderVistaActual = () => {
     switch (vistaActual) {
       case "dashboard":
-        return <DashboardView />;
+        // 🔹 PASAR LA FUNCIÓN DE NAVEGACIÓN AL DASHBOARD
+        return <DashboardView onNavigateToSection={cambiarVista} />;
       case "turnos":
         return <TurnosView />;
       case "pagos":
@@ -44,7 +45,7 @@ const AdminDashboardCompleto = () => {
       case "cupones":
         return <CuponesView />;
       default:
-        return <DashboardView />;
+        return <DashboardView onNavigateToSection={cambiarVista} />;
     }
   };
 
@@ -57,8 +58,8 @@ const AdminDashboardCompleto = () => {
             <h2 className="mb-0 text-primary fw-bold">Panel de Administración</h2>
             <small className="text-muted">Sistema de gestión integral</small>
           </div>
-          <Button 
-            variant="outline-danger" 
+          <Button
+            variant="outline-danger"
             size="sm"
             onClick={handleLogout}
             className="d-flex align-items-center gap-2"

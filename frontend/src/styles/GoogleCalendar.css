@@ -59,8 +59,13 @@
     width: 100%;
     min-height: 80vh;
     /* Para que no se pegue arriba */
-    padding-top: 20px;
-    /* Espacio debajo del buscador */
+    
+}
+
+@media (min-width: 992px) {
+    .calendar-page {
+        margin-top: -7rem; /* 🔹 Ajustar margen superior en pantallas grandes */
+    }
 }
 
 /* Ajustar tamaño del contenedor para ocupar todo el ancho */

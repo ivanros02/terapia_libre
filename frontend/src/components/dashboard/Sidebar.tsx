@@ -57,7 +57,11 @@ const Sidebar: React.FC = () => {
   };
 
 
-
+  // Función para navegar a la sección especial de profesional
+  const handleProfesionalClick = () => {
+    // Aquí defines a dónde quieres navegar
+    navigate("/dashboard/profesional/datos"); // o la ruta que necesites
+  };
 
 
 
@@ -138,6 +142,13 @@ const Sidebar: React.FC = () => {
             <img src="/sidebar/config.png" alt="Home" width="24" height="24" />
           </button>
         </li>
+        {esProfesional && (
+          <li className="nav-item">
+            <button onClick={handleProfesionalClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
+              <img src="/sidebar/config.png" alt="Profesional" width="24" height="24" />
+            </button>
+          </li>
+        )}
         <li className="nav-item">
           <button onClick={handleLogout} className="nav-link text-white py-3 bg-transparent border-0 w-100">
             <img src="/sidebar/out.png" alt="Home" width="24" height="24" />

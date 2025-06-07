@@ -5,7 +5,21 @@ const bcrypt = require("bcryptjs");
 
 class Profesional {
 
-  static async create({ nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional }) {
+  static async create({
+    nombre,
+    titulo_universitario,
+    matricula_nacional,
+    matricula_provincial,
+    cuit,
+    descripcion,
+    telefono,
+    correo_electronico,
+    contrasena_hash,
+    foto_perfil_url,
+    valor,
+    valor_internacional,
+    cbu
+  }) {
     // 1️⃣ Verificar si el correo ya existe en profesionales
     const [existingEmail] = await pool.execute(
       `SELECT correo_electronico FROM profesionales WHERE correo_electronico = ?`,
@@ -26,11 +40,48 @@ class Profesional {
       throw new Error("El correo electrónico ya está registrado como usuario.");
     }
 
-    // Si el correo no existe, proceder con la inserción
+    // 🔹 3️⃣ Verificar si el CBU ya existe
+    const [existingCbu] = await pool.execute(
+      `SELECT cbu FROM profesionales WHERE cbu = ?`,
+      [cbu]
+    );
+
+    if (existingCbu.length > 0) {
+      throw new Error("El CBU/CVU ya está registrado.");
+    }
+
+    // Si todo está bien, proceder con la inserción
     const [result] = await pool.execute(
-      `INSERT INTO profesionales (nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nombre, titulo_universitario, matricula_nacional, matricula_provincial, descripcion, telefono, disponibilidad, correo_electronico, contrasena_hash, foto_perfil_url, valor, valor_internacional]
+      `INSERT INTO profesionales (
+            nombre, 
+            titulo_universitario, 
+            matricula_nacional, 
+            matricula_provincial, 
+            cuit, 
+            descripcion, 
+            telefono, 
+            correo_electronico, 
+            contrasena_hash, 
+            foto_perfil_url, 
+            valor, 
+            valor_internacional, 
+            cbu
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        nombre,
+        titulo_universitario,
+        matricula_nacional,
+        matricula_provincial,
+        cuit,
+        descripcion,
+        telefono,
+        correo_electronico,
+        contrasena_hash,
+        foto_perfil_url,
+        valor,
+        valor_internacional,
+        cbu
+      ]
     );
 
     return result.insertId;

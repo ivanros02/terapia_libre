@@ -116,9 +116,33 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
     }, [showModal, id_profesional]);
 
 
+    const isTimeAvailableFromNow = (fecha: string, hora_inicio: string): boolean => {
+        const fechaSeleccionada = new Date(fecha + 'T00:00:00'); // Fecha seleccionada
+        const hoy = new Date();
 
+        // Si la fecha seleccionada es anterior a hoy, no mostrar horarios
+        if (fechaSeleccionada < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())) {
+            return false;
+        }
 
+        // Si la fecha seleccionada es hoy
+        if (fechaSeleccionada.getTime() === new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime()) {
+            const horaActual = new Date();
+            const horaLimite = new Date();
+            horaLimite.setHours(horaActual.getHours() + 3, horaActual.getMinutes(), 0, 0); // Hora actual + 3 horas
 
+            // Convertir hora_inicio del horario a objeto Date de hoy
+            const [hours, minutes] = hora_inicio.split(':').map(Number);
+            const horaInicioDate = new Date();
+            horaInicioDate.setHours(hours, minutes, 0, 0);
+
+            // Solo mostrar si el horario es después de hora actual + 3 horas
+            return horaInicioDate >= horaLimite;
+        }
+
+        // Si es una fecha futura, mostrar todos los horarios
+        return true;
+    };
 
     useEffect(() => {
         const fetchProfessional = async () => {
@@ -207,7 +231,9 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
                             (() => {
                                 const fechaSeleccionada = selectedDate.toISOString().split("T")[0];
                                 const horariosDisponibles = availableTimes[fechaSeleccionada].filter(time => {
-                                    return !isTimeInAbsence(fechaSeleccionada, time.hora_inicio, time.hora_fin);
+                                    // Filtrar por ausencias Y por tiempo mínimo desde ahora
+                                    return !isTimeInAbsence(fechaSeleccionada, time.hora_inicio, time.hora_fin) &&
+                                        isTimeAvailableFromNow(fechaSeleccionada, time.hora_inicio);
                                 });
 
                                 return horariosDisponibles.length > 0 ? (

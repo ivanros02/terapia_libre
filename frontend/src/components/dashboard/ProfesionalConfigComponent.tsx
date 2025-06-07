@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import DisponibilidadSection from "./configProfesional/DisponibilidadSection";
-import ProfesionalSection from "./configProfesional/ProfesionalSection";
-import SuscripcionInfo from "./SuscripcionInfo";
 import AusenciaSection from "./configProfesional/AusenciaSection";
 
 const url = import.meta.env.VITE_API_BASE_URL;
@@ -28,7 +26,7 @@ interface Profesional {
 }
 
 function ProfesionalConfigComponent() {
-    const [profesional, setProfesional] = useState<Profesional | null>(null);
+    const [, setProfesional] = useState<Profesional | null>(null);
 
     const idProfesional = localStorage.getItem("id");
     
@@ -51,18 +49,6 @@ function ProfesionalConfigComponent() {
         <div>
             <DisponibilidadSection />
             <AusenciaSection/>
-            
-            <ProfesionalSection 
-                profesional={profesional}
-                fetchProfesionalData={fetchProfesionalData}
-            />
-
-            {/* Mostrar la información de la suscripción */}
-            {profesional?.correo_electronico && (
-                <div className="container">
-                    <SuscripcionInfo email={profesional.correo_electronico} />
-                </div>
-            )}
         </div>
     );
 }

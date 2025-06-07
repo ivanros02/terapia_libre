@@ -175,6 +175,8 @@ class Admin {
             u.nombre as nombre_usuario,
             u.correo_electronico as correo_usuario,
             p.nombre as nombre_profesional,
+            p.cbu as cbu_profesional,        -- 🔹 AGREGAR CBU
+            p.cuit as cuit_profesional,
             cu.codigo_cupon,
             cu.usado_en as fecha_uso_cupon,
             CASE 

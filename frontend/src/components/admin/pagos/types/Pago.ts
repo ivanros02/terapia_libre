@@ -11,6 +11,8 @@ export interface Pago {
   nombre_usuario: string;
   correo_usuario: string;
   nombre_profesional: string;
+  cbu_profesional?: string | null;    // 🔹 AGREGAR ESTA LÍNEA
+  cuit_profesional?: string | null;
   codigo_cupon?: string;
   fecha_uso_cupon?: string;
   tiene_cupon: 'Si' | 'No';
@@ -20,6 +22,8 @@ export interface IngresoProfesional {
   total: number;
   cantidad: number;
   pagos: Pago[];
+  cbu?: string | null;     // 🔹 AGREGAR ESTA LÍNEA
+  cuit?: string | null;    // 🔹 AGREGAR ESTA LÍNEA
 }
 
 export interface Filtros {

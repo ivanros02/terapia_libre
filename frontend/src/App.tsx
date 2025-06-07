@@ -23,6 +23,7 @@ import AdminLogin from "./components/AdminLogin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import RutaProtegida from "./components/RutaProtegida";
+import RegisterProfExitoso from "./pages/RegisterProfExitoso";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import RetornoPago from "./pages/RetornoPago";
 import "./index.css";
@@ -30,6 +31,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DashboardFacturacion from "./pages/DashboardFacturacion";
+import DashboardProfesionalData from "./pages/DashboardProfesionalData";
 const client_id_paypal = import.meta.env.VITE_PAYPAL_ID_CLIENT;
 
 const App: React.FC = () => {
@@ -56,13 +58,14 @@ const App: React.FC = () => {
               <Route path="/messages" element={<RutaProtegida> <DashboardMensajes /> </RutaProtegida>} />
               <Route path="/profesional/:id" element={<ProfessionalDetails />} />
               <Route path="/dashboard/profesional/config_profesional" element={<RutaProtegida> <DashboardProfesionalConfig /> </RutaProtegida>} />
+              <Route path="/dashboard/profesional/datos" element={<RutaProtegida> <DashboardProfesionalData /> </RutaProtegida>} />
               <Route path="/dashboard/usuario/config_usuario" element={<RutaProtegida> <DashboardUsuarioConfig /> </RutaProtegida>} />
               <Route path="/retorno-pago" element={<RetornoPago />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
-
+              <Route path="/successfulProfessionalRegister" element={<RegisterProfExitoso />} />
             </Routes>
             {/*<WhatsAppButton /> */}
           </Router>

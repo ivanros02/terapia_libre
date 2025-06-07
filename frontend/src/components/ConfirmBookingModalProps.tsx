@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Button } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import axios from "axios";
-import { PayPalButtons } from "@paypal/react-paypal-js";
+//import { PayPalButtons } from "@paypal/react-paypal-js";
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
+import "../styles/ConfirmBookingModal.css"; // Importa tu CSS personalizado
 const url = import.meta.env.VITE_API_BASE_URL;
 const public_key_mp = import.meta.env.VITE_MP_PUBLIC_KEY;
 
@@ -18,19 +19,42 @@ interface ConfirmBookingModalProps {
     profesionalName: string | null;
 }
 
-const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide, selectedDateTime, id_profesional, id_usuario, }) => {
+const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide, selectedDateTime, id_profesional, id_usuario, precio,
+}) => {
     // ✅ Inicializa Mercado Pago solo una vez
     initMercadoPago(public_key_mp, { locale: 'es-AR' });
 
-    const [showPayPal, setShowPayPal] = useState(false);
+    //const [showPayPal, setShowPayPal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [preferenceId, setPreferenceId] = useState(null);
     const [loadingWallet, setLoadingWallet] = useState(false);
     const [cupon, setCupon] = useState('');
-    const [bookingToken, setBookingToken] = useState<string | null>(null); // 🔒 Token para PayPal
+    //const [bookingToken, setBookingToken] = useState<string | null>(null); // 🔒 Token para PayPal
 
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
 
+    // Calcular precio del servicio (5% del precio base)
+    const precioServicio = Math.round(precio * 0.05);
+    const totalAPagar = precio + precioServicio;
+
+    // Formatear fecha y hora
+    const formatearFechaHora = () => {
+        if (!selectedDateTime) return '';
+
+        const [fecha, rango] = selectedDateTime.split(" - ");
+        const [anio, mes, dia] = fecha.split("-");
+        const fechaDate = new Date(Number(anio), Number(mes) - 1, Number(dia));
+
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const diaSemana = diasSemana[fechaDate.getDay()];
+
+        const [inicio,] = rango.split(" a ");
+        const horaInicio = inicio.slice(0, 5);
+
+        return `${diaSemana} ${dia}/${mes} - ${horaInicio} PM`;
+    };
+
+    /*
     // 🔹 Crear orden de pago en PayPal
     const handleCreateOrder = async (): Promise<string> => {
         try {
@@ -75,6 +99,7 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
             console.error("❌ Error al capturar el pago:", error);
         }
     };
+    */
 
 
     // CREAR ORDEN DE PAGO
@@ -116,128 +141,102 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
 
     return (
         <>
-            <Modal show={show} onHide={onHide} centered>
-                <Modal.Body style={{ backgroundColor: "var(--verde)", color: "white" }} className="text-center rounded-top p-4">
-                    {selectedDateTime && (
-                        <p className="fs-5 fw-bold">
-                            Turno: {
-                                (() => {
-                                    const [fecha, rango] = selectedDateTime.split(" - ");
-                                    const [anio, mes, dia] = fecha.split("-");
-                                    const fechaDate = new Date(Number(anio), Number(mes) - 1, Number(dia));
-
-                                    const fechaFormateada = fechaDate.toLocaleDateString("es-AR", {
-                                        weekday: "long",
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    });
-
-                                    const [inicio, fin] = rango.split(" a ");
-                                    const horaInicio = inicio.slice(0, 5);
-                                    const horaFin = fin.slice(0, 5);
-
-                                    return `${fechaFormateada} de ${horaInicio} a ${horaFin}`;
-                                })()
-                            }
-                        </p>
-                    )}
-
-                    <div className="p-4 bg-white shadow rounded-4">
-                        <p className="text-center" style={{ color: "var(--verde)" }}>
-                            Para confirmar debe abonar la sesión.
-                        </p>
-
-                        {/* 🔹 Campo de cupón */}
-                        <div className="mt-3">
-                            <label className="form-label text-dark fw-bold">¿Tenés un cupón?</label>
-                            <input
-                                type="text"
-                                className="form-control text-center"
-                                placeholder="Ej: PRIMERASESION"
-                                value={cupon}
-                                onChange={(e) => setCupon(e.target.value.toUpperCase())}
-                            />
-                        </div>
+            <Modal
+                show={show}
+                onHide={onHide}
+                centered
+                className="modal-confirmation"
+                dialogClassName="custom-modal-size"
+                backdrop="static"
+            >
+                <Modal.Body>
+                    {/* Título principal */}
+                    <div className="main-title">
+                        Para confirmar el turno debes abonar la sesión
                     </div>
 
-                </Modal.Body>
+                    {/* Contenedor de información del turno */}
+                    <div className="info-container"></div>
 
-                <Modal.Footer style={{ backgroundColor: "var(--verde)" }} className="d-flex flex-column align-items-center border-0">
-                    {!showPayPal ? (
-                        <>
-                            {/* 🔹 Botón de Mercado Pago Checkout Pro */}
-                            {!preferenceId && !loadingWallet && (
-                                <Button
-                                    style={{ backgroundColor: "white", color: "var(--verde)", border: "2px solid white", width: "80%" }}
-                                    className="fw-bold px-4 py-2 d-flex flex-column align-items-center justify-content-center"
-                                    onClick={handleBuy}
-                                >
-                                    {/* 🔹 Contenedor centrado del Wallet */}
-                                    {preferenceId && (
-                                        <div className="wallet-container" style={{ display: "flex", justifyContent: "center" }}>
-                                            <Wallet initialization={{ preferenceId: preferenceId }} />
-                                        </div>
-                                    )}
+                    {/* Información del turno */}
+                    <div className="turno-text">
+                        Turno: {formatearFechaHora()}
+                    </div>
 
-                                    {/* 🔹 Texto centrado correctamente */}
-                                    <span className="text-center w-100 mt-2">Pagar con Mercado Pago</span>
-                                </Button>
-                            )}
+                    {/* Detalles de precios */}
+                    <div className="price-details">
+                        <span className="price-session">Valor de la sesión:</span>
+                        <span className="price-value"> ${precio.toLocaleString()}.-<br /></span>
+                        <span className="service-cost">Costo de servicio: </span>
+                        <span className="price-value">${precioServicio.toLocaleString()}.-</span>
+                    </div>
 
-                            {/* 🔹 Loader */}
-                            {loadingWallet && (
-                                <div className="text-white py-2">
-                                    Cargando botón de pago...
-                                </div>
-                            )}
+                    {/* Total a pagar */}
+                    <div className="total-amount">
+                        Total a abonar: ${totalAPagar.toLocaleString()}.-
+                    </div>
 
-                            {/* 🔹 Wallet cuando está lista la preferencia */}
-                            {preferenceId && (
-                                <div className="wallet-container mb-2" style={{ display: "flex", justifyContent: "center", width: "80%" }}>
-                                    <Wallet initialization={{ preferenceId }} />
-                                </div>
-                            )}
+                    {/* Campo de cupón */}
+                    <div className="coupon-container">
+                        <input
+                            type="text"
+                            className="coupon-input"
+                            placeholder=""
+                            value={cupon}
+                            onChange={(e) => setCupon(e.target.value.toUpperCase())}
+                        />
+                        {!cupon && <div className="coupon-label">Cupón de descuento</div>}
+                    </div>
 
-
-                            {/* 🔹 Botón de PayPal */}
-                            <Button
-                                style={{ backgroundColor: "white", color: "var(--verde)", border: "2px solid white", width: "80%" }}
-                                className="fw-bold px-4 py-2"
-                                onClick={() => setShowPayPal(true)}
-                            >
-                                Pagar con PayPal
-                            </Button>
-                        </>
-                    ) : (
-                        <div className="w-100 d-flex justify-content-center">
-                            <PayPalButtons createOrder={handleCreateOrder} onApprove={handleApprove} />
+                    {/* Botón de Pagar / Wallet de Mercado Pago */}
+                    {!preferenceId && !loadingWallet && (
+                        <div className="btn-pagar" onClick={handleBuy}>
+                            <div className="btn-pagar-text">PAGAR</div>
                         </div>
                     )}
-                    <Button
-                        style={{ backgroundColor: "white", color: "var(--verde)", border: "2px solid white", width: "80%" }}
-                        className="fw-bold px-4 py-2 mt-3"
-                        onClick={onHide}
-                    >
-                        Cancelar
-                    </Button>
-                </Modal.Footer>
+
+                    {/* Loader */}
+                    {loadingWallet && (
+                        <div className="btn-pagar">
+                            <div className="btn-pagar-text">Cargando...</div>
+                        </div>
+                    )}
+
+                    {/* Wallet cuando está lista la preferencia */}
+                    {preferenceId && (
+                        <div className="wallet-container">
+                            <Wallet initialization={{ preferenceId }} />
+                        </div>
+                    )}
+
+                    {/* Botón Cancelar */}
+                    <div className="btn-cancelar" onClick={onHide}>
+                        <div className="btn-cancelar-text">CANCELAR</div>
+                    </div>
+                </Modal.Body>
             </Modal>
 
-            {/* ✅ Modal de Confirmación de Pago Exitoso */}
+            {/* Modal de Confirmación de Pago Exitoso */}
             <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
                 <Modal.Body className="text-center p-4">
                     <h4 className="fw-bold" style={{ color: "var(--verde)" }}>¡Turno Confirmado!</h4>
                     <p>Te enviamos un correo con los detalles de tu turno.</p>
                 </Modal.Body>
                 <Modal.Footer className="d-flex justify-content-center border-0">
-                    <Button
-                        style={{ backgroundColor: "var(--verde)", color: "white", width: "80%", borderColor: "var(--verde)" }}
-                        className="fw-bold px-4 py-2"
+                    <button
+                        style={{
+                            backgroundColor: "var(--verde)",
+                            color: "white",
+                            width: "80%",
+                            border: "1px solid var(--verde)",
+                            borderRadius: "8px",
+                            padding: "10px 20px",
+                            fontWeight: "600"
+                        }}
                         onClick={() => setShowSuccessModal(false)}
                     >
                         Aceptar
-                    </Button>
+                    </button>
                 </Modal.Footer>
             </Modal>
         </>
