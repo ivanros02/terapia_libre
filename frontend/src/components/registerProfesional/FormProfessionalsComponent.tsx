@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import TermsAndConditions from "../TermsAndConditions";
 import { useNavigate } from "react-router-dom";
 import SubscriptionInfo from "./SubscriptionInfo";
+import MercadoPagoCheckout from "./MercadoPagoCheckout";
 
 const FormProfessionalsComponent = () => {
 
@@ -17,6 +18,8 @@ const FormProfessionalsComponent = () => {
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [descripcionAviso, setDescripcionAviso] = useState("");
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    //const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
     const MAX_CARACTERES = 315;
     const navigate = useNavigate();
 
@@ -78,55 +81,46 @@ const FormProfessionalsComponent = () => {
         setFormData({ ...formData, especialidades: selected });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!termsChecked) {
-            toast.warning("Debes aceptar los Términos y Condiciones para continuar.", {
-                position: "top-center",
-                autoClose: 3000,
-            });
-            return;
-        }
-
-        if (!validateForm()) {
-            toast.error("Por favor, complete todos los campos obligatorios.", {
-                position: "top-center",
-                autoClose: 3000,
-            });
-            return;
-        }
-
-        if (!navigator.onLine) {
-            toast.error("Estás desconectado de Internet.");
-            return;
-        }
-
+    const handlePaymentSuccess = async () => {
         try {
             setLoading(true);
             await axios.post(`${url}/api/profesionales`, formData);
 
             toast.success("Profesional registrado con éxito 🎉");
             localStorage.removeItem("formProfesional");
+            setShowPaymentModal(false);
 
-            // 🔹 Abrir MercadoPago en nueva pestaña después del registro exitoso
-            const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084955cc4800195a48f3aa61f98";
-            window.open(mercadoPagoUrl, "_blank");
-
-            // 🔹 Redirigir a /login después de un pequeño delay
             setTimeout(() => {
                 navigate("/successfulProfessionalRegister");
-            }, 2000); // Aumenté a 2 segundos para que el usuario vea el toast
+            }, 1000);
 
         } catch (error: any) {
-            if (error.message === "Network Error") {
-                toast.error("No se pudo conectar al servidor. Verificá tu conexión a Internet.");
-            } else {
-                toast.error(error.response?.data?.message || "Error inesperado");
-            }
+            toast.error("Error al registrar profesional: " + error.response?.data?.message);
+            setShowPaymentModal(false);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handlePaymentError = () => {
+        toast.error("Error al procesar el pago. Intentá nuevamente.");
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!termsChecked) {
+            toast.warning("Debes aceptar los Términos y Condiciones para continuar.");
+            return;
+        }
+
+        if (!validateForm()) {
+            toast.error("Por favor, complete todos los campos obligatorios.");
+            return;
+        }
+
+        // Solo validar y mostrar modal de pago, NO hacer POST todavía
+        setShowPaymentModal(true);
     };
 
     // Función de validación
@@ -435,6 +429,25 @@ const FormProfessionalsComponent = () => {
                         </Form>
                     </Card.Body>
                 </Card>
+
+                {/* Modal de Pago */}
+                <Modal
+                    show={showPaymentModal}
+                    onHide={() => setShowPaymentModal(false)}
+                    centered
+                    size="lg"
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Completar Suscripción</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <MercadoPagoCheckout
+                            userEmail={formData.correo_electronico}
+                            onSuccess={handlePaymentSuccess}
+                            onError={handlePaymentError}
+                        />
+                    </Modal.Body>
+                </Modal>
             </div>
 
 

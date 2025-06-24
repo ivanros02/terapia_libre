@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom"; // 👈 Importamos useNavigate
-import { useSocket } from "../../context/SocketContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Sidebar.css";
 import { Link } from "react-router-dom"; // 👈 Importamos Link
@@ -18,20 +17,10 @@ declare global {
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate(); // 👈 Hook para redirigir
-  let socket;
-  try {
-    socket = useSocket();
-  } catch (error) {
-    console.warn("⚠️ Sidebar cargado antes de que el SocketProvider esté listo.");
-    socket = null;
-  }
 
-  //const [hasNewMessages, setHasNewMessages] = useState(false);
-  const userId = localStorage.getItem("id");
   const esProfesional = localStorage.getItem("esProfesional") === "true";
   const homeRoute = esProfesional ? "/dashboard/profesional" : "/dashboard/usuario";
   const configRoute = esProfesional ? "/dashboard/profesional/config_profesional" : "/dashboard/usuario/config_usuario";
-
 
   // Función para cerrar sesión
   const handleLogout = async () => {
@@ -74,14 +63,6 @@ const Sidebar: React.FC = () => {
   const handleConfigClick = () => {
     navigate(configRoute);
   };
-
-  // 🔹 Unir el usuario a su sala personal de Socket.io al cargar la app
-  useEffect(() => {
-    if (socket && userId) {
-      socket.emit("join_user", userId);
-    }
-  }, [socket, userId]);
-
   // 🔹 Escuchar notificaciones de nuevos mensajes
   /*
   useEffect(() => {
@@ -113,13 +94,19 @@ const Sidebar: React.FC = () => {
       <ul className="nav">
         <li className="nav-item">
           <button onClick={handleHomeClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
-            <img src="/sidebar/home.png" alt="Home" width="24" height="24" />
+            <img src="/sidebar/home.svg" alt="Home" width="24" height="24" />
           </button>
         </li>
 
         <li className="nav-item">
+          <Link to="/dashboard/facturacion" className="nav-link text-white py-3 bg-transparent border-0 w-100">
+            <img src="/sidebar/factura.png" alt="Factura" width="24" height="24" />
+          </Link>
+        </li>
+
+        <li className="nav-item">
           <Link to="/dashboard/calendario" className="nav-link text-white py-3">
-            <img src="/sidebar/calendar.png" alt="Home" width="24" height="24" />
+            <img src="/sidebar/calendar.svg" alt="Home" width="24" height="24" />
           </Link>
         </li>
 
@@ -139,19 +126,19 @@ const Sidebar: React.FC = () => {
 
         <li className="nav-item">
           <button onClick={handleConfigClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
-            <img src="/sidebar/config.png" alt="Home" width="24" height="24" />
+            <img src="/sidebar/settings.svg" alt="Home" width="24" height="24" />
           </button>
         </li>
         {esProfesional && (
           <li className="nav-item">
             <button onClick={handleProfesionalClick} className="nav-link text-white py-3 bg-transparent border-0 w-100">
-              <img src="/sidebar/config.png" alt="Profesional" width="24" height="24" />
+              <img src="/sidebar/perfil.png" alt="Profesional" width="24" height="24" />
             </button>
           </li>
         )}
         <li className="nav-item">
           <button onClick={handleLogout} className="nav-link text-white py-3 bg-transparent border-0 w-100">
-            <img src="/sidebar/out.png" alt="Home" width="24" height="24" />
+            <img src="/sidebar/logout.svg" alt="Home" width="24" height="24" />
           </button>
         </li>
       </ul>

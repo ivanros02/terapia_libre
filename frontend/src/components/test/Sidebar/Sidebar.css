@@ -1,0 +1,70 @@
+/* Sidebar.css */
+.sidebar-dags {
+    grid-area: sidebar;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    position: relative;
+    width: 140px;
+    height: 100%;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    transform: translateX(-50%);
+    gap: 60px;
+    /* AGREGAR ESTA LÍNEA */
+    margin-top: 15vh;
+    /* AGREGAR ESTA LÍNEA para posicionar todo el grupo */
+}
+
+.nav-item-dashboard {
+    width: 30.724px;
+    height: 30.724px;
+    transform: rotate(0.016deg);
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.nav-item-dashboard:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.nav-item-dashboard img {
+    width: 30px;
+    height: 30px;
+    opacity: 0.7;
+}
+
+.nav-item-dashboard:hover img {
+    opacity: 1;
+}
+
+.sidebar-logo {
+    position: absolute;
+    bottom: -20px;
+    left: 35%;
+    transform: translateX(-50%) rotate(-0.185deg);
+    width: 116.391px;
+    height: 116.391px;
+    flex-shrink: 0;
+    aspect-ratio: 116.39/116.39;
+}
+
+.sidebar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

@@ -12,9 +12,9 @@ exports.getProfesionales = async (req, res) => {
         const especialidad = req.query.especialidad || null;
         const disponibilidad = req.query.disponibilidad || null;
         const orden = req.query.orden || null; // "asc" o "desc"
-
+        const seed = req.query.seed || null;
         // Obtener profesionales con filtros
-        const profesionales = await Profesional.getAll(limit, offset, especialidad, disponibilidad, orden);
+        const profesionales = await Profesional.getAll(limit, offset, especialidad, disponibilidad, orden, seed);
 
         // Obtener el total de profesionales con los filtros aplicados
         const totalProfesionales = await Profesional.getTotalCount(especialidad, disponibilidad);
@@ -66,74 +66,53 @@ enviarBienvenida = async (nombreProfesional, correoDestino) => {
 
 exports.createProfesional = async (req, res) => {
     try {
-        const {
-            nombre,
-            titulo_universitario,
-            matricula_nacional,
-            matricula_provincial,
-            cuit,  // 🔹 AGREGAR ESTA LÍNEA
-            descripcion,
-            telefono,
-            correo_electronico,
-            contrasena,
-            foto_perfil_url,
-            valor,
-            valor_internacional,
-            especialidades,
-            cbu
-        } = req.body;
+        const data = { ...req.body };
 
-        if (!contrasena) {
+        if (!data.contrasena) {
             return res.status(400).json({ message: "La contraseña es obligatoria" });
         }
 
-        // 🔹 Validar CBU obligatorio
-        if (!cbu) {
+        if (!data.cbu) {
             return res.status(400).json({ message: "El CBU/CVU es obligatorio" });
         }
 
         // Convertir la URL de Google Drive a formato directo si es necesario
-        let fotoFinal = foto_perfil_url;
-        const driveMatch = foto_perfil_url.match(/drive\.google\.com\/file\/d\/([^/]+)\//);
-        if (driveMatch) {
-            const fileId = driveMatch[1];
-            fotoFinal = `https://drive.google.com/uc?export=view&id=${fileId}`;
+        if (data.foto_perfil_url) {
+            const driveMatch = data.foto_perfil_url.match(/drive\.google\.com\/file\/d\/([^/]+)\//);
+            if (driveMatch) {
+                const fileId = driveMatch[1];
+                data.foto_perfil_url = `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
         }
 
         // Encriptar contraseña
         const salt = await bcrypt.genSalt(10);
-        const contrasena_hash = await bcrypt.hash(contrasena, salt);
+        data.contrasena_hash = await bcrypt.hash(data.contrasena, salt);
+        delete data.contrasena;
 
-        const matriculaNacionalFinal = matricula_nacional?.trim() || null;
-        const matriculaProvincialFinal = matricula_provincial?.trim() || null;
+        if (data.matricula_nacional) {
+            data.matricula_nacional = data.matricula_nacional.trim() || null;
+        }
+        if (data.matricula_provincial) {
+            data.matricula_provincial = data.matricula_provincial.trim() || null;
+        }
 
         // Insertar profesional
-        const id_profesional = await Profesional.create({
-            nombre,
-            titulo_universitario,
-            matricula_nacional: matriculaNacionalFinal,
-            matricula_provincial: matriculaProvincialFinal,
-            descripcion,
-            telefono,
-            correo_electronico,
-            contrasena_hash,
-            foto_perfil_url: fotoFinal,
-            valor,
-            valor_internacional,
-            cbu,
-            cuit
-        });
+        const especialidades = data.especialidades;
+        delete data.especialidades; // Remover antes de crear
 
-        // Insertar especialidades si hay
+        const id_profesional = await Profesional.create(data);
+
         if (especialidades && especialidades.length > 0) {
             await Profesional.assignEspecialidades(id_profesional, especialidades);
         }
+
 
         // 🔥 Solo UNA respuesta
         res.status(201).json({ message: "Profesional registrado exitosamente", id_profesional });
 
         // 🔥 Después el mail, SIN tocar res ni hacer nada más
-        enviarBienvenida(nombre, correo_electronico);
+        enviarBienvenida(data.nombre, data.correo_electronico);
 
     } catch (error) {
         console.error("Error en createProfesional:", error);
@@ -176,6 +155,17 @@ exports.getProfesionalData = async (req, res) => {
     } catch (error) {
         console.error("Error al obtener datos del profesional:", error);
         res.status(400).json({ message: "No se pudo obtener la información del profesional." });
+    }
+};
+
+exports.getSesiones = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const sesiones = await Profesional.getSesiones(id);
+        res.json(sesiones);
+    } catch (error) {
+        console.error("Error al obtener sesiones:", error);
+        res.status(400).json({ message: "No se pudieron obtener las sesiones." });
     }
 };
 

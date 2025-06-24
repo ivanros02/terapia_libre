@@ -167,7 +167,7 @@ class Turno {
             WHERE t.id_profesional = ? 
                 AND DATE(t.fecha_turno) >= CURDATE()
                 AND t.estado IN ('Pendiente', 'Confirmado')
-            ORDER BY t.fecha_turno ASC
+            ORDER BY t.fecha_turno ASC, t.hora_turno ASC
             LIMIT 1`,
             [id_profesional]
         );
@@ -182,7 +182,7 @@ class Turno {
              WHERE t.id_usuario = ?
                AND t.estado = 'Pendiente'
                AND DATE(t.fecha_turno) >= CURDATE()
-             ORDER BY t.fecha_turno ASC
+             ORDER BY t.fecha_turno ASC, t.hora_turno ASC
              LIMIT 1`,
             [id_usuario]
         );

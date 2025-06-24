@@ -1,0 +1,59 @@
+.dashboard {
+  display: grid;
+  grid-template-areas: 
+    "sidebar search search"
+    "sidebar bienvenida calendario"
+    "sidebar historial calendario";
+  grid-template-columns: 140px auto 414px; /* Cambiar 1fr por auto */
+  grid-template-rows: auto auto auto; /* Cambiar por auto también */
+  gap: 20px;
+  padding: 20px;
+}
+
+.sidebar {
+  grid-area: sidebar;
+}
+
+.search {
+  grid-area: search;
+}
+
+.bienvenida {
+  grid-area: bienvenida;
+}
+
+.historial {
+  grid-area: historial;
+}
+
+.calendario {
+  grid-area: calendario;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dashboard {
+    grid-template-areas: 
+      "search search"
+      "bienvenida calendario"
+      "historial calendario";
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: 60px 1fr 1fr;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    grid-template-areas: 
+      "search"
+      "bienvenida"
+      "historial"
+      "calendario";
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px repeat(3, 1fr);
+  }
+}

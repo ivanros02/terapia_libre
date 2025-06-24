@@ -1,11 +1,11 @@
 const pool = require("../config/db");
 
 class Usuario {
-  static async create({ correo_electronico, contrasena_hash, nombre, telefono = null, id_google }) { // 🔹 Agregado telefono
+  static async create(data) {
     // 1️⃣ Verificar si el correo ya existe
     const [existingUsers] = await pool.execute(
       `SELECT id_usuario FROM usuarios WHERE correo_electronico = ?`,
-      [correo_electronico]
+      [data.correo_electronico]
     );
 
     if (existingUsers.length > 0) {
@@ -15,7 +15,7 @@ class Usuario {
     // 2️⃣ Verificar si el correo ya existe en la tabla profesionales
     const [existingProfesionales] = await pool.execute(
       `SELECT id_profesional FROM profesionales WHERE correo_electronico = ?`,
-      [correo_electronico]
+      [data.correo_electronico]
     );
 
     if (existingProfesionales.length > 0) {
@@ -23,10 +23,12 @@ class Usuario {
     }
 
     // 3️⃣ Insertar el nuevo usuario
-    const [result] = await pool.execute(
-      `INSERT INTO usuarios (correo_electronico, contrasena_hash, nombre, telefono, id_google) VALUES (?, ?, ?, ?, ?)`, // 🔹 Agregado telefono
-      [correo_electronico, contrasena_hash, nombre, telefono, id_google]
-    );
+    const fields = Object.keys(data);
+    const placeholders = fields.map(() => '?');
+    const values = Object.values(data);
+
+    const query = `INSERT INTO usuarios (${fields.join(', ')}) VALUES (${placeholders.join(', ')})`;
+    const [result] = await pool.execute(query, values);
 
     return result.insertId;
   }
@@ -69,29 +71,19 @@ class Usuario {
     return rows[0]; // Retorna el profesional si existe
   }
 
-  static async editarUsuario(id_usuario, { nombre, correo_electronico, telefono, contrasena_hash }) { // 🔹 Agregado telefono
+  static async editarUsuario(id_usuario, data) {
     let query = "UPDATE usuarios SET ";
     let fields = [];
     let values = [];
 
-    if (nombre) {
-      fields.push("nombre = ?");
-      values.push(nombre);
-    }
-    if (correo_electronico) {
-      fields.push("correo_electronico = ?");
-      values.push(correo_electronico);
-    }
-    if (telefono !== undefined) { // 🔹 Permitir telefono null
-      fields.push("telefono = ?");
-      values.push(telefono);
-    }
-    if (contrasena_hash) {
-      fields.push("contrasena_hash = ?");
-      values.push(contrasena_hash);
-    }
+    Object.keys(data).forEach((key) => {
+      if (key !== 'contrasena_actual') {
+        fields.push(`${key} = ?`);
+        values.push(data[key]);
+      }
+    });
 
-    if (fields.length === 0) return false; // Si no hay datos, no actualiza nada
+    if (fields.length === 0) return false;
 
     query += fields.join(", ") + " WHERE id_usuario = ?";
     values.push(id_usuario);

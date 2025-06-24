@@ -6,10 +6,10 @@ import Sidebar from "../components/dashboard/Sidebar";
 import DashboardCard from "../components/dashboard/DashboardCard";
 import PatientHistory from "../components/dashboard/PatientHistory";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
-import "../styles/DashboardProfesional.css"
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { getGoogleDriveImageUrl } from "../utils/googleDrive";
+import "../styles/DashboardProfesional.css"
 const url = import.meta.env.VITE_API_BASE_URL;
 
 // Tipos de datos

@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
-import HeroSection from "../components/HeroSection";
-import AboutSection from "../components/AboutSection";
-import NeedTherapy from "../components/NeedTherapy";
-import BenefitsSection from "../components/BenefitsSection";
+import HeroSection from "../components/home/HeroSection";
+import AboutSection from "../components/home/AboutSection";
+import NeedTherapy from "../components/home/NeedTherapy";
+import BenefitsSection from "../components/home/BenefitsSection";
 import Footer from "../layouts/Footer";
 import Head from "../layouts/Header";
 import LegalPopup from "../layouts/LegalPopup";

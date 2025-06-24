@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import ProfessionalDetailsComponent from "../components/ProfessionalDetailsComponent"; // Importar el nuevo componente
+import ProfessionalDetailsComponent from "../components/detallesProfesional/ProfessionalDetailsComponent"; // Importar el nuevo componente
 import Footer from "../layouts/Footer";
 import Head from "../layouts/Header";
 import LegalPopup from "../layouts/LegalPopup";

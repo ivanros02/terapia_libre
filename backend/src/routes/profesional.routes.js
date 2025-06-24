@@ -8,4 +8,5 @@ router.post("/", profesionalController.createProfesional);
 router.get("/", profesionalController.getProfesionales);
 router.get("/:id", profesionalController.getProfesionalData);
 router.put("/:id", profesionalController.updateProfesional);
+router.get("/:id/sesiones", profesionalController.getSesiones);
 module.exports = router;

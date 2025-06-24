@@ -1,7 +1,7 @@
 import React from "react";
 import Head from "../layouts/Header"; // Usa el mismo Head si es necesario
 import Footer from "../layouts/Footer";
-import LoginComponente from "../components/LoginComponent"; // Asegúrate de tener este componente
+import LoginComponente from "../components/login/LoginComponent"; // Asegúrate de tener este componente
 import LegalPopup from "../layouts/LegalPopup";
 const Login: React.FC = () => {
     const menuLinks = [

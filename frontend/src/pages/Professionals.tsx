@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Head from "../layouts/Header"; // Usa el mismo Head si es necesario
 import Footer from "../layouts/Footer";
-import ProfessionalList from "../components/ProfessionalList";
-import FilterBar from "../components/FilterBar";
+import ProfessionalList from "../components/profesionales/ProfessionalList";
+import FilterBar from "../components/profesionales/FilterBar";
 import VolverLink from '../components/VolverLink';
 
 import "../styles/Professionals.css";

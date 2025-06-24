@@ -1,0 +1,79 @@
+/* Historial.css */
+.historial-card {
+    width: 815.21px;
+    /* mantener */
+    height: 370.736px;
+    /* cambiar de 484.415px */
+    transform: rotate(0.016deg);
+    flex-shrink: 0;
+    background: #d17676;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 16.386px;
+    display: flex;
+    /* AGREGAR */
+    gap: 20px;
+    /* AGREGAR */
+}
+
+.lista-pacientes {
+    width: 390.195px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.historia-clinica {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.historial h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.historial-card {
+    width: 815.21px;
+    height: 484.415px;
+    transform: rotate(0.016deg);
+    flex-shrink: 0;
+    background: #d17676;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+
+    border-radius: 16.386px;
+}
+
+.paciente {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.paciente span {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.paciente p {
+    margin: 0;
+    color: white;
+    font-weight: 500;
+}
+
+.paciente small {
+    color: rgba(255, 255, 255, 0.8);
+}

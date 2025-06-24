@@ -1,0 +1,44 @@
+/* Calendario.css */
+.calendario {
+  width: 413.75px;
+  height: 889.223px;
+  transform: rotate(0.016deg);
+  flex-shrink: 0;
+  background: #dfd0ca;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 16.386px;
+  
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin: 20px 0;
+}
+
+.calendario-grid div {
+  padding: 10px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.turno {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.turno span {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: orange;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}

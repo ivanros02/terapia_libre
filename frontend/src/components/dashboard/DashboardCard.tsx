@@ -2,7 +2,7 @@ import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Card, Container, Modal } from "react-bootstrap";
 import imagen from "/quienes_somos.png"; // Asegúrate de importar la imagen correctamente
-import CalendarAvailability from "../CalendarAvailability";
+import CalendarAvailability from "../detallesProfesional/CalendarAvailability";
 import "../../styles/DashboardCard.css";
 import { Link } from "react-router-dom";
 import { format, parseISO } from "date-fns";

@@ -12,21 +12,20 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 
 exports.registrarUsuario = async (req, res) => {
   try {
-    const { correo_electronico, contrasena, nombre, telefono = null, id_google = null } = req.body;
+    const data = { ...req.body };
 
-    if (!correo_electronico || !nombre) {
+    if (!data.correo_electronico || !data.nombre) {
       return res.status(400).json({ message: "Correo y nombre son obligatorios" });
     }
 
-    let contrasena_hash = null;
-
-    if (contrasena) {
+    if (data.contrasena) {
       const salt = await bcrypt.genSalt(10);
-      contrasena_hash = await bcrypt.hash(contrasena, salt);
+      data.contrasena_hash = await bcrypt.hash(data.contrasena, salt);
+      delete data.contrasena;
     }
 
     // Guardar usuario en la BD
-    const id_usuario = await Usuario.create({ correo_electronico, contrasena_hash, nombre, telefono, id_google }); // 🔹 Agregado telefono
+    const id_usuario = await Usuario.create(data);
 
     res.status(201).json({ message: "Usuario registrado con éxito", id_usuario });
   } catch (error) {
@@ -153,11 +152,12 @@ exports.getUserData = async (req, res) => {
 exports.editarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, correo_electronico, telefono, contrasena, contrasena_actual } = req.body;
+    const data = { ...req.body };
+    const { contrasena, contrasena_actual } = data;
 
 
     // Validar que al menos un campo esté presente
-    if (!nombre && !correo_electronico && !telefono && !contrasena) { // 🔹 Agregado telefono en validación
+    if (Object.keys(data).filter(key => key !== 'contrasena_actual').length === 0) {
       return res.status(400).json({ message: "No se enviaron datos para actualizar" });
     }
 
@@ -180,14 +180,16 @@ exports.editarUsuario = async (req, res) => {
       }
 
       const salt = await bcrypt.genSalt(10);
-      contrasena_hash = await bcrypt.hash(contrasena, salt);
+      data.contrasena_hash = await bcrypt.hash(contrasena, salt);
+      delete data.contrasena;
+      delete data.contrasena_actual;
 
       // ✅ (opcional) Notificación por correo
       await sendEmail({
-        to: correo_electronico,
+        to: data.correo_electronico || usuario.correo_electronico,
         subject: "¡Tu contraseña fue actualizada! 🔐",
         html: `
-          <p>Hola ${nombre},</p>
+          <p>Hola ${data.nombre || usuario.nombre},</p>
           <p>Queremos confirmarte que el cambio de contraseña en tu cuenta de Terapia Libre se realizó con éxito.</p>
           <p>📍Si no realizaste este cambio o tenés alguna duda, podés escribirnos:</p>
           <p>Por WhatsApp al +54 9 11 4448-2738/+54 9 11 4419-1777
@@ -199,7 +201,7 @@ exports.editarUsuario = async (req, res) => {
 
 
     // Actualizar el usuario en la base de datos
-    const actualizado = await Usuario.editarUsuario(id, { nombre, correo_electronico, telefono, contrasena_hash }); // 🔹 Agregado telefono
+    const actualizado = await Usuario.editarUsuario(id, data);
 
     if (actualizado) {
       return res.json({ message: "Usuario actualizado correctamente." });

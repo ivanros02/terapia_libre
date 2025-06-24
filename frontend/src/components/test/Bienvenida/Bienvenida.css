@@ -1,0 +1,39 @@
+/* Bienvenida.css */
+.bienvenida {
+  grid-area: bienvenida; /* Mantiene el grid funcionando */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  
+}
+
+.titulo-superior {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #333;
+  width: 815.152px; /* Mismo ancho que la card */
+}
+
+.bienvenida-card {
+  width: 815.152px;
+  height: 312.676px;
+  transform: rotate(0.016deg);
+  flex-shrink: 0;
+  background: #e7ddcc;
+  padding: 20px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
+  
+  border-radius: 16.386px;
+}
+
+.bienvenida-image {
+  position: absolute;
+  right: -20px;
+  top: -10px;
+  z-index: 5;
+  width: 200px;
+  height: auto;
+}
