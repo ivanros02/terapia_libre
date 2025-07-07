@@ -16,6 +16,9 @@ export interface Pago {
   codigo_cupon?: string;
   fecha_uso_cupon?: string;
   tiene_cupon: 'Si' | 'No';
+  correo_electronico?: string;
+  condicion_fiscal?: string;
+  valor?: number;
 }
 
 export interface IngresoProfesional {
@@ -24,6 +27,9 @@ export interface IngresoProfesional {
   pagos: Pago[];
   cbu?: string | null;     // 🔹 AGREGAR ESTA LÍNEA
   cuit?: string | null;    // 🔹 AGREGAR ESTA LÍNEA
+  correo_electronico: string;
+  condicion_fiscal: string;
+  valor: number;
 }
 
 export interface Filtros {

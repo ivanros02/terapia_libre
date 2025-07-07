@@ -1,1 +1,28 @@
-CAMBIAR IDX DE DB!
+ALTER TABLE `turnos` 
+ADD COLUMN `factura_filename` varchar(255) DEFAULT NULL,
+ADD COLUMN `factura_path` varchar(500) DEFAULT NULL,
+ADD COLUMN `factura_subida_en` timestamp NULL DEFAULT NULL;
+
+ALTER TABLE `profesionales` 
+ADD COLUMN `condicion_fiscal` VARCHAR(50) DEFAULT NULL;
+
+-- Turnos por fecha y estado (consultas más comunes)
+CREATE INDEX idx_turnos_fecha_estado ON turnos(fecha_turno, estado);
+CREATE INDEX idx_turnos_profesional_fecha ON turnos(id_profesional, fecha_turno);
+
+-- Mensajes por chat y fecha (para paginación)
+CREATE INDEX idx_mensajes_chat_fecha ON mensajes(id_chat, fecha_envio);
+CREATE INDEX idx_mensajes_remitente_fecha ON mensajes(id_remitente, fecha_envio);
+
+-- Disponibilidad por profesional y día
+CREATE INDEX idx_disponibilidad_profesional_dia ON disponibilidad(id_profesional, dia_semana);
+
+-- Ausencias por profesional y fecha
+CREATE INDEX idx_ausencias_profesional_fecha ON ausencias(id_profesional, fecha);
+
+-- Notificaciones por usuario/profesional y estado
+CREATE INDEX idx_notificaciones_usuario_leido ON notificaciones(id_usuario, leido);
+CREATE INDEX idx_notificaciones_profesional_leido ON notificaciones(id_profesional, leido);
+
+-- Pagos por estado y fecha
+CREATE INDEX idx_pagos_estado_fecha ON pagos(estado, fecha_pago);

@@ -95,12 +95,12 @@ class Turno {
 
     static async obtenerTurnosPorProfesional(id_profesional) {
         const [rows] = await pool.execute(
-            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente,profesionales.correo_electronico AS email_profesional
+            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente,profesionales.correo_electronico AS email_profesional, profesionales.nombre AS nombre_profesional
             FROM turnos 
             LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
             LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
             WHERE turnos.id_profesional = ? 
-            ORDER BY fecha_turno, hora_turno`,
+            ORDER BY fecha_turno DESC, hora_turno DESC`,
             [id_profesional]
         );
         return rows;
@@ -409,6 +409,27 @@ class Turno {
             `DELETE FROM tokens_temporales WHERE booking_token = ?`,
             [booking_token]
         );
+    }
+
+    static async obtenerPorId(id_turno) {
+        const [rows] = await pool.execute(
+            `SELECT * FROM turnos WHERE id_turno = ?`,
+            [id_turno]
+        );
+        return rows[0];
+    }
+
+    static async subirFactura(id_turno, filename, filepath) {
+        const [result] = await pool.execute(
+            `UPDATE turnos SET 
+         factura_filename = ?, 
+         factura_path = ?, 
+         factura_subida_en = NOW() 
+         WHERE id_turno = ?`,
+            [filename, filepath, id_turno]
+        );
+
+        return result.affectedRows > 0;
     }
 
 }

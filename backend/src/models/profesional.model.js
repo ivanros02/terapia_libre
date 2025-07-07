@@ -236,13 +236,18 @@ class Profesional {
     const fields = [];
     const values = [];
 
+    // Excluir campos que no deben actualizarse
+    const excludedFields = ['contrasena_hash', 'creado_en', 'id_profesional'];
+
     Object.keys(data).forEach((key) => {
-      if (key === "estado") {
-        fields.push(`${key} = ?`);
-        values.push(data[key] ? 1 : 0);
-      } else if (key !== "contrasena_hash") { // 🚫 Nunca permitir que se actualice desde acá
-        fields.push(`${key} = ?`);
-        values.push(data[key]);
+      if (!excludedFields.includes(key)) {
+        if (key === "estado") {
+          fields.push(`${key} = ?`);
+          values.push(data[key] ? 1 : 0);
+        } else {
+          fields.push(`${key} = ?`);
+          values.push(data[key]);
+        }
       }
     });
 

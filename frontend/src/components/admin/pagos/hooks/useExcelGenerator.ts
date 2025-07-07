@@ -84,7 +84,10 @@ const useExcelGenerator = () => {
                         cantidad: 0,
                         pagos: [],
                         cbu: pago.cbu_profesional || 'No registrado',     // 🔹 AGREGAR CBU
-                        cuit: pago.cuit_profesional || 'No registrado'    // 🔹 AGREGAR CUIT
+                        cuit: pago.cuit_profesional || 'No registrado',    // 🔹 AGREGAR CUIT
+                        correo_electronico: pago.correo_electronico || 'No registrado',     // ⭐ NUEVO
+                        condicion_fiscal: pago.condicion_fiscal || 'No registrado', // ⭐ NUEVO
+                        valor: pago.valor || 0
                     };
                 }
                 acc[pago.nombre_profesional].total += pago.monto;
@@ -96,7 +99,7 @@ const useExcelGenerator = () => {
             const profesionalesData: (string | number)[][] = [
                 ['INGRESOS POR PROFESIONAL'],
                 [''],
-                ['Profesional', 'CUIT', 'CBU', 'Cantidad de Sesiones', 'Total de Ingresos', 'Promedio por Sesión', 'Porcentaje del Total'], // 🔹 AGREGAR COLUMNAS
+                ['Profesional', 'Correo', 'CUIT', 'CBU', 'Condición Fiscal', 'Cantidad de Sesiones', 'Valor por Sesión', 'Total de Ingresos', 'Comisión (5%)'], // ⭐ NUEVO ORDEN
             ];
 
             const profesionalesOrdenados = Object.entries(ingresoPorProfesional)
@@ -104,17 +107,19 @@ const useExcelGenerator = () => {
 
             profesionalesOrdenados.forEach(([nombreProfesional, datos]) => {
                 const datosTyped = datos as IngresoProfesional;
-                const promedioPorSesion = datosTyped.total / datosTyped.cantidad;
-                const porcentajeDelTotal = ((datosTyped.total / totalIngresos) * 100).toFixed(2);
+                const valor = Number(datosTyped.valor) || 0; // ⭐ AGREGAR ESTA LÍNEA
+                const comision = (valor * 0.05 * datosTyped.cantidad).toFixed(2); // ⭐ USAR valor
 
                 profesionalesData.push([
                     nombreProfesional,
-                    datosTyped.cuit || 'No registrado',        // 🔹 AGREGAR CUIT
-                    datosTyped.cbu || 'No registrado',         // 🔹 AGREGAR CBU
+                    datosTyped.correo_electronico,
+                    datosTyped.cuit || 'No registrado',
+                    datosTyped.cbu || 'No registrado',
+                    datosTyped.condicion_fiscal,
                     datosTyped.cantidad.toString(),
+                    valor.toFixed(2), // ⭐ USAR valor
                     datosTyped.total.toFixed(2),
-                    promedioPorSesion.toFixed(2),
-                    `${porcentajeDelTotal}%`
+                    `$${comision}`
                 ]);
             });
 
@@ -254,8 +259,34 @@ const useExcelGenerator = () => {
             const wsCupones = XLSX.utils.aoa_to_sheet(cuponesData);
             XLSX.utils.book_append_sheet(workbook, wsCupones, 'Análisis de Cupones');
 
+            // HOJA 6: Galicia
+            const galiciaData: (string | number)[][] = [
+                ['REPORTE GALICIA'],
+                [''],
+                ['CBU/CVU', 'Importe', 'Motivo', 'Descripción', 'Email del destinatario', 'Mensaje del email'],
+            ];
+
+            // Agrupar por profesional para evitar duplicados
+            Object.entries(ingresoPorProfesional).forEach(([_nombreProfesional, datos]) => {
+                const datosTyped = datos as IngresoProfesional;
+                const valor = Number(datosTyped.valor) || 0;
+                const importeTotal = (valor * datosTyped.cantidad).toFixed(2);
+
+                galiciaData.push([
+                    datosTyped.cbu || '',
+                    `$${importeTotal}`,
+                    '',
+                    '',
+                    datosTyped.correo_electronico || '',
+                    ''
+                ]);
+            });
+
+            const wsGalicia = XLSX.utils.aoa_to_sheet(galiciaData);
+            XLSX.utils.book_append_sheet(workbook, wsGalicia, 'Galicia');
+
             // Aplicar estilos básicos a las hojas
-            const worksheets = [wsResumen, wsProfesionales, wsTransacciones, wsTemporal];
+            const worksheets = [wsResumen, wsProfesionales, wsTransacciones, wsTemporal, wsGalicia];
             worksheets.forEach(ws => {
                 const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
                 const colWidths = [];

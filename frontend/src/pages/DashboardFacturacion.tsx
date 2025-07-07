@@ -4,6 +4,7 @@ import SearchNavbar from "../components/dashboard/SearchNavbar";
 import Sidebar from "../components/dashboard/Sidebar";
 import LoadingSpinner from "../components/LoadingSpinner";
 const url = import.meta.env.VITE_API_BASE_URL;
+import { getGoogleDriveImageUrl } from "../utils/googleDrive";
 import '../styles/DashboardFacturacion.css';
 
 interface Session {
@@ -16,33 +17,154 @@ interface Session {
     detail?: string;
 }
 
+interface UserData {
+    nombre: string;
+    correo_electronico: string;
+    foto_perfil_url?: string;
+}
 
 const DashboardFacturacion = () => {
     const [activeFilter, setActiveFilter] = useState('todas');
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    const [profesionalData, setProfesionalData] = useState<any>(null);
+    const [userData, setUserData] = useState<UserData | null>(null);
     const esProfesional = localStorage.getItem("esProfesional") === "true";
     const [, setError] = useState<string | null>(null);
     const [sessions, setSessions] = useState<Session[]>([]);
     const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileUpload = () => {
+    const [uploading, setUploading] = useState(false);
+    const [currentSessionId, setCurrentSessionId] = useState<string>('');
+    const handleFileUpload = (sessionId: string) => {
+        setCurrentSessionId(sessionId);
         fileInputRef.current?.click();
     };
+    const id = localStorage.getItem("id");
+    const token = localStorage.getItem("token");
 
-    const handleDownloadInvoice = () => {
-        console.log('Descargando factura...');
-        // Aquí puedes implementar la lógica de descarga
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        const fetchUserData = async () => {
+            try {
+                if (!id || !token) {
+                    throw new Error("No se encontró el ID o el token de autenticación.");
+                }
+
+                const apiUrl = esProfesional
+                    ? `${url}/api/profesionales/${id}`
+                    : `${url}/api/auth/usuario/${id}`;
+
+                const response = await axios.get(apiUrl, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                setUserData(response.data);
+            } catch (error: any) {
+                setError(error.message || "Error al obtener los datos.");
+            }
+        };
+
+        fetchUserData();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [id, token, esProfesional]);
+
+    const mapearEstado = (estado: string) => {
+        const estadoLower = estado?.toLowerCase();
+        switch (estadoLower) {
+            case 'pendiente':
+            case 'confirmado':
+                return 'pendiente';
+            case 'completado':
+                return 'completada';
+            case 'cancelado':
+                return 'cancelada';
+            default:
+                return 'pendiente';
+        }
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const formatDateForMobile = (dateString: string) => {
+        const [day, month] = dateString.split('/');
+        return `${day}/${month}`;
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const id = localStorage.getItem("id");
+                if (!id) throw new Error("No se encontró el ID.");
+
+                const turnosResponse = await axios.get(
+                    esProfesional
+                        ? `${url}/api/turnos/profesional/${id}`
+                        : `${url}/api/turnos/usuario/${id}`
+                );
+
+                const formattedSessions = turnosResponse.data.map((turno: any) => ({
+                    id: turno.id_turno,
+                    date: turno.fecha_turno.split('T')[0].split('-').reverse().join('/'),
+                    time: turno.hora_turno.slice(0, 5),
+                    patient: esProfesional
+                        ? (turno.nombre_paciente || 'Sin nombre')
+                        : (turno.nombre_profesional || 'Sin nombre'),
+                    value: 15000,
+                    status: mapearEstado(turno.estado),
+                    detail: turno.factura_filename ? 'Ver factura' : null
+                }));
+
+                setSessions(formattedSessions);
+            } catch (error: any) {
+                setError(error.response?.data?.message || "Error al cargar los datos");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [esProfesional]);
+
+    const handleDownloadInvoice = (sessionId: string, sessionDate: string) => {
+        // Convertir de DD/MM/YYYY a YYYY/MM
+        const [_, month, year] = sessionDate.split('/');
+        const formattedDate = `${year}/${month.padStart(2, '0')}`;
+
+        window.open(`${url}/api/facturas/${formattedDate}/turno_${sessionId}_factura.pdf`, '_blank');
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            console.log('Archivo seleccionado:', file.name);
-            // Aquí puedes hacer lo que necesites con el archivo
+        if (!file || !currentSessionId) return;
+
+        setUploading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('factura', file);
+            formData.append('id_turno', currentSessionId);
+
+            // Encontrar la fecha del turno actual
+            const currentSession = sessions.find(s => s.id === currentSessionId);
+            if (currentSession) {
+                formData.append('fecha_turno', currentSession.date); // DD/MM/YYYY
+            }
+
+            await axios.post(`${url}/api/turnos/factura/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            window.location.reload();
+        } catch (error) {
+            console.error('Error al subir factura:', error);
+            alert('Error al subir la factura');
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -56,39 +178,13 @@ const DashboardFacturacion = () => {
         setExpandedSessions(newExpanded);
     };
 
-
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const id = localStorage.getItem("id");
-                if (!id) {
-                    throw new Error("No se encontró el ID del profesional.");
-                }
-
-                const [profesionalResponse, sesionesResponse] = await Promise.all([
-                    axios.get(`${url}/api/profesionales/${id}`),
-                    axios.get(`${url}/api/profesionales/${id}/sesiones`)
-                ]);
-
-                setProfesionalData(profesionalResponse.data);
-                setSessions(sesionesResponse.data);
-            } catch (error: any) {
-                setError(error.response?.data?.message || "Error al cargar los datos");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDashboardData();
-    }, []);
-
     const filteredSessions = sessions.filter(session => {
         const matchesFilter = activeFilter === 'todas' ||
             (activeFilter === 'próximas' && session.status === 'pendiente') ||
             (activeFilter === 'completadas' && session.status === 'completada') ||
             (activeFilter === 'canceladas' && session.status === 'cancelada');
 
-        const matchesSearch = session.patient.toLowerCase().includes(search.toLowerCase());
+        const matchesSearch = session.patient?.toLowerCase().includes(search.toLowerCase()) || false;
 
         return matchesFilter && matchesSearch;
     });
@@ -104,38 +200,6 @@ const DashboardFacturacion = () => {
         return statusMap[status as keyof typeof statusMap] || status;
     };
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const id = localStorage.getItem("id");
-                if (!id) {
-                    throw new Error("No se encontró el ID del profesional.");
-                }
-
-                // 🔹 Obtener datos del profesional
-                const profesionalResponse = await axios.get(`${url}/api/profesionales/${id}`);
-                setProfesionalData(profesionalResponse.data);
-
-
-            } catch (error: any) {
-                setError(error.response?.data?.message || "Error al cargar los datos");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDashboardData();
-    }, []);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-
     if (loading) return <LoadingSpinner />;
 
     return (
@@ -145,9 +209,8 @@ const DashboardFacturacion = () => {
 
             <div className="div-search-navbar">
                 <SearchNavbar
-                    profileImage="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
-                    profileName={profesionalData?.nombre || "Profesional"} // Usar el nombre del profesional
-                />
+                    profileImage={getGoogleDriveImageUrl(userData?.foto_perfil_url || "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png")}
+                    profileName={userData?.nombre || (esProfesional ? "Profesional" : "Usuario")} />
             </div>
 
             <div className="div-centrado-solo" style={{ backgroundColor: "#F8F8F8", borderRadius: "25px", marginTop: "-7rem" }}>
@@ -212,7 +275,7 @@ const DashboardFacturacion = () => {
                         <div className="table-header">
                             <div className="header-cell">Fecha</div>
                             <div className="header-cell">Hora</div>
-                            <div className="header-cell">Paciente</div>
+                            <div className="header-cell">{esProfesional ? 'Paciente' : 'Profesional'}</div>
                             <div className="header-cell">Valor</div>
                             <div className="header-cell">Estado</div>
                             <div className="header-cell">Detalle</div>
@@ -225,13 +288,13 @@ const DashboardFacturacion = () => {
                                         {isMobile ? (
                                             <>
                                                 <div className="cell">{session.patient}</div>
-                                                <div className="cell">{session.date} - {session.time}</div>
+                                                <div className="cell">{formatDateForMobile(session.date)} - {session.time}</div>
                                                 <div className="cell">
                                                     <button
                                                         className="expand-btn"
                                                         onClick={() => toggleExpanded(session.id)}
                                                     >
-                                                        {expandedSessions.has(session.id) ? '▲' : '▼'}
+                                                        {expandedSessions.has(session.id) ? '⌄' : '⌃'}
                                                     </button>
                                                 </div>
                                             </>
@@ -247,12 +310,20 @@ const DashboardFacturacion = () => {
                                                     </span>
                                                 </div>
                                                 <div className="cell">
-                                                    {session.detail ? (
+                                                    {esProfesional ? (
                                                         <button
                                                             className="detail-link"
-                                                            onClick={esProfesional ? handleFileUpload : handleDownloadInvoice}
+                                                            onClick={() => handleFileUpload(session.id)}
+                                                            disabled={uploading}
                                                         >
-                                                            {esProfesional ? session.detail : 'Descargar factura'}
+                                                            {uploading ? 'Subiendo...' : (session.detail ? 'Cambiar factura' : 'Subir factura')}
+                                                        </button>
+                                                    ) : session.detail ? (
+                                                        <button
+                                                            className="detail-link"
+                                                            onClick={() => handleDownloadInvoice(session.id, session.date)}
+                                                        >
+                                                            Descargar factura
                                                         </button>
                                                     ) : (
                                                         '-'
@@ -270,12 +341,26 @@ const DashboardFacturacion = () => {
                                                 <span>Pagó: {formatValue(session.value)}</span>
                                             </div>
                                             {session.detail && (
-                                                <button
-                                                    className="detail-link"
-                                                    onClick={esProfesional ? handleFileUpload : handleDownloadInvoice}
-                                                >
-                                                    {esProfesional ? session.detail : 'Descargar factura'}
-                                                </button>
+                                                <div className="cell">
+                                                    {esProfesional ? (
+                                                        <button
+                                                            className="detail-link"
+                                                            onClick={() => handleFileUpload(session.id)}
+                                                            disabled={uploading}
+                                                        >
+                                                            {uploading ? 'Subiendo...' : (session.detail ? 'Cambiar factura' : 'Subir factura')}
+                                                        </button>
+                                                    ) : session.detail ? (
+                                                        <button
+                                                            className="detail-link"
+                                                            onClick={() => handleDownloadInvoice(session.id, session.date)}
+                                                        >
+                                                            Descargar factura
+                                                        </button>
+                                                    ) : (
+                                                        '-'
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                     )}
@@ -288,7 +373,7 @@ const DashboardFacturacion = () => {
             <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
+                accept=".pdf"
                 onChange={handleFileChange}
                 style={{ display: 'none' }}
             />

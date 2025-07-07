@@ -3,8 +3,10 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const http = require("http");
-const { Server } = require("socket.io");
+const compression = require("compression");
+const rateLimit = require("express-rate-limit");
+const path = require("path");
+const fs = require("fs");
 
 const profesionalRoutes = require("./src/routes/profesional.routes");
 const authRoutes = require("./src/routes/auth.routes");
@@ -12,84 +14,113 @@ const especialidadRoutes = require("./src/routes/especialidad.routes");
 const disponibilidadRoutes = require("./src/routes/disponibilidad.routes");
 const turnosRoutes = require("./src/routes/turnos.routes");
 const googleAuthRoutes = require('./src/routes/googleAuth.routes');
-const chatRoutes = require('./src/routes/chat.routes'); // Nueva ruta para el chat
 const mercadoPagoRoutes = require("./src/routes/mercadoPago.routes");
 const googleMeetRoutes = require("./src/routes/googleMeet.routes");
-const adminRoutes = require("./src/routes/admin.routes"); // Nueva ruta para el chat
+const adminRoutes = require("./src/routes/admin.routes");
 const suscripcionRoutes = require("./src/routes/suscripcion.routes");
-const ausenciaRoutes = require("./src/routes/ausencia.routes"); // Nueva ruta para ausencias
-const app = express();
-const server = http.createServer(app);
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://terapialibre.com.ar"
-];
+const ausenciaRoutes = require("./src/routes/ausencia.routes");
 
-// Configuración de Socket.io
-const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"],
-        credentials: true
-    }
+const app = express();
+
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ["https://terapialibre.com.ar"]
+  : ["http://localhost:5173", "https://terapialibre.com.ar"];
+
+// Rate limiting general
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // máximo 100 requests por IP
+  message: { error: "Demasiadas solicitudes" }
 });
+
+// Logs para producción
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, 'access.log'), 
+  { flags: 'a' }
+);
 
 // Middlewares
-app.use(express.json());
+app.use(compression());
+app.use(limiter);
+app.use(express.json({ limit: '10mb' }));
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
+  origin: allowedOrigins,
+  credentials: true
 }));
-app.use(helmet());
 
-// Rutas para produccion agregar /api_terapia
-app.use("/api/profesionales", profesionalRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/especialidades", especialidadRoutes);
-app.use("/disponibilidad", disponibilidadRoutes);
-app.use("/api/turnos", turnosRoutes);
-app.use('/google', googleAuthRoutes);
-app.use("/google-meet", googleMeetRoutes);
-app.use("/api/mercadopago", mercadoPagoRoutes);
-app.use("/api/admin", adminRoutes); // 🔹 Agregamos la ruta de administración
-app.use("/api/suscripcion", suscripcionRoutes);
-app.use("/ausencias", ausenciaRoutes);
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:"]
+    }
+  }
+}));
 
-// Pasar `io` al cargar las rutas del chat
-app.use("/api/chat", (req, res, next) => {
-    req.io = io;
-    next();
-}, chatRoutes);
+// Logs
+if (process.env.NODE_ENV === 'production') {
+  app.use(morgan('combined', { stream: accessLogStream }));
+} else {
+  app.use(morgan('dev'));
+}
 
-// Socket.io
-io.on("connection", (socket) => {
-    console.log("🔌 Usuario conectado:", socket.id);
+// Servir archivos estáticos del build de React
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+}
 
-    // Manejo de unión a sala personal basada en userId
-    socket.on("join_user", (userId) => {
-        if (userId) {
-            socket.join(userId.toString());
-            console.log(`✅ Usuario ${userId} se unió a su sala personal`);
-        }
-    });
-
-    // Evento de unirse a un chat específico
-    socket.on("join_chat", (chatId) => {
-        socket.join(chatId);
-        console.log(`🛎️ Usuario ${socket.id} se unió al chat ${chatId}`);
-    });
-
-    socket.on("disconnect", () => {
-        console.log("⛔ Usuario desconectado:", socket.id);
-    });
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// API Routes con prefijo para producción
+const apiPrefix = process.env.NODE_ENV === 'production' ? '/api_terapia' : '';
 
-module.exports = { app, server }; // NO exportamos `io` aquí para evitar la dependencia circular
+app.use(`${apiPrefix}/api/profesionales`, profesionalRoutes);
+app.use(`${apiPrefix}/api/auth`, authRoutes);
+app.use(`${apiPrefix}/api/especialidades`, especialidadRoutes);
+app.use(`${apiPrefix}/disponibilidad`, disponibilidadRoutes);
+app.use(`${apiPrefix}/api/turnos`, turnosRoutes);
+app.use(`${apiPrefix}/google`, googleAuthRoutes);
+app.use(`${apiPrefix}/google-meet`, googleMeetRoutes);
+app.use(`${apiPrefix}/api/mercadopago`, mercadoPagoRoutes);
+app.use(`${apiPrefix}/api/admin`, adminRoutes);
+app.use(`${apiPrefix}/api/suscripcion`, suscripcionRoutes);
+app.use(`${apiPrefix}/ausencias`, ausenciaRoutes);
+app.use(`${apiPrefix}/api/facturas`, express.static('/var/www/storage/facturas'));
 
-// Iniciar servidor 
+// Servir React app para todas las rutas no API
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  });
+}
+
+// Manejo de errores global
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  
+  if (process.env.NODE_ENV === 'production') {
+    res.status(500).json({ error: 'Error interno del servidor' });
+  } else {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM recibido, cerrando servidor...');
+  process.exit(0);
+});
+
+// Iniciar servidor
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor corriendo en puerto ${PORT} - Modo: ${process.env.NODE_ENV || 'development'}`);
 });
 
+module.exports = app;

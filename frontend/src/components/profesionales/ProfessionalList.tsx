@@ -26,7 +26,6 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
   selectedOrden,
 }) => {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
-  const [filteredProfessionals, setFilteredProfessionals] = useState<Professional[]>([]);
   const [currentPage, setCurrentPage] = useState(1); // Página actual
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
   const [loading, setLoading] = useState(false);
@@ -42,18 +41,22 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
 
   useEffect(() => {
     const fetchProfessionals = async () => {
-      setLoading(true); // ⏳ Empieza la carga
+      setLoading(true);
+      const startTime = performance.now();
       try {
         const response = await axios.get(`${url}/api/profesionales`, {
           params: {
             page: currentPage,
             limit: 12,
-            seed: randomSeed, // 🔹 Añade el seed aleatorio
+            seed: randomSeed,
             especialidad: selectedEspecialidad || undefined,
             disponibilidad: selectedDisponibilidad || undefined,
             orden: selectedOrden || undefined,
           },
         });
+        const endTime = performance.now();
+        console.log(`Frontend request: ${endTime - startTime}ms`);
+
         setProfessionals(response.data.professionals);
         setTotalPages(response.data.totalPages);
       } catch (error) {
@@ -65,32 +68,6 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
 
     fetchProfessionals();
   }, [currentPage, randomSeed]);
-  
-  useEffect(() => {
-    let filtered = professionals;
-
-    // Filtrar por especialidad
-    if (selectedEspecialidad) {
-      filtered = filtered.filter((prof) =>
-        (prof.especialidades ? prof.especialidades.split(", ") : []).includes(selectedEspecialidad)
-      );
-
-    }
-
-    // Filtrar por disponibilidad
-    if (selectedDisponibilidad) {
-      filtered = filtered.filter((prof) => prof.disponibilidad === selectedDisponibilidad);
-    }
-
-    // Ordenar por precio
-    if (selectedOrden === "asc") {
-      filtered = [...filtered].sort((a, b) => a.valor - b.valor);
-    } else if (selectedOrden === "desc") {
-      filtered = [...filtered].sort((a, b) => b.valor - a.valor);
-    }
-
-    setFilteredProfessionals(filtered);
-  }, [selectedEspecialidad, selectedDisponibilidad, selectedOrden, professionals]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -119,7 +96,7 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
             <LoadingSpinner />
           </div>
         ) : (
-          filteredProfessionals.map((prof) => (
+          professionals.map((prof) => (
             <div key={prof.id_profesional} className="col-6 col-md-6 col-lg-3">
               <ProfessionalCard
                 id={prof.id_profesional}

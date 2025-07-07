@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql
--- Tiempo de generación: 23-06-2025 a las 13:35:43
+-- Tiempo de generación: 07-07-2025 a las 12:20:04
 -- Versión del servidor: 10.11.13-MariaDB-ubu2204
--- Versión de PHP: 8.2.28
+-- Versión de PHP: 8.2.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `test_index`
+-- Base de datos: `terapia_db`
 --
 
 -- --------------------------------------------------------
@@ -126,6 +126,34 @@ CREATE TABLE `especialidades` (
   `nombre` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `especialidades`
+--
+
+INSERT INTO `especialidades` (`id_especialidad`, `nombre`) VALUES
+(47, 'Neuropsicología'),
+(2, 'Psicologia'),
+(50, 'Psicología Ambiental'),
+(43, 'Psicología Clínica'),
+(54, 'Psicología Comunitaria'),
+(48, 'Psicología de la Salud'),
+(3, 'Psicologia del color'),
+(55, 'Psicología del Consumidor'),
+(49, 'Psicología del Deporte'),
+(56, 'Psicología del Deporte y del Ejercicio'),
+(52, 'Psicología del Desarrollo'),
+(53, 'Psicología del Trabajo y de las Organizaciones'),
+(46, 'Psicología Educativa'),
+(58, 'Psicología Forense'),
+(60, 'Psicología Gerontológica'),
+(44, 'Psicología Infantil'),
+(59, 'Psicología Intercultural'),
+(45, 'Psicología Organizacional'),
+(57, 'Psicología Positiva'),
+(51, 'Psicología Transpersonal'),
+(62, 'Psicopedagogía'),
+(61, 'Psiquiatría');
+
 -- --------------------------------------------------------
 
 --
@@ -193,7 +221,7 @@ CREATE TABLE `profesionales` (
   `valor` decimal(10,2) NOT NULL DEFAULT 0.00,
   `valor_internacional` decimal(10,2) NOT NULL DEFAULT 0.00,
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp(),
-  `estado` tinyint(1) NOT NULL DEFAULT 1,
+  `estado` tinyint(1) NOT NULL DEFAULT 0,
   `reset_token` varchar(255) DEFAULT NULL,
   `reset_token_expira` bigint(20) DEFAULT NULL,
   `cbu` varchar(255) DEFAULT NULL,
@@ -243,7 +271,7 @@ CREATE TABLE `turnos` (
   `fecha_turno` date NOT NULL,
   `hora_turno` time NOT NULL,
   `estado` enum('Pendiente','Confirmado','Cancelado','Completado') DEFAULT 'Pendiente',
-  `motivo_cancelacion` varchar(500) DEFAULT NULL,
+  `motivo_cancelacion` text DEFAULT NULL,
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp(),
   `meet_url` varchar(255) DEFAULT NULL,
   `meet_creado_en` timestamp NULL DEFAULT NULL,
@@ -293,9 +321,7 @@ ALTER TABLE `ausencias`
 ALTER TABLE `chats`
   ADD PRIMARY KEY (`id_chat`),
   ADD KEY `id_profesional` (`id_profesional`),
-  ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `idx_chats_profesional` (`id_profesional`),
-  ADD KEY `idx_chats_usuario` (`id_usuario`);
+  ADD KEY `id_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `cupones`
@@ -322,16 +348,14 @@ ALTER TABLE `disponibilidad`
 --
 ALTER TABLE `especialidades`
   ADD PRIMARY KEY (`id_especialidad`),
-  ADD UNIQUE KEY `nombre` (`nombre`),
-  ADD KEY `idx_especialidades_nombre` (`nombre`);
+  ADD UNIQUE KEY `nombre` (`nombre`);
 
 --
 -- Indices de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
   ADD PRIMARY KEY (`id_mensaje`),
-  ADD KEY `id_chat` (`id_chat`),
-  ADD KEY `idx_mensajes_chat_fecha` (`id_chat`,`fecha_envio`);
+  ADD KEY `id_chat` (`id_chat`);
 
 --
 -- Indices de la tabla `notificaciones`
@@ -356,19 +380,14 @@ ALTER TABLE `pagos`
 ALTER TABLE `profesionales`
   ADD PRIMARY KEY (`id_profesional`),
   ADD UNIQUE KEY `correo_electronico` (`correo_electronico`),
-  ADD UNIQUE KEY `cbu` (`cbu`),
-  ADD KEY `idx_profesionales_estado_valor` (`estado`,`valor`),
-  ADD KEY `idx_profesionales_estado_disponibilidad` (`estado`,`disponibilidad`),
-  ADD KEY `idx_profesionales_creado_en` (`creado_en`);
+  ADD UNIQUE KEY `cbu` (`cbu`);
 
 --
 -- Indices de la tabla `profesional_especialidad`
 --
 ALTER TABLE `profesional_especialidad`
   ADD PRIMARY KEY (`id_profesional`,`id_especialidad`),
-  ADD KEY `id_especialidad` (`id_especialidad`),
-  ADD KEY `idx_prof_esp_profesional` (`id_profesional`),
-  ADD KEY `idx_prof_esp_especialidad` (`id_especialidad`);
+  ADD KEY `id_especialidad` (`id_especialidad`);
 
 --
 -- Indices de la tabla `tokens_temporales`
@@ -382,9 +401,7 @@ ALTER TABLE `tokens_temporales`
 ALTER TABLE `turnos`
   ADD PRIMARY KEY (`id_turno`),
   ADD KEY `id_profesional` (`id_profesional`),
-  ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `idx_turnos_profesional_fecha` (`id_profesional`,`fecha_turno`),
-  ADD KEY `idx_turnos_usuario_fecha` (`id_usuario`,`fecha_turno`);
+  ADD KEY `id_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -431,7 +448,7 @@ ALTER TABLE `disponibilidad`
 -- AUTO_INCREMENT de la tabla `especialidades`
 --
 ALTER TABLE `especialidades`
-  MODIFY `id_especialidad` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_especialidad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT de la tabla `mensajes`

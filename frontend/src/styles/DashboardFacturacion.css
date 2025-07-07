@@ -155,7 +155,7 @@
 
 .cell {
     padding: 0 8px;
-    font-size: 14px;
+    font-size: 20px;
     color: #333;
     display: flex;
     align-items: center;
@@ -169,21 +169,20 @@
     border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
+    font-size: 20px;
 }
 
 .status.cancelada {
-    background-color: #ffebee;
     color: #d32f2f;
 }
 
 .status.completada {
-    background-color: #e8f5e8;
-    color: #2e7d32;
+    color: var(--verde);
+
 }
 
 .status.pendiente {
-    background-color: #fff3e0;
-    color: #f57c00;
+    color: var(--naranja);
 }
 
 .detail-link {
@@ -287,11 +286,19 @@
     }
 
     .expand-btn {
-        background: none;
+        background: black;
+        border-radius: 50%;
         border: none;
+        width: 32px;
+        height: 32px;
         font-size: 16px;
         cursor: pointer;
-        padding: 4px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        line-height: 1;
     }
 
     .expanded-content {

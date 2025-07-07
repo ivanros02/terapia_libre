@@ -24,7 +24,7 @@ const Footer = () => {
                             {/* Descripción debajo */}
                             <p className="text-light mt-2" style={{ maxWidth: "70%", lineHeight: "1.6", fontSize: "16px" }}>
                                 Es una plataforma innovadora que te ofrece la libertad
-                                de elegir al profesional de salud mental ideal para ti.
+                                de elegir al profesional de salud mental ideal para vos.
                                 Con una amplia variedad de expertos, facilitamos la
                                 búsqueda y selección de tu terapeuta, priorizando tu
                                 bienestar emocional con tratamientos personalizados.

@@ -17,4 +17,5 @@ export interface Profesional {
         id_especialidad: number;
         nombre: string;
     }[];
+    condicion_fiscal?: string | null;
 }

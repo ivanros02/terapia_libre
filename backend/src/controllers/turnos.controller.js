@@ -1,231 +1,6 @@
 const Turno = require("../models/turnos.model");
-const Pago = require("../models/pagos.model");
-const axios = require("axios");
-const { aplicarCupon, registrarUsoCupon } = require("../utils/cupones");
-const { v4: uuidv4 } = require("uuid");
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
-const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
-const PAYPAL_API = process.env.PAYPAL_API;
-
-// 🔹 Crear una orden en PayPal
-exports.crearOrdenPayPal = async (req, res) => {
-    try {
-        const {
-            id_profesional,
-            id_usuario,
-            fecha_turno,
-            hora_turno,
-            cupon
-        } = req.body;
-
-        // 🔒 PASO 2: Validar datos obligatorios
-        if (!id_profesional || !id_usuario || !fecha_turno || !hora_turno) {
-            return res.status(400).json({ message: "Todos los campos son obligatorios" });
-        }
-
-        // 🔒 PASO 3: Validar disponibilidad y obtener datos del profesional
-        const { profesional, usuario } = await Turno.validarDatosTurno(
-            id_profesional,
-            id_usuario,
-            fecha_turno,
-            hora_turno
-        );
-
-        // 🔒 PASO 4: Obtener precio REAL del profesional (USD para PayPal)
-        const precioBase = parseFloat(profesional.precio_usd);
-        if (!precioBase || precioBase <= 0) {
-            return res.status(400).json({
-                message: "Precio internacional no configurado para este profesional"
-            });
-        }
-
-        // 🔒 PASO 5: Aplicar cupón de descuento (si existe)
-        const {
-            precio_final,
-            cupon_valido,
-            registrar,
-            cupon_codigo
-        } = await aplicarCupon({
-            id_usuario,
-            cupon,
-            precio_original: precioBase
-        });
-
-        // 🔧 Convertir precio_final a número
-        const precioFinalNumerico = parseFloat(precio_final);
-
-        // 🔒 PASO 6: Generar token de seguridad
-        const booking_token = uuidv4();
-
-        // 🔐 Guardar temporalmente los datos asociados al booking_token
-        await Turno.guardarTokenTemporal(booking_token, {
-            id_profesional,
-            id_usuario,
-            fecha_turno,
-            hora_turno,
-            precio_original: precioBase,
-            precio_final: precioFinalNumerico,
-            cupon: cupon_valido ? cupon_codigo : null,
-            registrar_cupon: cupon_valido && registrar,
-            timestamp: Date.now() // 🔧 Agregar timestamp
-        });
-
-        // Autenticación en PayPal
-        const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString("base64");
-
-        // ✅ Crear orden en PayPal con datos del backend
-        const orderData = {
-            intent: "CAPTURE",
-            purchase_units: [{
-                amount: {
-                    currency_code: "USD",
-                    value: precioFinalNumerico.toFixed(2) // 🔧 Precio calculado en backend
-                },
-                description: `Turno con ${profesional.nombre} - ${fecha_turno} ${hora_turno}`,
-                custom_id: booking_token // 🔒 Token seguro
-            }],
-        };
-
-        const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders`, orderData, {
-            headers: {
-                Authorization: `Basic ${auth}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        // ✅ Devolver orderID y token al frontend
-        res.json({
-            id: response.data.id,
-            booking_token // 🔒 Frontend necesita el token para capturar
-        });
-
-    } catch (error) {
-        console.error("❌ [PayPal] Error creando la orden:", error);
-
-        // 🔒 No exponer detalles internos
-        const mensaje = error.message.includes("disponible") ||
-            error.message.includes("encontrado") ||
-            error.message.includes("pasadas") ||
-            error.message.includes("configurado") ||
-            error.message.includes("inactivo")
-            ? error.message
-            : "No se pudo completar la operación. Verificá los datos e intentá nuevamente.";
-
-        res.status(400).json({ message: mensaje });
-    }
-};
-
-// 🔹 Capturar el pago en PayPal y registrar en BD
-exports.capturarPagoPayPal = async (req, res) => {
-    try {
-        const { orderID, booking_token } = req.body;
-
-        if (!orderID || !booking_token) {
-            return res.status(400).json({ message: "Faltan datos de seguridad" });
-        }
-
-        // 🔒 Validar y obtener datos del token
-        const datos = await Turno.obtenerTokenTemporal(booking_token);
-        if (!datos) {
-            return res.status(400).json({ message: "Token inválido o expirado" });
-        }
-
-        // 🔒 Verificar expiración del token (30 minutos)
-        const tiempoExpiracion = 30 * 60 * 1000;
-        if (datos.timestamp && (Date.now() - datos.timestamp > tiempoExpiracion)) {
-            await Turno.eliminarTokenTemporal(booking_token);
-            return res.status(400).json({ message: "Token expirado, inicia el proceso nuevamente" });
-        }
-
-        const {
-            id_profesional,
-            id_usuario,
-            fecha_turno,
-            hora_turno,
-            precio_final,
-            cupon,
-            registrar_cupon
-        } = datos;
-
-
-        // 🔒 RE-VALIDAR disponibilidad antes de confirmar
-        try {
-            await Turno.validarDatosTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
-            
-        } catch (error) {
-            console.log("❌ [PayPal] Re-validación falló:", error.message);
-            await Turno.eliminarTokenTemporal(booking_token);
-            return res.status(400).json({ message: error.message });
-        }
-
-        // ✅ Capturar pago en PayPal
-        const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString("base64");
-
-        const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`, {}, {
-            headers: {
-                Authorization: `Basic ${auth}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (response.data.status === "COMPLETED") {
-            const id_transaccion = response.data.id;
-
-            // 🔒 TRANSACCIÓN ATÓMICA: Todo o nada
-            try {
-
-                // ✅ Crear turno
-                const id_turno = await Turno.crearTurno(id_profesional, id_usuario, fecha_turno, hora_turno);
-                
-
-                // ✅ Registrar pago
-                await Pago.registrarPago(id_turno, precio_final, "PayPal", "Pagado", id_transaccion);
-                
-
-                // ✅ Aplicar cupón si corresponde
-                if (cupon && registrar_cupon) {
-                    await registrarUsoCupon(id_usuario, cupon);
-                    
-                }
-
-                // ✅ Notificar confirmación
-                await Turno.notificarTurnoConfirmado(id_turno);
-
-                // 🔒 Limpiar token usado
-                await Turno.eliminarTokenTemporal(booking_token);
-
-                return res.status(201).json({
-                    message: "Pago exitoso y turno reservado",
-                    id_turno
-                });
-
-            } catch (dbError) {
-                console.error("❌ [PayPal] Error en base de datos:", dbError);
-
-                // 🚨 CRÍTICO: Si falla la BD pero PayPal se cobró
-                console.error("🚨 [PayPal] CRÍTICO: Pago exitoso en PayPal pero error en BD:", {
-                    orderID,
-                    id_transaccion,
-                    booking_token,
-                    precio_final,
-                    error: dbError.message
-                });
-
-                return res.status(500).json({
-                    message: "Error interno. El pago fue procesado, contacta soporte.",
-                    support_code: booking_token // Para que soporte pueda rastrear
-                });
-            }
-        }
-
-        console.log(`❌ [PayPal] Pago no completado. Status: ${response.data.status}`);
-        res.status(400).json({ message: "Pago no completado en PayPal" });
-
-    } catch (error) {
-        console.error("❌ [PayPal] Error al capturar el pago:", error);
-        res.status(500).json({ message: "Error interno del servidor" });
-    }
-};
+const fs = require('fs');
+const path = require('path');
 
 exports.reservarTurno = async (req, res) => {
     try {
@@ -457,6 +232,56 @@ exports.obtenerHistorialUsuario = async (req, res) => {
     } catch (error) {
         console.error("Error al obtener historial de sesiones:", error);
         res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
+
+exports.subirFactura = async (req, res) => {
+    try {
+        const { id_turno } = req.body;
+        
+        if (!id_turno) {
+            return res.status(400).json({ error: 'id_turno es requerido' });
+        }
+
+        // Obtener la fecha del turno
+        const turno = await Turno.obtenerPorId(id_turno);
+        if (!turno) {
+            return res.status(404).json({ error: 'Turno no encontrado' });
+        }
+
+        // Manejar fecha como objeto Date
+        const fechaTurno = new Date(turno.fecha_turno);
+        const year = fechaTurno.getFullYear().toString();
+        const month = String(fechaTurno.getMonth() + 1).padStart(2, '0');
+        
+        console.log('Fecha del turno:', turno.fecha_turno, 'Year:', year, 'Month:', month);
+        
+        // Crear estructura de carpetas
+        const targetDir = path.join('/var/www/storage/facturas', year, month);
+        
+        if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+        }
+
+        // Mover archivo de temp a carpeta correcta
+        const oldPath = req.file.path;
+        const newFilename = `turno_${id_turno}_factura.pdf`;
+        const newPath = path.join(targetDir, newFilename);
+        
+        fs.renameSync(oldPath, newPath);
+        
+        const filepath = `/facturas/${year}/${month}/${newFilename}`;
+        
+        const actualizado = await Turno.subirFactura(id_turno, newFilename, filepath);
+        
+        if (actualizado) {
+            res.json({ message: 'Factura subida', filename: newFilename });
+        } else {
+            res.status(404).json({ error: 'Turno no encontrado' });
+        }
+    } catch (error) {
+        console.error('Error subiendo factura:', error);
+        res.status(500).json({ error: error.message });
     }
 };
 

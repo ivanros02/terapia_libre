@@ -1,9 +1,17 @@
-import { useEffect, useState } from "react";
+// ProfesionalForm.tsx
 import axios from "axios";
 import { Modal, Button, Form } from "react-bootstrap";
-import EspecialidadSelectEditable from "../EspecialidadSelectEditable";
 import { toast } from 'react-toastify';
 import { getGoogleDriveImageUrl } from "../../../utils/googleDrive";
+import { useEditProfessional } from "../../../hooks/formProfesional/useEditProfessional";
+import { usePasswordChange } from "../../../hooks/formProfesional/usePasswordChange";
+import PersonalDataSection from "../../registerProfesional/form-sections/PersonalDataSection";
+import ProfessionalDataSection from "../../registerProfesional/form-sections/ProfessionalDataSection";
+import DescriptionSection from "../../registerProfesional/form-sections/DescriptionSection";
+import ValuesSection from "../../registerProfesional/form-sections/ValuesSection";
+import PasswordChangeSection from "../../registerProfesional/form-sections/PasswordChangeSection";
+
+const url = import.meta.env.VITE_API_BASE_URL;
 
 interface Profesional {
     id_profesional: number;
@@ -19,14 +27,13 @@ interface Profesional {
     valor_internacional: number;
     cbu?: string | null;
     cuit?: string | null;
+    condicion_fiscal?: string | null;
     creado_en: string;
     especialidades: {
         id_especialidad: number;
         nombre: string;
     }[];
 }
-
-const url = import.meta.env.VITE_API_BASE_URL;
 
 interface ProfesionalFormProps {
     show: boolean;
@@ -37,97 +44,41 @@ interface ProfesionalFormProps {
 }
 
 function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesionalData }: ProfesionalFormProps) {
-    const [formData, setFormData] = useState<Profesional>({
-        id_profesional: 0,
-        nombre: "",
-        titulo_universitario: "",
-        matricula_nacional: "",
-        matricula_provincial: "",
-        descripcion: "",
-        telefono: "",
-        correo_electronico: "",
-        foto_perfil_url: "",
-        valor: 0.0,
-        valor_internacional: 0.0,
-        cbu: "",
-        cuit: "",
-        creado_en: "",
-        especialidades: []
-    });
+    const {
+        formData,
+        selectedEspecialidades,
+        handleChange,
+        handleEspecialidadChange,
+    } = useEditProfessional(profesional);
 
-    const [, setEspecialidadesDisponibles] = useState<{ id_especialidad: number; nombre: string }[]>([]);
+    const {
+        passwordActual,
+        nuevaPassword,
+        confirmarPassword,
+        mostrarPasswordForm,
+        setPasswordActual,
+        setNuevaPassword,
+        setConfirmarPassword,
+        togglePasswordForm,
+        validatePasswords,
+        getPasswordData,
+        resetPasswords,
+    } = usePasswordChange();
 
-    const [selectedEspecialidades, setSelectedEspecialidades] = useState<number[]>([]);
-    const [passwordActual, setPasswordActual] = useState("");
-    const [nuevaPassword, setNuevaPassword] = useState("");
-    const [confirmarPassword, setConfirmarPassword] = useState("");
-    const [mostrarPasswordForm, setMostrarPasswordForm] = useState(false);
-
-
-    // 🔹 Cargar especialidades disponibles al montar el componente
-    useEffect(() => {
-        const fetchEspecialidades = async () => {
-            try {
-                const response = await axios.get<{ id_especialidad: number; nombre: string }[]>(`${url}/api/especialidades`);
-                setEspecialidadesDisponibles(response.data);
-                console.log("✅ Especialidades disponibles:", response.data);
-            } catch (error) {
-                console.error("❌ Error al cargar especialidades", error);
-            }
-        };
-
-        fetchEspecialidades();
-    }, []);
-
-    // 🔹 Cargar datos del profesional cuando el modal se abre
-    useEffect(() => {
-        if (profesional && show) {
-            const especialidadesIDs = profesional.especialidades.map(e => e.id_especialidad);
-
-            setFormData(profesional); // ✅
-            setSelectedEspecialidades(especialidadesIDs);
-
-        }
-    }, [profesional, show]);
-
-
-
-
-
-    // 🔹 Manejo de cambios en el formulario
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        setFormData(prev => ({
-            ...prev,
-            [e.target.name]: e.target.value
-        }));
-    };
-
-    // 🔹 Guardar cambios en la API
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validatePasswords()) return;
+
         try {
-
-            if (nuevaPassword || confirmarPassword || passwordActual) {
-                if (!passwordActual || !nuevaPassword || !confirmarPassword) {
-                    toast.error("❌ Completá todos los campos para cambiar la contraseña");
-                    return;
-                }
-                if (nuevaPassword !== confirmarPassword) {
-                    toast.error("❌ Las contraseñas nuevas no coinciden");
-                    return;
-                }
-            }
-
             await axios.put(`${url}/api/profesionales/${profesional?.id_profesional}`, {
                 ...formData,
                 especialidades: selectedEspecialidades.map(Number),
-                password_actual: passwordActual || undefined,
-                nueva_password: nuevaPassword || undefined
+                ...getPasswordData(),
             });
 
-
             toast.success("✅ Profesional actualizado correctamente");
-
+            resetPasswords();
             onSave();
             fetchProfesionalData();
             handleClose();
@@ -137,7 +88,6 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
         }
     };
 
-
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -145,23 +95,32 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Nombre</Form.Label>
-                        <Form.Control type="text" name="nombre" value={formData.nombre} onChange={handleChange} />
-                    </Form.Group>
+                    <PersonalDataSection
+                        formData={formData}
+                        onChange={handleChange}
+                    />
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>URL de la Foto de Perfil</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="foto_perfil_url"
-                            value={formData.foto_perfil_url ?? ""}
-                            onChange={handleChange}
-                            placeholder="Pegá aquí el enlace de la foto (por ejemplo, de Google Drive)"
-                        />
-                    </Form.Group>
+                    <ProfessionalDataSection
+                        formData={formData}
+                        onChange={handleChange}
+                        onEspecialidadChange={handleEspecialidadChange}
+                    />
+
+                    <DescriptionSection
+                        formData={formData}
+                        onChange={handleChange}
+                        descripcionAviso=""
+                        maxCaracteres={1000}
+                    />
+
+                    <ValuesSection
+                        formData={formData}
+                        onChange={handleChange}
+                    />
+
+                    {/* Vista previa de foto si existe */}
                     {formData.foto_perfil_url && (
-                        <div className="text-center mt-3">
+                        <div className="text-center mt-3 mb-3">
                             <img
                                 src={getGoogleDriveImageUrl(formData.foto_perfil_url)}
                                 alt="Foto de perfil"
@@ -170,137 +129,30 @@ function ProfesionalForm({ show, handleClose, profesional, onSave, fetchProfesio
                         </div>
                     )}
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Título Universitario</Form.Label>
-                        <Form.Control type="text" name="titulo_universitario" value={formData.titulo_universitario} onChange={handleChange} />
-                    </Form.Group>
+                    {/* Input para cambiar foto */}
+                    <div className="mt-3 mb-3">
+                        <Form.Group>
+                            <Form.Label>URL de foto de perfil</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="foto_perfil_url"
+                                value={formData.foto_perfil_url || ''}
+                                onChange={handleChange}
+                                placeholder="https://ejemplo.com/imagen.jpg"
+                            />
+                        </Form.Group>
+                    </div>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Matrícula Nacional</Form.Label>
-                        <Form.Control type="text" name="matricula_nacional" value={formData.matricula_nacional} onChange={handleChange} />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Matrícula Provincial</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="matricula_provincial"
-                            value={formData.matricula_provincial ?? ""}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Valor</Form.Label>
-                        <Form.Control
-                            type="number"
-                            name="valor"
-                            value={formData.valor}
-                            onChange={handleChange}
-                            step="0.01"
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Valor Internacional</Form.Label>
-                        <Form.Control
-                            type="number"
-                            name="valor_internacional"
-                            value={formData.valor_internacional}
-                            onChange={handleChange}
-                            step="0.01"
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>CBU/CVU</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="cbu"
-                            value={formData.cbu ?? ""}
-                            onChange={handleChange}
-                            placeholder="Ingresá tu CBU o CVU"
-                        />
-                        <Form.Text className="text-muted">
-                            Número de CBU (22 dígitos) o CVU para recibir pagos
-                        </Form.Text>
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>CUIT</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="cuit"
-                            value={formData.cuit ?? ""}
-                            onChange={handleChange}
-                            placeholder="Ingresá tu CUIT"
-                        />
-                        <Form.Text className="text-muted">
-                            Número de CUIT (11 dígitos) para facturación
-                        </Form.Text>
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Descripción</Form.Label>
-                        <Form.Control as="textarea" name="descripcion" value={formData.descripcion ?? ""} onChange={handleChange} />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Teléfono</Form.Label>
-                        <Form.Control type="text" name="telefono" value={formData.telefono ?? ""} onChange={handleChange} />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Especialidades</Form.Label>
-                        <EspecialidadSelectEditable
-                            selectedEspecialidades={selectedEspecialidades}
-                            onChange={(selected) => {
-                                setSelectedEspecialidades(selected);
-                            }}
-                        />
-                    </Form.Group>
-
-                    <Button
-                        variant="outline-secondary"
-                        className="mb-5"
-                        onClick={() => setMostrarPasswordForm(!mostrarPasswordForm)}
-                    >
-                        {mostrarPasswordForm ? "Cancelar cambio de contraseña" : "¿Cambiar contraseña?"}
-                    </Button>
-
-                    {mostrarPasswordForm && (
-                        <>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Contraseña actual</Form.Label>
-                                <Form.Control
-                                    type="password"
-                                    value={passwordActual}
-                                    onChange={(e) => setPasswordActual(e.target.value)}
-                                    placeholder="Ingresá tu contraseña actual"
-                                />
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Nueva contraseña</Form.Label>
-                                <Form.Control
-                                    type="password"
-                                    value={nuevaPassword}
-                                    onChange={(e) => setNuevaPassword(e.target.value)}
-                                    placeholder="Nueva contraseña"
-                                />
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Confirmar nueva contraseña</Form.Label>
-                                <Form.Control
-                                    type="password"
-                                    value={confirmarPassword}
-                                    onChange={(e) => setConfirmarPassword(e.target.value)}
-                                    placeholder="Confirmá la nueva contraseña"
-                                />
-                            </Form.Group>
-                        </>
-                    )}
-
-
+                    <PasswordChangeSection
+                        passwordActual={passwordActual}
+                        nuevaPassword={nuevaPassword}
+                        confirmarPassword={confirmarPassword}
+                        mostrarForm={mostrarPasswordForm}
+                        onToggleForm={togglePasswordForm}
+                        onPasswordActualChange={setPasswordActual}
+                        onNuevaPasswordChange={setNuevaPassword}
+                        onConfirmarPasswordChange={setConfirmarPassword}
+                    />
 
                     <Button
                         type="submit"
