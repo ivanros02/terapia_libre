@@ -26,3 +26,13 @@ CREATE INDEX idx_notificaciones_profesional_leido ON notificaciones(id_profesion
 
 -- Pagos por estado y fecha
 CREATE INDEX idx_pagos_estado_fecha ON pagos(estado, fecha_pago);
+
+de backend modifique
+paypal controlerl ok
+turno controler ok
+upload.js en middleware ok
+adnimin.model ok
+profesional.model ok
+turno.model ok
+en routes turnos.routes ok
+en server.js 'app.use('/api_demo/api/facturas', express.static(path.join(__dirname, '../storage/facturas')));'

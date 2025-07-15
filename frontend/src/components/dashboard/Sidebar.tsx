@@ -142,9 +142,18 @@ const Sidebar: React.FC = () => {
           </button>
         </li>
       </ul>
-      <div className="sidebar-logo">
-        <Link to="/">
-          <img src="/logo.png" alt="Logo" style={{ cursor: "pointer" }} />
+      <div className="sidebar-logo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginBottom: '50px' }}>
+        <Link to="/" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px 0', width: '100%' }}>
+          <img
+            src="/logo.png"
+            alt="Logo"
+            style={{
+              cursor: "pointer",
+              width: "80px",
+              height: "80px",
+              objectFit: "contain"
+            }}
+          />
         </Link>
       </div>
     </div>

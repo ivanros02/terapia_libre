@@ -213,7 +213,7 @@ const DashboardUsuario = () => {
             <Card
               className="card-movil"
             >
-              <img src="/sidebar/config.png" alt="Home" width="24" height="24" className="mb-2" />
+              <img src="/sidebar/settings.svg" alt="Home" width="24" height="24" className="mb-2" />
               <span style={{ color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
           </div>
@@ -222,7 +222,7 @@ const DashboardUsuario = () => {
             <Card
               className="card-movil"
             >
-              <img src="/sidebar/terapeuta_movil.png" alt="Home" width="24" height="24" className="mb-2" />
+              <img src="/sidebar/perfil.png" alt="Home" width="24" height="24" className="mb-2" />
               <span style={{ color: "var(--verde)", fontSize:"11px", fontWeight:"500" }}>CAMBIAR TERAPEUTA</span>
             </Card>
           </div>

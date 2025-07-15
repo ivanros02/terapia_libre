@@ -238,7 +238,7 @@ exports.obtenerHistorialUsuario = async (req, res) => {
 exports.subirFactura = async (req, res) => {
     try {
         const { id_turno } = req.body;
-        
+
         if (!id_turno) {
             return res.status(400).json({ error: 'id_turno es requerido' });
         }
@@ -253,12 +253,12 @@ exports.subirFactura = async (req, res) => {
         const fechaTurno = new Date(turno.fecha_turno);
         const year = fechaTurno.getFullYear().toString();
         const month = String(fechaTurno.getMonth() + 1).padStart(2, '0');
-        
+
         console.log('Fecha del turno:', turno.fecha_turno, 'Year:', year, 'Month:', month);
-        
+
         // Crear estructura de carpetas
-        const targetDir = path.join('/var/www/storage/facturas', year, month);
-        
+        const targetDir = path.join('../storage/facturas', year, month);
+
         if (!fs.existsSync(targetDir)) {
             fs.mkdirSync(targetDir, { recursive: true });
         }
@@ -267,13 +267,13 @@ exports.subirFactura = async (req, res) => {
         const oldPath = req.file.path;
         const newFilename = `turno_${id_turno}_factura.pdf`;
         const newPath = path.join(targetDir, newFilename);
-        
+
         fs.renameSync(oldPath, newPath);
-        
+
         const filepath = `/facturas/${year}/${month}/${newFilename}`;
-        
+
         const actualizado = await Turno.subirFactura(id_turno, newFilename, filepath);
-        
+
         if (actualizado) {
             res.json({ message: 'Factura subida', filename: newFilename });
         } else {

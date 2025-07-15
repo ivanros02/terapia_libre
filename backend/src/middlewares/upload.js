@@ -5,7 +5,7 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Usar carpeta temporal - el controller moverá el archivo a la carpeta correcta
-    const tempDir = `/var/www/storage/temp`;
+    const tempDir = `../storage/temp`;
     
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });

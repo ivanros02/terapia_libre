@@ -4,7 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
-const rateLimit = require("express-rate-limit");
+// const rateLimit = require("express-rate-limit");
 const path = require("path");
 const fs = require("fs");
 
@@ -23,25 +23,24 @@ const ausenciaRoutes = require("./src/routes/ausencia.routes");
 const app = express();
 
 const allowedOrigins = process.env.NODE_ENV === 'production' 
-  ? ["https://terapialibre.com.ar"]
+  ? ["https://terapialibre.com.ar", "https://demo.terapialibre.com.ar"]
   : ["http://localhost:5173", "https://terapialibre.com.ar"];
 
-// Rate limiting general
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por IP
-  message: { error: "Demasiadas solicitudes" }
-});
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   message: { error: "Demasiadas solicitudes" }
+// });
 
-// Logs para producción
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'), 
   { flags: 'a' }
 );
 
-// Middlewares
+app.set('trust proxy', 1);
+
 app.use(compression());
-app.use(limiter);
+// app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(cors({
   origin: allowedOrigins,
@@ -60,47 +59,48 @@ app.use(helmet({
   }
 }));
 
-// Logs
 if (process.env.NODE_ENV === 'production') {
   app.use(morgan('combined', { stream: accessLogStream }));
 } else {
   app.use(morgan('dev'));
 }
 
-// Servir archivos estáticos del build de React
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
 }
 
-// Health check
-app.get('/health', (req, res) => {
+app.get('/api_demo', (req, res) => {
+  res.json({ 
+    message: 'API Demo funcionando',
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+app.get('/api_demo/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// API Routes con prefijo para producción
-const apiPrefix = process.env.NODE_ENV === 'production' ? '/api_terapia' : '';
+app.use('/api_demo/api/profesionales', profesionalRoutes);
+app.use('/api_demo/api/auth', authRoutes);
+app.use('/api_demo/api/especialidades', especialidadRoutes);
+app.use('/api_demo/disponibilidad', disponibilidadRoutes);
+app.use('/api_demo/api/turnos', turnosRoutes);
+app.use('/api_demo/google', googleAuthRoutes);
+app.use('/api_demo/google-meet', googleMeetRoutes);
+app.use('/api_demo/api/mercadopago', mercadoPagoRoutes);
+app.use('/api_demo/api/admin', adminRoutes);
+app.use('/api_demo/api/suscripcion', suscripcionRoutes);
+app.use('/api_demo/ausencias', ausenciaRoutes);
+app.use('/api_demo/api/facturas', express.static(path.join(__dirname, '../storage/facturas')));
 
-app.use(`${apiPrefix}/api/profesionales`, profesionalRoutes);
-app.use(`${apiPrefix}/api/auth`, authRoutes);
-app.use(`${apiPrefix}/api/especialidades`, especialidadRoutes);
-app.use(`${apiPrefix}/disponibilidad`, disponibilidadRoutes);
-app.use(`${apiPrefix}/api/turnos`, turnosRoutes);
-app.use(`${apiPrefix}/google`, googleAuthRoutes);
-app.use(`${apiPrefix}/google-meet`, googleMeetRoutes);
-app.use(`${apiPrefix}/api/mercadopago`, mercadoPagoRoutes);
-app.use(`${apiPrefix}/api/admin`, adminRoutes);
-app.use(`${apiPrefix}/api/suscripcion`, suscripcionRoutes);
-app.use(`${apiPrefix}/ausencias`, ausenciaRoutes);
-app.use(`${apiPrefix}/api/facturas`, express.static('/var/www/storage/facturas'));
-
-// Servir React app para todas las rutas no API
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
 }
 
-// Manejo de errores global
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   
@@ -111,16 +111,17 @@ app.use((err, req, res, next) => {
   }
 });
 
-// Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM recibido, cerrando servidor...');
   process.exit(0);
 });
 
-// Iniciar servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT} - Modo: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 URLs disponibles:`);
+  console.log(`   Health: /api_demo/health`);
+  console.log(`   API: /api_demo/api/profesionales`);
 });
 
 module.exports = app;

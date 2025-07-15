@@ -13,7 +13,7 @@ const MercadoPagoCheckout: React.FC<MercadoPagoCheckoutProps> = ({
 }) => {
     const [loading, setLoading] = useState(true);
     // test '2c9380848f81302d018f81f9c2da004b' produccion '2c938084955cc4800195a48f3aa61f98'
-    const subscriptionUrl = `https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380848f81302d018f81f9c2da004b&external_reference=${userEmail}`;
+    const subscriptionUrl = `https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084955cc4800195a48f3aa61f98&external_reference=${userEmail}`;
 
     const handleIframeLoad = () => {
         setLoading(false);

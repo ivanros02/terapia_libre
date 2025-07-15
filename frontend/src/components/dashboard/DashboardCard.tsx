@@ -102,8 +102,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ name, patientName, appoin
                 {/* ✅ Mover el botón fuera del Card */}
                 {!esProfesional && (
                     <div className="btn-agendar-turno mt-3" onClick={handleShowModal}>
-                        <img src="/sidebar/calendar_white.png" alt="Home" width="24" height="24" className="mx-3" />
-              
                         Agendar un nuevo turno
                     </div>
                 )}

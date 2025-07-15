@@ -316,7 +316,7 @@ const DashboardFacturacion = () => {
                                                             onClick={() => handleFileUpload(session.id)}
                                                             disabled={uploading}
                                                         >
-                                                            {uploading ? 'Subiendo...' : (session.detail ? 'Cambiar factura' : 'Subir factura')}
+                                                            {uploading ? 'Subiendo...' : (session.detail ? 'Factura cargada' : 'Subir factura')}
                                                         </button>
                                                     ) : session.detail ? (
                                                         <button

@@ -55,7 +55,6 @@ const ProfessionalList: React.FC<ProfessionalListProps> = ({
           },
         });
         const endTime = performance.now();
-        console.log(`Frontend request: ${endTime - startTime}ms`);
 
         setProfessionals(response.data.professionals);
         setTotalPages(response.data.totalPages);

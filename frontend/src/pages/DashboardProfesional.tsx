@@ -152,7 +152,7 @@ const DashboardProfesional = () => {
             <Card
               className="card-calendar-movil"
             >
-              <img src="/sidebar/calendar.png" alt="Calendar" width="24" height="24" />
+              <img src="/sidebar/calendar.svg" alt="Calendar" width="24" height="24" />
               <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>CALENDARIO</span>
             </Card>
           </div>
@@ -163,17 +163,17 @@ const DashboardProfesional = () => {
               className="card-movil"
 
             >
-              <img src="/sidebar/config.png" alt="Home" width="24" height="24" className="mb-2" />
+              <img src="/sidebar/settings.svg" alt="Home" width="24" height="24" className="mb-2" />
               <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
           </div>
 
-            <div className="chats-div-movil" onClick={() => navigate('/messages')} style={{ cursor: "pointer" }}>
+            <div className="chats-div-movil"  style={{ cursor: "pointer" }}>
             <Card
               className="card-movil"
 
             >
-              <img src="/sidebar/chat.png" alt="Home" width="24" height="24" className="mb-2" />
+              <img src="/sidebar/chats.svg" alt="Home" width="24" height="24" className="mb-2" />
               <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>Chats</span>
             </Card>
           </div>
