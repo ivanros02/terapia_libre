@@ -114,7 +114,7 @@ const DashboardFacturacion = () => {
                     patient: esProfesional
                         ? (turno.nombre_paciente || 'Sin nombre')
                         : (turno.nombre_profesional || 'Sin nombre'),
-                    value: 15000,
+                    value: turno.valor || turno.precio,
                     status: mapearEstado(turno.estado),
                     detail: turno.factura_filename ? 'Ver factura' : null
                 }));
@@ -340,28 +340,26 @@ const DashboardFacturacion = () => {
                                                 </span>
                                                 <span>Pagó: {formatValue(session.value)}</span>
                                             </div>
-                                            {session.detail && (
-                                                <div className="cell">
-                                                    {esProfesional ? (
-                                                        <button
-                                                            className="detail-link"
-                                                            onClick={() => handleFileUpload(session.id)}
-                                                            disabled={uploading}
-                                                        >
-                                                            {uploading ? 'Subiendo...' : (session.detail ? 'Cambiar factura' : 'Subir factura')}
-                                                        </button>
-                                                    ) : session.detail ? (
-                                                        <button
-                                                            className="detail-link"
-                                                            onClick={() => handleDownloadInvoice(session.id, session.date)}
-                                                        >
-                                                            Descargar factura
-                                                        </button>
-                                                    ) : (
-                                                        '-'
-                                                    )}
-                                                </div>
-                                            )}
+                                            <div className="cell">
+                                                {esProfesional ? (
+                                                    <button
+                                                        className="detail-link"
+                                                        onClick={() => handleFileUpload(session.id)}
+                                                        disabled={uploading}
+                                                    >
+                                                        {uploading ? 'Subiendo...' : (session.detail ? 'Cambiar factura' : 'Subir factura')}
+                                                    </button>
+                                                ) : session.detail ? (
+                                                    <button
+                                                        className="detail-link"
+                                                        onClick={() => handleDownloadInvoice(session.id, session.date)}
+                                                    >
+                                                        Descargar factura
+                                                    </button>
+                                                ) : (
+                                                    '-'
+                                                )}
+                                            </div>
                                         </div>
                                     )}
                                 </div>

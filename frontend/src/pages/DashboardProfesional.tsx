@@ -116,7 +116,7 @@ const DashboardProfesional = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  
+
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -164,17 +164,17 @@ const DashboardProfesional = () => {
 
             >
               <img src="/sidebar/settings.svg" alt="Home" width="24" height="24" className="mb-2" />
-              <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>CONFIGURACIÓN</span>
+              <span style={{ fontWeight: "550", fontSize: "14px", color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
           </div>
 
-            <div className="chats-div-movil"  style={{ cursor: "pointer" }}>
+          <div className="chats-div-movil" onClick={() => navigate('/dashboard/facturacion')} style={{ cursor: "pointer" }}>
             <Card
               className="card-movil"
 
             >
               <img src="/sidebar/chats.svg" alt="Home" width="24" height="24" className="mb-2" />
-              <span style={{ fontWeight: "bold", fontSize: "14px", color: "var(--verde)" }}>Chats</span>
+              <span style={{ fontWeight: "550", fontSize: "12px", color: "var(--verde)" }}>HISTORIAL DE SESIONES</span>
             </Card>
           </div>
 

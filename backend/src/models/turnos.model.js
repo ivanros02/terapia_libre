@@ -95,7 +95,7 @@ class Turno {
 
     static async obtenerTurnosPorProfesional(id_profesional) {
         const [rows] = await pool.execute(
-            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente,profesionales.correo_electronico AS email_profesional, profesionales.nombre AS nombre_profesional
+            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente,profesionales.correo_electronico AS email_profesional, profesionales.nombre AS nombre_profesional, profesionales.valor AS valor
             FROM turnos 
             LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
             LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
@@ -143,7 +143,7 @@ class Turno {
     static async obtenerTurnosPorUsuario(id_usuario) {
         try {
             const [rows] = await pool.execute(
-                `SELECT turnos.*, profesionales.nombre AS nombre_profesional, profesionales.correo_electronico AS email_profesional,usuarios.correo_electronico AS email_paciente
+                `SELECT turnos.*, profesionales.nombre AS nombre_profesional, profesionales.correo_electronico AS email_profesional,usuarios.correo_electronico AS email_paciente,profesionales.valor AS valor
                 FROM turnos 
                 LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
                 LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
