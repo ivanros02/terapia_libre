@@ -6,6 +6,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 const url = import.meta.env.VITE_API_BASE_URL;
 import { getGoogleDriveImageUrl } from "../utils/googleDrive";
 import '../styles/DashboardFacturacion.css';
+import TablaFacturacion from "../components/dashboard/TablaFacturacion";
 
 interface Session {
     id: string;
@@ -281,90 +282,19 @@ const DashboardFacturacion = () => {
                             <div className="header-cell">Detalle</div>
                         </div>
 
-                        <div className="table-body">
-                            {filteredSessions.map(session => (
-                                <div key={session.id} className="table-row-container">
-                                    <div className="table-row">
-                                        {isMobile ? (
-                                            <>
-                                                <div className="cell">{session.patient}</div>
-                                                <div className="cell">{formatDateForMobile(session.date)} - {session.time}</div>
-                                                <div className="cell">
-                                                    <button
-                                                        className="expand-btn"
-                                                        onClick={() => toggleExpanded(session.id)}
-                                                    >
-                                                        {expandedSessions.has(session.id) ? '⌄' : '⌃'}
-                                                    </button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="cell">{session.date}</div>
-                                                <div className="cell">{session.time}</div>
-                                                <div className="cell">{session.patient}</div>
-                                                <div className="cell">{formatValue(session.value)}</div>
-                                                <div className="cell">
-                                                    <span className={`status ${session.status}`}>
-                                                        {getStatusDisplay(session.status)}
-                                                    </span>
-                                                </div>
-                                                <div className="cell">
-                                                    {esProfesional ? (
-                                                        <button
-                                                            className="detail-link"
-                                                            onClick={() => handleFileUpload(session.id)}
-                                                            disabled={uploading}
-                                                        >
-                                                            {uploading ? 'Subiendo...' : (session.detail ? 'Factura cargada' : 'Subir factura')}
-                                                        </button>
-                                                    ) : session.detail ? (
-                                                        <button
-                                                            className="detail-link"
-                                                            onClick={() => handleDownloadInvoice(session.id, session.date)}
-                                                        >
-                                                            Descargar factura
-                                                        </button>
-                                                    ) : (
-                                                        '-'
-                                                    )}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                    {isMobile && expandedSessions.has(session.id) && (
-                                        <div className="expanded-content">
-                                            <div className="expanded-row">
-                                                <span className={`status ${session.status}`}>
-                                                    {getStatusDisplay(session.status)}
-                                                </span>
-                                                <span>Pagó: {formatValue(session.value)}</span>
-                                            </div>
-                                            <div className="cell">
-                                                {esProfesional ? (
-                                                    <button
-                                                        className="detail-link"
-                                                        onClick={() => handleFileUpload(session.id)}
-                                                        disabled={uploading}
-                                                    >
-                                                        {uploading ? 'Subiendo...' : (session.detail ? 'Cambiar factura' : 'Subir factura')}
-                                                    </button>
-                                                ) : session.detail ? (
-                                                    <button
-                                                        className="detail-link"
-                                                        onClick={() => handleDownloadInvoice(session.id, session.date)}
-                                                    >
-                                                        Descargar factura
-                                                    </button>
-                                                ) : (
-                                                    '-'
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
+                        <TablaFacturacion
+                            sessions={filteredSessions}
+                            isMobile={isMobile}
+                            uploading={uploading}
+                            expandedSessions={expandedSessions}
+                            esProfesional={esProfesional}
+                            toggleExpanded={toggleExpanded}
+                            formatValue={formatValue}
+                            getStatusDisplay={getStatusDisplay}
+                            handleFileUpload={handleFileUpload}
+                            handleDownloadInvoice={handleDownloadInvoice}
+                            formatDateForMobile={formatDateForMobile}
+                        />
                     </div>
                 </div>
             </div>

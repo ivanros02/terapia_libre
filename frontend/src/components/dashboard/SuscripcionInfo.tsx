@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import LoadingSpinner from '../LoadingSpinner'; // Asegurate que el path sea correcto
 const url = import.meta.env.VITE_API_BASE_URL;
-
+const id = import.meta.env.VITE_MP_SUSCRIPTION_ID;
 interface SuscripcionInfoProps {
     email: string;
 }
@@ -57,7 +57,7 @@ const SuscripcionInfo: React.FC<SuscripcionInfoProps> = ({ email }) => {
                     </>
                 ) : (
                     <a
-                        href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c938084955cc4800195a48f3aa61f98"
+                        href={`https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=${id}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-primary"

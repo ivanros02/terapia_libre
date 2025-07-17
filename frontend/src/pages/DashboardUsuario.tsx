@@ -7,9 +7,12 @@ import DashboardCard from "../components/dashboard/DashboardCard";
 import CalendarioTurnos from "../components/dashboard/CalendarioTurnos";
 import HistorialSesiones from "../components/dashboard/HistorialSesiones";
 import { useNavigate } from "react-router-dom";
-
 import "../styles/DashboardProfesional.css"
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useRef } from "react";
+import TablaFacturacion from "../components/dashboard/TablaFacturacion";
+import { Modal } from "react-bootstrap";
+import CalendarAvailability from "../components/detallesProfesional/CalendarAvailability";
 const url = import.meta.env.VITE_API_BASE_URL;
 
 interface TurnoHoy {
@@ -35,6 +38,15 @@ type Terapeuta = {
   descripcion: string;
 };
 
+interface Session {
+  id: string;
+  date: string;
+  time: string;
+  patient: string;
+  value: number;
+  status: 'cancelada' | 'completada' | 'pendiente';
+  detail?: string;
+}
 
 const DashboardUsuario = () => {
   const [userName, setUserName] = useState<string | null>(null);
@@ -47,8 +59,105 @@ const DashboardUsuario = () => {
   const [terapeuta, setTerapeuta] = useState<Terapeuta | null>(null);
   const userId = localStorage.getItem("id"); // 🔹 Obtener el ID almacenado en localStorage
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [search, _] = useState('');
+  const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
+  const [uploading, setUploading] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const response = await axios.get(`${url}/api/turnos/usuario/${userId}`);
+        const formattedSessions = response.data.map((turno: any) => ({
+          id: turno.id_turno,
+          date: turno.fecha_turno.split('T')[0].split('-').reverse().join('/'),
+          time: turno.hora_turno.slice(0, 5),
+          patient: turno.nombre_profesional || 'Sin nombre',
+          value: turno.valor || turno.precio,
+          status: turno.estado?.toLowerCase() === 'completado' ? 'completada' :
+            turno.estado?.toLowerCase() === 'cancelado' ? 'cancelada' : 'pendiente',
+          detail: turno.factura_filename ? 'Ver factura' : null
+        }));
+        setSessions(formattedSessions);
+      } catch (error) {
+        console.error('Error al cargar sessions:', error);
+      }
+    };
+
+    if (userId) fetchSessions();
+  }, [userId]);
+
+  const toggleExpanded = (sessionId: string) => {
+    const newExpanded = new Set(expandedSessions);
+    if (newExpanded.has(sessionId)) {
+      newExpanded.delete(sessionId);
+    } else {
+      newExpanded.add(sessionId);
+    }
+    setExpandedSessions(newExpanded);
+  };
+
+  const formatValue = (value: number) => `$${value.toLocaleString()}`;
+
+  const getStatusDisplay = (status: string) => {
+    const statusMap = {
+      cancelada: 'Cancelada',
+      completada: 'Completada',
+      pendiente: 'Pendiente'
+    };
+    return statusMap[status as keyof typeof statusMap] || status;
+  };
+
+  const handleFileUpload = (sessionId: string) => {
+    setCurrentSessionId(sessionId);
+    fileInputRef.current?.click();
+  };
+
+  const handleDownloadInvoice = (sessionId: string, sessionDate: string) => {
+    const [_, month, year] = sessionDate.split('/');
+    const formattedDate = `${year}/${month.padStart(2, '0')}`;
+    window.open(`${url}/api/facturas/${formattedDate}/turno_${sessionId}_factura.pdf`, '_blank');
+  };
+
+  const formatDateForMobile = (dateString: string) => {
+    const [day, month] = dateString.split('/');
+    return `${day}/${month}`;
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentSessionId) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('factura', file);
+      formData.append('id_turno', currentSessionId);
+
+      const currentSession = sessions.find(s => s.id === currentSessionId);
+      if (currentSession) {
+        formData.append('fecha_turno', currentSession.date);
+      }
+
+      await axios.post(`${url}/api/turnos/factura/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      window.location.reload();
+    } catch (error) {
+      console.error('Error al subir factura:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -197,8 +306,30 @@ const DashboardUsuario = () => {
       </div>
 
       <div className={isMobile ? "proximos-turnos" : "div-hc-card"}>
-        {terapeuta && (
-          <HistorialSesiones sesiones={sesiones} terapeuta={terapeuta} onCambiarTerapeuta={() => alert("Cambiar terapeuta")} />
+        {isMobile ? (
+          <TablaFacturacion
+            sessions={sessions.filter(session =>
+              session.patient?.toLowerCase().includes(search.toLowerCase()) || false
+            )}
+            isMobile={isMobile}
+            uploading={uploading}
+            expandedSessions={expandedSessions}
+            esProfesional={false}
+            toggleExpanded={toggleExpanded}
+            formatValue={formatValue}
+            getStatusDisplay={getStatusDisplay}
+            handleFileUpload={handleFileUpload}
+            handleDownloadInvoice={handleDownloadInvoice}
+            formatDateForMobile={formatDateForMobile}
+          />
+        ) : (
+          terapeuta && (
+            <HistorialSesiones
+              sesiones={sesiones}
+              terapeuta={terapeuta}
+              onCambiarTerapeuta={() => alert("Cambiar terapeuta")}
+            />
+          )
         )}
       </div>
 
@@ -209,6 +340,7 @@ const DashboardUsuario = () => {
       {/* 🔹 Estas tarjetas SOLO aparecen en móviles */}
       {isMobile && (
         <>
+          {/* 
           <div className="config-div-movil" onClick={() => navigate('/dashboard/usuario/config_usuario')} style={{ cursor: "pointer" }}>
             <Card
               className="card-movil"
@@ -216,23 +348,48 @@ const DashboardUsuario = () => {
               <img src="/sidebar/settings.svg" alt="Home" width="24" height="24" className="mb-2" />
               <span style={{ color: "var(--verde)" }}>CONFIGURACIÓN</span>
             </Card>
+
+          </div>
+          */}
+
+          <div className="config-div-movil" onClick={handleShowModal} style={{ cursor: "pointer" }}>
+            <Card className="card-movil" style={{ backgroundColor: "var(--naranja)" }}>
+              <img src="/sidebar/calendar_white.svg" alt="Home" width="24" height="24" className="mb-2" />
+              <span style={{ color: "white" }}>AGENDAR TURNO</span>
+            </Card>
           </div>
 
           <div className="chats-div-movil" onClick={() => navigate('/professionals')} style={{ cursor: "pointer" }}>
             <Card
               className="card-movil"
             >
-              <img src="/sidebar/perfil.png" alt="Home" width="24" height="24" className="mb-2" />
-              <span style={{ color: "var(--verde)", fontSize:"11px", fontWeight:"500" }}>CAMBIAR TERAPEUTA</span>
+              <img src="/sidebar/perfil_dash_usuario.svg" alt="Home" width="24" height="24" className="mb-2" />
+              <span style={{ color: "var(--verde)", fontSize: "11px", fontWeight: "500" }}>CAMBIAR TERAPEUTA</span>
             </Card>
           </div>
         </>
       )}
       {/* 🔹 FIN DE tarjetas SOLO aparecen en móviles */}
 
+      <Modal show={showModal} onHide={handleCloseModal} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Agendar Turno</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <CalendarAvailability id_profesional={terapeuta?.id_profesional ?? 0} showModal={showModal} />
+        </Modal.Body>
+      </Modal>
 
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf"
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
 
     </div>
+
   );
 };
 

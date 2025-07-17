@@ -76,32 +76,32 @@ const FormProfessionalsComponent = () => {
               Registro de profesionales
             </Card.Title>
             <Form onSubmit={handleSubmit}>
-              <PersonalDataSection 
-                formData={formData} 
-                onChange={handleChange} 
+              <PersonalDataSection
+                formData={formData}
+                onChange={handleChange}
               />
 
-              <AccountCreationSection 
-                formData={formData} 
-                onChange={handleChange} 
+              <AccountCreationSection
+                formData={formData}
+                onChange={handleChange}
               />
 
-              <ProfessionalDataSection 
-                formData={formData} 
+              <ProfessionalDataSection
+                formData={formData}
                 onChange={handleChange}
                 onEspecialidadChange={handleEspecialidadChange}
               />
 
-              <DescriptionSection 
-                formData={formData} 
+              <DescriptionSection
+                formData={formData}
                 onChange={handleChange}
                 descripcionAviso={descripcionAviso}
                 maxCaracteres={MAX_CARACTERES}
               />
 
-              <ValuesSection 
-                formData={formData} 
-                onChange={handleChange} 
+              <ValuesSection
+                formData={formData}
+                onChange={handleChange}
               />
 
               <SubscriptionInfo />

@@ -37,22 +37,37 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     const precioServicio = Math.round(precio * 0.05);
     const totalAPagar = precio + precioServicio;
 
+
+    const a24ConAmPm = (hora: string) => {
+        // hora viene como "14:30:00" o "09:00:00"
+        const [h] = hora.split(':');          // ["14","30"]
+        const hh = h.padStart(2, '0');           // "14" → "14",  "9" → "09"
+        const sufijo = Number(h) < 12 ? 'AM' : 'PM';
+        return `${hh}${sufijo}`;                 // "14PM", "09AM"
+    };
+
+
     // Formatear fecha y hora
     const formatearFechaHora = () => {
         if (!selectedDateTime) return '';
 
-        const [fecha, rango] = selectedDateTime.split(" - ");
-        const [anio, mes, dia] = fecha.split("-");
+        const [fecha, rango] = selectedDateTime.split(' - ');
+        const [anio, mes, dia] = fecha.split('-');
         const fechaDate = new Date(Number(anio), Number(mes) - 1, Number(dia));
 
-        const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const diasSemana = [
+            'domingo', 'lunes', 'martes', 'miércoles',
+            'jueves', 'viernes', 'sábado'
+        ];
         const diaSemana = diasSemana[fechaDate.getDay()];
 
-        const [inicio,] = rango.split(" a ");
-        const horaInicio = inicio.slice(0, 5);
+        const [inicio] = rango.split(' a ');
 
-        return `${diaSemana} ${dia}/${mes} - ${horaInicio} PM`;
+        return `${diaSemana} ${dia}/${mes} - ${a24ConAmPm(inicio)}`;
     };
+
+
+
 
     /*
     // 🔹 Crear orden de pago en PayPal

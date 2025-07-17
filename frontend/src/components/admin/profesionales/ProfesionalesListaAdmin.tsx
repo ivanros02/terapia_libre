@@ -13,6 +13,7 @@ interface Profesional {
   valor: number;
   estado: boolean;
   foto_perfil_url: string; // 🔹 Agregamos la URL de la imagen
+  suscripcion_estado?: string;
 }
 
 interface ProfesionalCompleto {
@@ -51,24 +52,36 @@ const ProfesionalesListaAdmin = () => {
     }
   };
 
+  const obtenerEstadoSuscripcion = async (email: string): Promise<string> => {
+    try {
+      const res = await axios.get(`${url}/api/suscripcion/${email}`);
+      return res.data.estado || 'no_encontrado';
+    } catch (error) {
+      return 'no_encontrado';
+    }
+  };
+
   const fetchProfesionales = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      if (!token) {
-        console.error("⚠️ No hay token disponible");
-        return;
-      }
+      if (!token) return;
 
       const response = await axios.get(`${url}/api/admin/profesionales`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const profesionalesConEstadoBooleano = response.data.professionals.map((prof: any) => ({
-        ...prof,
-        estado: prof.estado === 1,
-      }));
+      const profesionalesConEstado = await Promise.all(
+        response.data.professionals.map(async (prof: any) => {
+          const estadoSuscripcion = await obtenerEstadoSuscripcion(prof.correo_electronico);
+          return {
+            ...prof,
+            estado: prof.estado === 1,
+            suscripcion_estado: estadoSuscripcion
+          };
+        })
+      );
 
-      setProfesionales(profesionalesConEstadoBooleano);
+      setProfesionales(profesionalesConEstado);
     } catch (error) {
       console.error("❌ Error al obtener profesionales:", error);
     }
@@ -123,6 +136,7 @@ const ProfesionalesListaAdmin = () => {
             <th>Disponibilidad</th>
             <th>Valor</th>
             <th>Estado</th>
+            <th>Suscripción</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -145,6 +159,11 @@ const ProfesionalesListaAdmin = () => {
                 <td>{prof.disponibilidad}</td>
                 <td>${Number(prof.valor).toFixed(2)}</td>
                 <td>{prof.estado ? "Activo" : "Inactivo"}</td>
+                <td>
+                  <span className={`badge ${prof.suscripcion_estado === 'authorized' ? 'bg-success' : 'bg-danger'}`}>
+                    {prof.suscripcion_estado === 'authorized' ? 'Activa' : 'Inactiva'}
+                  </span>
+                </td>
                 <td>
                   <Button
                     variant={prof.estado ? "danger" : "success"}
