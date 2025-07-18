@@ -1,26 +1,38 @@
 import { Card } from "react-bootstrap";
+import '../../styles/ClinicaCard.css';
 
 interface ClinicaCardProps {
     titulo?: string;
     servicios?: string;
-    contacto?: string;
+    email?: string;
+    telefono?: string;
     logo?: string;
 }
 
 const ClinicaCard: React.FC<ClinicaCardProps> = ({
     titulo = "Internación - Consultorios externos - Módulos de integración - Hospital de día",
-    servicios = "admisiones@clinicacomunidadtandil.com +54 9 2494 34-0696",
+    servicios = "32 años brindando servicios de Salud Mental",
+    email = "admisiones@clinicacomunidadtandil.com",
+    telefono = "+54 9 2494 34-0696",
     logo = "/clinica_home.jpg",
 }) => {
+    const handleEmailClick = () => {
+        window.location.href = `mailto:${email}`;
+    };
+
+    const handlePhoneClick = () => {
+        window.location.href = `tel:${telefono}`;
+    };
+
     return (
         <div className="d-flex justify-content-center mb-5 px-2 px-md-3">
             <Card
                 className="d-flex flex-column align-items-center text-center p-4 w-100 w-md-75 w-lg-50"
                 style={{
                     maxWidth: '1274px',
-                    height: '375px',
+                    minHeight: '375px',
                     flexShrink: 0,
-                    borderRadius: '57px',
+                    borderRadius: '49px',
                     border: '1px var(--verde) solid',
                     backgroundColor: 'white'
                 }}
@@ -28,29 +40,52 @@ const ClinicaCard: React.FC<ClinicaCardProps> = ({
                 <img
                     src={logo}
                     alt="Logo clínica"
-                    className="mb-3 mt-2"
+                    className="mb-2"
                     style={{
                         maxWidth: '436.25px',
                         height: '171px'
                     }}
                 />
 
-                <h4 className="mb-3 fs-6 fs-md-5 mt-2" style={{
-                    fontWeight: '600',
-                    color: '#333'
-                }}>
+                <p className="service-text mb-3">
+                    {servicios}
+                </p>
+
+                <h4 className="mb-3 title-text">
                     {titulo}
                 </h4>
 
-                <div className="text-center mt-2" style={{ color: '#666' }}>
-                    <p className="mb-2 fs-6 fs-md-5" style={{
-                        wordWrap: 'break-word',
-                        overflowWrap: 'break-word'
-                    }}>
-                        {servicios}
-                    </p>
-                </div>
+                <div className="d-flex flex-column flex-md-row gap-2 gap-md-4 mt-2 align-items-start align-items-md-center">
+                    <div
+                        className="d-flex align-items-center justify-content-start justify-content-md-center gap-2 cursor-pointer"
+                        onClick={handleEmailClick}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <img
+                            src="/publi_home/letter.png"
+                            alt="Email"
+                            className="icon-responsive"
+                        />
+                        <span className="contact-text">
+                            {email}
+                        </span>
+                    </div>
 
+                    <div
+                        className="d-flex align-items-center justify-content-start justify-content-md-center gap-2 cursor-pointer"
+                        onClick={handlePhoneClick}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <img
+                            src="/publi_home/phone.png"
+                            alt="Teléfono"
+                            className="icon-responsive"
+                        />
+                        <span className="contact-text">
+                            {telefono}
+                        </span>
+                    </div>
+                </div>
             </Card>
         </div>
     );
