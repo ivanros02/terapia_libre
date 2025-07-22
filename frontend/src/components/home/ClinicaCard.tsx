@@ -14,7 +14,7 @@ const ClinicaCard: React.FC<ClinicaCardProps> = ({
     servicios = "32 años brindando servicios de Salud Mental",
     email = "admisiones@clinicacomunidadtandil.com",
     telefono = "+54 9 2494 34-0696",
-    logo = "/clinica_home.jpg",
+    logo = "/clinica_home.png",
 }) => {
     const handleEmailClick = () => {
         window.location.href = `mailto:${email}`;
@@ -27,12 +27,9 @@ const ClinicaCard: React.FC<ClinicaCardProps> = ({
     return (
         <div className="d-flex justify-content-center mb-5 px-2 px-md-3">
             <Card
-                className="d-flex flex-column align-items-center text-center p-4 w-100 w-md-75 w-lg-50"
+                className="d-flex flex-column align-items-start align-items-md-center text-start text-md-center p-3 p-md-4 clinica-card"
                 style={{
-                    maxWidth: '1274px',
-                    minHeight: '375px',
                     flexShrink: 0,
-                    borderRadius: '49px',
                     border: '1px var(--verde) solid',
                     backgroundColor: 'white'
                 }}
@@ -40,24 +37,20 @@ const ClinicaCard: React.FC<ClinicaCardProps> = ({
                 <img
                     src={logo}
                     alt="Logo clínica"
-                    className="mb-2"
-                    style={{
-                        maxWidth: '436.25px',
-                        height: '171px'
-                    }}
+                    className="mb-0 mb-md-1 align-self-start align-self-md-center logo-clinica" 
                 />
 
-                <p className="service-text mb-3">
+                <p className="service-text mb-1 mb-md-3 text-start text-md-center service-overlay">
                     {servicios}
                 </p>
 
-                <h4 className="mb-3 title-text">
+                <h4 className="mb-4 mb-md-3 title-text text-start text-md-center">
                     {titulo}
                 </h4>
 
-                <div className="d-flex flex-column flex-md-row gap-2 gap-md-4 mt-2 align-items-start align-items-md-center">
+                <div className="d-flex flex-column flex-md-row gap-2 gap-md-4 mt-md-5">
                     <div
-                        className="d-flex align-items-center justify-content-start justify-content-md-center gap-2 cursor-pointer"
+                        className="d-flex align-items-center justify-content-start justify-content-md-center gap-2 cursor-pointer contact-align-left"
                         onClick={handleEmailClick}
                         style={{ cursor: 'pointer' }}
                     >
@@ -72,9 +65,8 @@ const ClinicaCard: React.FC<ClinicaCardProps> = ({
                     </div>
 
                     <div
-                        className="d-flex align-items-center justify-content-start justify-content-md-center gap-2 cursor-pointer"
+                        className="d-flex align-items-center justify-content-start justify-content-md-center gap-2 cursor-pointer contact-align-left"
                         onClick={handlePhoneClick}
-                        style={{ cursor: 'pointer' }}
                     >
                         <img
                             src="/publi_home/phone.png"
