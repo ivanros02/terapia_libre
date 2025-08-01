@@ -37,18 +37,18 @@ const ClinicaCard: React.FC<ClinicaCardProps> = ({
                 <img
                     src={logo}
                     alt="Logo clínica"
-                    className="mb-0 mb-md-1 align-self-start align-self-md-center logo-clinica" 
+                    className="mb-0 mb-md-1 align-self-start align-self-md-center logo-clinica"
                 />
 
-                <p className="service-text mb-1 mb-md-3 text-start text-md-center service-overlay">
+                <p className="service-text mb-4 mb-md-5 text-start text-md-center service-overlay">
                     {servicios}
                 </p>
 
-                <h4 className="mb-4 mb-md-3 title-text text-start text-md-center">
+                <h4 className="mb-2 mb-md-2 title-text text-start text-md-center">
                     {titulo}
                 </h4>
 
-                <div className="d-flex flex-column flex-md-row gap-2 gap-md-4 mt-md-5">
+                <div className="d-flex flex-column flex-md-row gap-2 gap-md-4 mt-2 mt-md-2">
                     <div
                         className="d-flex align-items-center justify-content-start justify-content-md-center gap-2 cursor-pointer contact-align-left"
                         onClick={handleEmailClick}

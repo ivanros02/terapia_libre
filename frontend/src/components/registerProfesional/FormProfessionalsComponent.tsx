@@ -185,7 +185,7 @@ const FormProfessionalsComponent = () => {
         </Modal>
       </div>
 
-      <Modal show={showTermsModal} onHide={closeTermsModal} centered>
+      <Modal show={showTermsModal} onHide={closeTermsModal}>
         <Modal.Header closeButton>
           <Modal.Title>Términos y Condiciones</Modal.Title>
         </Modal.Header>

@@ -179,7 +179,7 @@ class Admin {
             p.cuit as cuit_profesional,
             p.correo_electronico,
             p.condicion_fiscal,
-            p.valor,              
+            pago.monto as valor,              
             cu.codigo_cupon,
             cu.usado_en as fecha_uso_cupon,
             CASE 

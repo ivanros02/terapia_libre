@@ -14,41 +14,60 @@ class Disponibilidad {
             `SELECT id_disponibilidad, id_profesional, dia_semana, hora_inicio, hora_fin, 
             DATE_FORMAT(creado_en, '%Y-%m-%d %H:%i:%s') AS creado_en 
             FROM disponibilidad 
-            WHERE id_profesional = ? 
+            WHERE id_profesional = ? AND activo = TRUE
             ORDER BY FIELD(dia_semana, 'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo')`,
             [id_profesional]
         );
         return rows;
     }
 
-    static calcularFechasDesdeDiaSemana(diaSemana, semanas = 24) { // Ahora calcula para 6 meses
-        const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    static calcularFechasDesdeDiaSemana(diaSemana, semanas = 24) {
+        console.log("🔍 Iniciando calcularFechasDesdeDiaSemana con:", diaSemana);
+
+        const diasSemana = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+
+        // 🔹 Crear fecha en zona horaria de Argentina
         const hoy = new Date();
+        console.log("📅 Fecha original del servidor:", hoy.toString());
+        console.log("📅 Fecha UTC:", hoy.toISOString());
+
+        hoy.setHours(hoy.getHours() - 3); // Ajustar a GMT-3 (Argentina)
+        console.log("📅 Fecha ajustada a Argentina:", hoy.toString());
+
         const fechas = [];
-
-        // 🔹 Normalizar el nombre del día
         const diaSemanaNormalizado = diaSemana?.trim()?.toLowerCase();
-        console.log("🔍 Verificando día de la semana recibido:", diaSemanaNormalizado);
 
-        const diasSemanaNormalizados = diasSemana.map(d => d.toLowerCase());
-
-        if (!diasSemanaNormalizados.includes(diaSemanaNormalizado)) {
+        if (!diasSemana.includes(diaSemanaNormalizado)) {
             console.error(`❌ Error: El día recibido "${diaSemana}" no es válido`);
             return [];
         }
 
-        for (let i = 0; i < semanas * 7; i++) { // Extiende a 6 meses
-            const fecha = new Date();
+        const diaObjetivo = diasSemana.indexOf(diaSemanaNormalizado);
+        console.log(`🎯 Buscando día: ${diaSemanaNormalizado} (índice ${diaObjetivo})`);
+
+        for (let i = 0; i < semanas * 7; i++) {
+            const fecha = new Date(hoy);
             fecha.setDate(hoy.getDate() + i);
 
-            const nombreDia = diasSemana[fecha.getDay()].toLowerCase();
+            if (fecha.getDay() === diaObjetivo) {
+                // 🔹 Formatear sin usar toISOString para evitar conversión UTC
+                const year = fecha.getFullYear();
+                const month = String(fecha.getMonth() + 1).padStart(2, '0');
+                const day = String(fecha.getDate()).padStart(2, '0');
+                const fechaFormateada = `${year}-${month}-${day}`;
 
-            if (nombreDia === diaSemanaNormalizado) {
-                fechas.push(fecha.toISOString().split("T")[0]); // Formato YYYY-MM-DD
+                fechas.push(fechaFormateada);
+
+                // Solo logear las primeras 3 fechas para no saturar
+                if (fechas.length <= 3) {
+                    console.log(`✅ Fecha encontrada: ${fechaFormateada} (día de semana: ${fecha.getDay()})`);
+                }
             }
         }
 
-        console.log("✅ Fechas generadas correctamente:", fechas);
+        console.log(`📊 Total de fechas generadas: ${fechas.length}`);
+        console.log("🔢 Primeras 5 fechas:", fechas.slice(0, 5));
+
         return fechas;
     }
 
@@ -60,7 +79,7 @@ class Disponibilidad {
         const [rows] = await pool.execute(
             `SELECT d.dia_semana, d.hora_inicio, d.hora_fin 
              FROM disponibilidad d
-             WHERE d.id_profesional = ? 
+             WHERE d.id_profesional = ? AND d.activo = TRUE
              ORDER BY FIELD(d.dia_semana, 'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'), d.hora_inicio`,
             [id_profesional]
         );
@@ -134,7 +153,10 @@ class Disponibilidad {
                     const claveTurno = `${fecha}-${horaActual}`;
 
                     const fechaHoraTurno = new Date(`${fecha}T${horaActual}`);
-                    if (fechaHoraTurno <= new Date()) {
+                    const ahora = new Date();
+                    ahora.setHours(ahora.getHours() - 3); // Ajustar a Argentina
+
+                    if (fechaHoraTurno <= ahora) {
                         horaActual = horaFin;
                         continue; // ⛔️ saltar horarios pasados
                     }
@@ -170,7 +192,7 @@ class Disponibilidad {
             hora_fin: a.hora_fin
         }));
 
-        console.log("✅ ausenciasHorarias:", ausenciasHorarias);
+        console.log("✅ ausenciasHorarias:", ausenciasHorarias, id_profesional);
 
         // 🔹 Convertimos `horariosDisponibles` en array antes de retornarlo
         return {
@@ -199,7 +221,7 @@ class Disponibilidad {
 
     static async eliminarDisponibilidad(id_disponibilidad, id_profesional) {
         const [result] = await pool.execute(
-            `DELETE FROM disponibilidad WHERE id_disponibilidad = ? AND id_profesional = ?`,
+            `UPDATE disponibilidad SET activo = FALSE, eliminado_en = NOW() WHERE id_disponibilidad = ? AND id_profesional = ?`,
             [id_disponibilidad, id_profesional]
         );
         return result.affectedRows;

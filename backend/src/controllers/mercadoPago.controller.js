@@ -22,7 +22,7 @@ exports.crearOrdenMercadoPago = async (req, res) => {
             cupon
         } = req.body;
 
-
+        console.log("🔍 Datos recibidos:", { fecha_turno, hora_turno }); // 🔹 DEBUG
 
         // 🔒 PASO 2: Validar datos obligatorios
         if (!id_profesional || !id_usuario || !fecha_turno || !hora_turno) {
@@ -97,7 +97,7 @@ exports.crearOrdenMercadoPago = async (req, res) => {
                 pending: "https://terapialibre.com.ar",
             },
             auto_return: "approved",
-            notification_url: "https://api.terapialibre.com.ar/api_terapia/api/mercadopago/webhook",
+            notification_url: "https://5fe6eeb4514a.ngrok-free.app/api_demo/api/mercadopago/webhook",
             external_reference: booking_token, // 🔒 Token seguro
         };
 
@@ -229,21 +229,25 @@ exports.capturarPagoMercadoPago = async (req, res) => {
 /* ======================= */
 exports.webhookMercadoPago = async (req, res) => {
     try {
+        console.log("🔔 Webhook recibido:", req.body); // 🔹 DEBUG
 
         const { type, data } = req.body;
 
         if (type === "payment" && data && data.id) {
+            console.log("💳 Procesando pago:", data.id); // 🔹 DEBUG
+
             const { data: paymentData } = await axios.get(
                 `https://api.mercadopago.com/v1/payments/${data.id}`,
                 { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
             );
 
+            console.log("📊 Estado del pago:", paymentData.status); // 🔹 DEBUG
+
             if (paymentData.status === "approved") {
                 const payment_id = paymentData.id;
 
-                // 🔄 Reutilizar la lógica existente de captura
                 await exports.capturarPagoMercadoPago({ body: { payment_id } }, {
-                    status: () => ({ json: () => { } }) // finge la respuesta, porque es webhook
+                    status: () => ({ json: () => { } })
                 });
             }
         }

@@ -1,9 +1,8 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 const TermsAndConditions: React.FC = () => {
     return (
-        <>
-            
+        <div>
 
             <p>
                 Esta web utiliza cookies propias y de terceros para analizar y mejorar su experiencia de navegación.
@@ -12,7 +11,7 @@ const TermsAndConditions: React.FC = () => {
                 <Link to="/privacidad" className="text-dark fw-semibold mx-2">Políticas de privacidad</Link>
             </p>
 
-        </>
+        </div>
     );
 };
 

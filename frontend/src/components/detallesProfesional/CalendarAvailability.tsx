@@ -160,6 +160,7 @@ const CalendarAvailability: React.FC<CalendarAvailabilityProps> = ({ id_profesio
     const handleDateChange = (value: Date | Date[] | null) => {
         if (!value || Array.isArray(value)) return;
         setSelectedDate(value);
+        setShowConfirmModal(false); // Cerrar modal si está abierto
     };
 
     const [precioFinal, setPrecioFinal] = useState<number>(0); // 🔹 Precio en ARS (MercadoPago)

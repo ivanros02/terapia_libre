@@ -95,12 +95,13 @@ class Turno {
 
     static async obtenerTurnosPorProfesional(id_profesional) {
         const [rows] = await pool.execute(
-            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente,profesionales.correo_electronico AS email_profesional, profesionales.nombre AS nombre_profesional, profesionales.valor AS valor
-            FROM turnos 
-            LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
-            LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
-            WHERE turnos.id_profesional = ? 
-            ORDER BY fecha_turno DESC, hora_turno DESC`,
+            `SELECT turnos.* , usuarios.nombre AS nombre_paciente, usuarios.correo_electronico AS email_paciente,profesionales.correo_electronico AS email_profesional, profesionales.nombre AS nombre_profesional, pagos.monto AS valor
+        FROM turnos 
+        LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
+        LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
+        LEFT JOIN pagos ON turnos.id_turno = pagos.id_turno
+        WHERE turnos.id_profesional = ? 
+        ORDER BY fecha_turno DESC, hora_turno DESC`,
             [id_profesional]
         );
         return rows;
@@ -119,17 +120,23 @@ class Turno {
         return rows;
     }
 
-    static async obtenerTurnosPorUsuarioDashboard(id_usuario) {
-        const [rows] = await pool.execute(
-            `SELECT t.fecha_turno, t.hora_turno, p.nombre AS nombre_profesional
-            FROM turnos t
-            JOIN profesionales p ON t.id_profesional = p.id_profesional
-            WHERE t.id_usuario = ?
-            ORDER BY t.fecha_turno ASC, t.hora_turno ASC
-            LIMIT 5`,
-            [id_usuario]
-        );
-        return rows;
+    static async obtenerTurnosPorUsuario(id_usuario) {
+        try {
+            const [rows] = await pool.execute(
+                `SELECT turnos.*, profesionales.nombre AS nombre_profesional, profesionales.correo_electronico AS email_profesional,usuarios.correo_electronico AS email_paciente, pagos.monto AS valor
+            FROM turnos 
+            LEFT JOIN profesionales ON turnos.id_profesional = profesionales.id_profesional
+            LEFT JOIN usuarios ON turnos.id_usuario = usuarios.id_usuario
+            LEFT JOIN pagos ON turnos.id_turno = pagos.id_turno
+            WHERE turnos.id_usuario = ?
+            ORDER BY fecha_turno, hora_turno`,
+                [id_usuario]
+            );
+            return rows;
+        } catch (error) {
+            console.error("Error en la consulta de turnos del usuario:", error);
+            throw new Error("Error al obtener los turnos del usuario.");
+        }
     }
 
     static async cancelarTurno(id_turno, motivo) {

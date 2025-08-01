@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from "react-bootstrap";
 import axios from "axios";
 //import { PayPalButtons } from "@paypal/react-paypal-js";
@@ -37,6 +37,12 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     const precioServicio = Math.round(precio * 0.05);
     const totalAPagar = precio + precioServicio;
 
+    useEffect(() => {
+        if (show) {
+            setPreferenceId(null);
+            setLoadingWallet(false);
+        }
+    }, [show, selectedDateTime]);
 
     const a24ConAmPm = (hora: string) => {
         // hora viene como "14:30:00" o "09:00:00"
@@ -120,14 +126,17 @@ const ConfirmBookingModal: React.FC<ConfirmBookingModalProps> = ({ show, onHide,
     // CREAR ORDEN DE PAGO
     const create_preference = async () => {
         try {
+            const [fecha, rangoHora] = selectedDateTime?.split(" - ") || [];
+            const horaInicio = rangoHora?.split(" a ")[0]; // 🔹 EXTRAER SOLO "15:00:00"
+
+            console.log("🔍 Enviando al backend:", { fecha, horaInicio }); // 🔹 DEBUG
+
             const response = await axios.post(`${url}/api/mercadopago/create-order`, {
-                // ✅ Solo datos de identificación
                 id_profesional,
                 id_usuario,
-                fecha_turno: selectedDateTime?.split(" - ")[0],
-                hora_turno: selectedDateTime?.split(" - ")[1],
+                fecha_turno: fecha,           // "2025-08-01"
+                hora_turno: horaInicio,       // "15:00:00" (sin " a 16:00:00")
                 cupon,
-                // ❌ NO enviamos: title, quantity, price
             });
 
             return response.data.id;
