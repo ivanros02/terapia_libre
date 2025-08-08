@@ -13,7 +13,6 @@ interface Profesional {
   valor: number;
   estado: boolean;
   foto_perfil_url: string; // 🔹 Agregamos la URL de la imagen
-  suscripcion_estado?: string;
 }
 
 interface ProfesionalCompleto {
@@ -41,6 +40,12 @@ const ProfesionalesListaAdmin = () => {
   const [profesionales, setProfesionales] = useState<Profesional[]>([]);
   const [editingProfesional, setEditingProfesional] = useState<ProfesionalCompleto | null>(null);
   const [showModalEditar, setShowModalEditar] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const profesionalesFiltrados = profesionales.filter(prof =>
+    prof.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    prof.correo_electronico.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEditarProfesional = async (id: number) => {
     try {
@@ -49,15 +54,6 @@ const ProfesionalesListaAdmin = () => {
       setShowModalEditar(true);
     } catch (error) {
       console.error("❌ Error al cargar datos del profesional", error);
-    }
-  };
-
-  const obtenerEstadoSuscripcion = async (email: string): Promise<string> => {
-    try {
-      const res = await axios.get(`${url}/api/suscripcion/${email}`);
-      return res.data.estado || 'no_encontrado';
-    } catch (error) {
-      return 'no_encontrado';
     }
   };
 
@@ -70,16 +66,10 @@ const ProfesionalesListaAdmin = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const profesionalesConEstado = await Promise.all(
-        response.data.professionals.map(async (prof: any) => {
-          const estadoSuscripcion = await obtenerEstadoSuscripcion(prof.correo_electronico);
-          return {
-            ...prof,
-            estado: prof.estado === 1,
-            suscripcion_estado: estadoSuscripcion
-          };
-        })
-      );
+      const profesionalesConEstado = response.data.professionals.map((prof: any) => ({
+        ...prof,
+        estado: prof.estado === 1
+      }));
 
       setProfesionales(profesionalesConEstado);
     } catch (error) {
@@ -126,6 +116,15 @@ const ProfesionalesListaAdmin = () => {
 
   return (
     <>
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Buscar por nombre o correo..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -136,14 +135,13 @@ const ProfesionalesListaAdmin = () => {
             <th>Disponibilidad</th>
             <th>Valor</th>
             <th>Estado</th>
-            <th>Suscripción</th>
             <th>Acciones</th>
           </tr>
         </thead>
 
         <tbody>
-          {profesionales.length > 0 ? (
-            profesionales.map((prof) => (
+          {profesionalesFiltrados.length > 0 ? (
+            profesionalesFiltrados.map((prof) => (
               <tr key={prof.id_profesional}>
                 <td>{prof.id_profesional}</td>
                 <td>
@@ -159,11 +157,6 @@ const ProfesionalesListaAdmin = () => {
                 <td>{prof.disponibilidad}</td>
                 <td>${Number(prof.valor).toFixed(2)}</td>
                 <td>{prof.estado ? "Activo" : "Inactivo"}</td>
-                <td>
-                  <span className={`badge ${prof.suscripcion_estado === 'authorized' ? 'bg-success' : 'bg-danger'}`}>
-                    {prof.suscripcion_estado === 'authorized' ? 'Activa' : 'Inactiva'}
-                  </span>
-                </td>
                 <td>
                   <Button
                     variant={prof.estado ? "danger" : "success"}
@@ -184,7 +177,9 @@ const ProfesionalesListaAdmin = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={8} className="text-center">No hay profesionales registrados</td>
+              <td colSpan={7} className="text-center">
+                {searchTerm ? "No se encontraron profesionales" : "No hay profesionales registrados"}
+              </td>
             </tr>
           )}
         </tbody>
